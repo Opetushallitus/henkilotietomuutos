@@ -76,6 +76,7 @@ clients:
     password: {{henkilotietomuutos_service_ryhmasahkoposti_user_password}}
     defaultReceiverEmail: {{henkilotietomuutos_service_default_receiver_email}}
     defaultReplyEmail: {{henkilotietomuutos_service_default_receiver_email | default('noreply@oph.fi')}}
+    flowToken: {{henkilotietomuutos_service_flowdoc_flowtoken}}
 
 scheduling:
   enabled: {{henkilotietomuutos_service_scheduling_enabled}}
@@ -93,3 +94,4 @@ scheduling:
 host:
   host-virkailija: {{host_virkailija}}
   host-cas: {{host_cas}}
+  host-flowdoc: {{host_flowdoc}}

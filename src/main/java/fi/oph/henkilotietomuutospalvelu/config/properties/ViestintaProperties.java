@@ -15,4 +15,5 @@ public class ViestintaProperties {
 
     private String defaultReceiverEmail;
     private String defaultReplyEmail;
+    private String flowToken;
 }
