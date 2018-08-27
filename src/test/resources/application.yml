@@ -1,0 +1,48 @@
+spring:
+  profiles.active: default
+  autoconfigure:
+    exclude: org.spring
+  cache:
+    type: NONE
+
+server:
+  context-path: /henkilotietomuutos-service
+
+flyway:
+  enabled: false
+
+scheduling:
+  enabled: false
+  enable:
+    importing: false
+    downloading: false
+    handling: false
+  fixed-delay-in-millis:
+    handling: 10000000
+    downloading: 10000000
+
+clients:
+  ftp:
+    downloadDir: /download/test/
+    uploadDir: /upload/test/
+    host: not.used
+    port: 21
+    deletefiles: false
+    localDownloadDir: download/
+    localImportDir: import/
+    localBackupDir: backup/
+    devMode: true
+
+host:
+  host-cas: not.used
+  host-virkailija: not.used
+
+mock:
+  ldap: true
+
+swagger:
+  enabled: false
+
+cas:
+  send-renew: false
+  key: henkilotietomuutos-service

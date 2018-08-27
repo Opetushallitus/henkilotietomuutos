@@ -1,0 +1,31 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Java template
+*.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+henkilotietomuutospalvelu.yml
+
+*.iml
+target
+.project
+.idea
+.settings
+.classpath
+.DS_store
+overlays
+
+/bin
+/build
+/.gradle
+
+rebel.xml
+*.log
+
+/download
+/import
+/backup

@@ -1,0 +1,494 @@
+package fi.oph.henkilotietomuutospalvelu.service.impl;
+
+import com.google.common.collect.Lists;
+import fi.oph.henkilotietomuutospalvelu.client.OnrServiceClient;
+import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
+import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
+import fi.oph.henkilotietomuutospalvelu.dto.type.NameType;
+import fi.oph.henkilotietomuutospalvelu.model.HenkiloMuutostietoRivi;
+import fi.oph.henkilotietomuutospalvelu.model.Tiedosto;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.HenkiloNameChange;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Henkilotunnuskorjaus;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.KotimainenOsoite;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Kutsumanimi;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.TilapainenKotimainenOsoite;
+import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
+import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
+import fi.oph.henkilotietomuutospalvelu.repository.TietoryhmaRepository;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.YhteystiedotRyhmaDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.YhteystietoDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.YhteystietoTyyppi;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@RunWith(SpringRunner.class)
+public class MuutostietoHandleServiceImplTest {
+    @InjectMocks
+    private MuutostietoHandleServiceImpl muutostietoHandleService;
+
+    @Mock
+    private OnrServiceClient onrServiceClient;
+
+    @Mock
+    private HenkiloMuutostietoRepository henkiloMuutostietoRepository;
+
+    @Mock
+    private TietoryhmaRepository tietoryhmaRepository;
+
+    @Mock
+    private TiedostoRepository tiedostoRepository;
+
+    @Captor
+    private ArgumentCaptor<List<HenkiloMuutostietoRivi>> listArgumentCaptor;
+
+    @Captor
+    private ArgumentCaptor<HenkiloForceUpdateDto> henkiloForceUpdateDtoArgumentCaptor;
+
+    @Test
+    public void lastRowIsNotPresent() {
+        String fileName = "FileName";
+        Tiedosto tiedosto = new Tiedosto();
+        tiedosto.setFileName(fileName);
+        tiedosto.setPartCount(1);
+        given(this.tiedostoRepository.findByFileName(eq(fileName))).willReturn(Optional.of(tiedosto));
+
+        given(this.henkiloMuutostietoRepository.findLastRowByTiedostoNimi(eq(fileName))).willReturn(Optional.empty());
+
+        MuutostietoDto muutostietoDto = MuutostietoDto.builder()
+                .rivi(1)
+                .build();
+        List<MuutostietoDto> muutostietoDtoList = Lists.newArrayList(muutostietoDto);
+
+        this.muutostietoHandleService.importUnprocessedMuutostiedotToDb(muutostietoDtoList, fileName);
+
+        verify(this.henkiloMuutostietoRepository).save(this.listArgumentCaptor.capture());
+
+        assertThat(this.listArgumentCaptor.getValue())
+                .extracting(HenkiloMuutostietoRivi::getRivi)
+                .containsExactlyInAnyOrder(1);
+    }
+
+    @Test
+    public void firstRowIsSkipped() {
+        String fileName = "FileName";
+        Tiedosto tiedosto = new Tiedosto();
+        tiedosto.setFileName(fileName);
+        tiedosto.setPartCount(1);
+        given(this.tiedostoRepository.findByFileName(eq(fileName))).willReturn(Optional.of(tiedosto));
+
+        given(this.henkiloMuutostietoRepository.findLastRowByTiedostoNimi(eq(fileName)))
+                .willReturn(Optional.of(1));
+
+        MuutostietoDto muutostietoDto = MuutostietoDto.builder()
+                .rivi(1)
+                .build();
+        MuutostietoDto muutostietoDto2 = MuutostietoDto.builder()
+                .rivi(2)
+                .build();
+        List<MuutostietoDto> muutostietoDtoList = Lists.newArrayList(muutostietoDto, muutostietoDto2);
+
+        this.muutostietoHandleService.importUnprocessedMuutostiedotToDb(muutostietoDtoList, fileName);
+
+        verify(this.henkiloMuutostietoRepository).save(this.listArgumentCaptor.capture());
+
+        assertThat(this.listArgumentCaptor.getValue())
+                .extracting(HenkiloMuutostietoRivi::getRivi)
+                .containsExactlyInAnyOrder(2);
+    }
+
+    @Test
+    public void handleMuutostietoWhenHenkiloNotFound() {
+        HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRivi.setQueryHetu("hetu1");
+
+        given(this.onrServiceClient.getHenkiloByHetu(eq("hetu1"))).willReturn(Optional.empty());
+
+        this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+
+        assertThat(henkiloMuutostietoRivi)
+                .extracting(HenkiloMuutostietoRivi::getProcessTimestamp)
+                .doesNotContainNull();
+    }
+
+    @Test
+    public void handleMuutostietoWhenHenkiloNotFoundAndOtherHetusNotFound() {
+        HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRivi.setQueryHetu("hetu1");
+
+        HenkiloMuutostietoRivi henkiloMuutostietoRiviOtherHetu = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRiviOtherHetu.setQueryHetu("hetu2");
+
+        given(this.onrServiceClient.getHenkiloByHetu(eq("hetu1"))).willReturn(Optional.empty());
+        given(this.onrServiceClient.getHenkiloByHetu(eq("hetu2"))).willReturn(Optional.empty());
+        given(this.henkiloMuutostietoRepository.findHenkiloMuutostietoRiviByQueryHetu(eq("hetu1")))
+                .willReturn(Lists.newArrayList(henkiloMuutostietoRiviOtherHetu));
+        this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, null, null);
+
+        assertThat(henkiloMuutostietoRivi)
+                .extracting(HenkiloMuutostietoRivi::getProcessTimestamp)
+                .doesNotContainNull();
+    }
+
+    @Test
+    public void handleMuutostietoWhenFirstQueryHetuNotFoundAndTietoryhmaIsKutsumanimi() {
+        Tietoryhma tietoryhma = Kutsumanimi.builder()
+                .name("kutsumanimi")
+                .startDate(LocalDate.now().minusDays(1))
+                .build();
+        Henkilotunnuskorjaus henkilotunnuskorjaus = Henkilotunnuskorjaus.builder()
+                .hetu("hetu2")
+                .build();
+
+        HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRivi.setQueryHetu("hetu1");
+        henkiloMuutostietoRivi.setTietoryhmaList(Lists.newArrayList(tietoryhma));
+
+        HenkiloMuutostietoRivi henkiloMuutostietoRiviOtherHetu = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRiviOtherHetu.setQueryHetu("hetu1");
+        henkiloMuutostietoRiviOtherHetu.setTietoryhmaList(Collections.singletonList(henkilotunnuskorjaus));
+
+        HenkiloDto henkiloDto = HenkiloDto.builder()
+                .hetu("hetu2")
+                .oidHenkilo("oid1")
+                .etunimet("etunimi kutsumanimi")
+                .build();
+
+        given(this.onrServiceClient.getHenkiloByHetu(eq("hetu1"))).willReturn(Optional.empty());
+        given(this.onrServiceClient.getHenkiloByHetu(eq("hetu2"))).willReturn(Optional.of(henkiloDto));
+        given(this.henkiloMuutostietoRepository.findHenkiloMuutostietoRiviByQueryHetu(eq("hetu1")))
+                .willReturn(Lists.newArrayList(henkiloMuutostietoRiviOtherHetu, henkiloMuutostietoRivi));
+
+        this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, null, null);
+        verify(this.onrServiceClient).updateHenkilo(this.henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+
+        assertThat(henkiloMuutostietoRivi)
+                .extracting(HenkiloMuutostietoRivi::getProcessTimestamp)
+                .doesNotContainNull();
+        assertThat(henkiloMuutostietoRivi.getQueryHetu())
+                .isEqualTo(henkiloMuutostietoRiviOtherHetu.getQueryHetu())
+                .isEqualTo("hetu2");
+
+        assertThat(this.henkiloForceUpdateDtoArgumentCaptor.getValue())
+                .extracting(HenkiloForceUpdateDto::getOidHenkilo, HenkiloForceUpdateDto::getKutsumanimi)
+                .containsExactly("oid1", "kutsumanimi");
+    }
+
+    @Test
+    public void handleMuutostietoWhenTietoryhmaIsKutsumanimi() {
+        Tietoryhma tietoryhma = Kutsumanimi.builder()
+                .name("kutsumanimi")
+                .startDate(LocalDate.now().minusDays(1))
+                .build();
+
+        HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRivi.setQueryHetu("hetu1");
+        henkiloMuutostietoRivi.setTietoryhmaList(Lists.newArrayList(tietoryhma));
+
+        HenkiloDto henkiloDto = HenkiloDto.builder()
+                .hetu("hetu1")
+                .oidHenkilo("oid1")
+                .etunimet("etunimi kutsumanimi")
+                .build();
+
+        given(this.onrServiceClient.getHenkiloByHetu(eq("hetu1"))).willReturn(Optional.of(henkiloDto));
+
+        this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+        verify(this.onrServiceClient).updateHenkilo(this.henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+
+        assertThat(henkiloMuutostietoRivi)
+                .extracting(HenkiloMuutostietoRivi::getProcessTimestamp)
+                .doesNotContainNull();
+
+        assertThat(this.henkiloForceUpdateDtoArgumentCaptor.getValue())
+                .extracting(HenkiloForceUpdateDto::getOidHenkilo, HenkiloForceUpdateDto::getKutsumanimi)
+                .containsExactly("oid1", "kutsumanimi");
+    }
+
+    @Test
+    public void handleMuutostietoKotimainenOsoiteKorjattu() {
+        Tietoryhma osoiteKorjattu = KotimainenOsoite.builder()
+                .muutostapa(Muutostapa.KORJATTU)
+                .lahiosoite("osoiteKorjattu")
+                .postinumero("00001")
+                .build();
+        Tietoryhma osoiteKorjattavaa = KotimainenOsoite.builder()
+                .muutostapa(Muutostapa.KORJATTAVAA)
+                .lahiosoite("osoiteKorjattavaa")
+                .postinumero("00002")
+                .build();
+        Tietoryhma osoiteLisatieto = KotimainenOsoite.builder()
+                .muutostapa(Muutostapa.LISATIETO)
+                .lahiosoite("osoiteLisatieto")
+                .postinumero("00003")
+                .build();
+        Tietoryhma osoitePoistettu = KotimainenOsoite.builder()
+                .muutostapa(Muutostapa.POISTETTU)
+                .lahiosoite("osoitePoistettu")
+                .postinumero("00004")
+                .build();
+
+        HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRivi.setQueryHetu("hetu1");
+        henkiloMuutostietoRivi.setTietoryhmaList(asList(osoiteKorjattu, osoiteKorjattavaa, osoiteLisatieto, osoitePoistettu));
+
+        HenkiloDto henkiloDto = HenkiloDto.builder()
+                .yhteystiedotRyhma(new HashSet<>())
+                .build();
+        when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
+
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+
+        verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
+        assertThat(updateDto.getYhteystiedotRyhma()).hasOnlyOneElementSatisfying(yhteystietoryhma -> assertThat(yhteystietoryhma.getYhteystieto())
+                .extracting(YhteystietoDto::getYhteystietoTyyppi, YhteystietoDto::getYhteystietoArvo)
+                .containsExactlyInAnyOrder(
+                        tuple(YhteystietoTyyppi.YHTEYSTIETO_KATUOSOITE, "osoiteKorjattu"),
+                        tuple(YhteystietoTyyppi.YHTEYSTIETO_POSTINUMERO, "00001")
+                ));
+    }
+
+    @Test
+    public void handleMuutostietoTilapainenOsoitePoistettu() {
+        Tietoryhma osoitePoistettu = TilapainenKotimainenOsoite.builder()
+                .muutostapa(Muutostapa.POISTETTU)
+                .lahiosoite("osoitePoistettu")
+                .postinumero("00001")
+                .build();
+
+        HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRivi.setQueryHetu("hetu1");
+        henkiloMuutostietoRivi.setTietoryhmaList(Collections.singletonList(osoitePoistettu));
+
+        HenkiloDto henkiloDto = HenkiloDto.builder()
+                .yhteystiedotRyhma(Stream.of(
+                        YhteystiedotRyhmaDto.builder()
+                                .ryhmaAlkuperaTieto("alkupera1")
+                                .ryhmaKuvaus("yhteystietotyyppi9")
+                                .yhteystieto(YhteystietoDto.builder()
+                                        .yhteystietoTyyppi(YhteystietoTyyppi.YHTEYSTIETO_KATUOSOITE)
+                                        .yhteystietoArvo("osoiteTilapainen")
+                                        .build())
+                                .build(),
+                        YhteystiedotRyhmaDto.builder()
+                                .ryhmaAlkuperaTieto("alkupera2")
+                                .ryhmaKuvaus("yhteystietotyyppi2")
+                                .yhteystieto(YhteystietoDto.builder()
+                                        .yhteystietoTyyppi(YhteystietoTyyppi.YHTEYSTIETO_SAHKOPOSTI)
+                                        .yhteystietoArvo("tyosahkopostiosoite@example.com")
+                                        .build())
+                                .build()
+                ).collect(Collectors.toSet()))
+                .build();
+        when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
+
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+
+        verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
+        assertThat(updateDto.getYhteystiedotRyhma()).hasOnlyOneElementSatisfying(yhteystietoryhma -> {
+            assertThat(yhteystietoryhma.getRyhmaAlkuperaTieto()).isEqualTo("alkupera2");
+            assertThat(yhteystietoryhma.getRyhmaKuvaus()).isEqualTo("yhteystietotyyppi2");
+            assertThat(yhteystietoryhma.getYhteystieto())
+                    .extracting(YhteystietoDto::getYhteystietoTyyppi, YhteystietoDto::getYhteystietoArvo)
+                    .containsExactly(tuple(YhteystietoTyyppi.YHTEYSTIETO_SAHKOPOSTI, "tyosahkopostiosoite@example.com"));
+        });
+    }
+
+    @Test
+    public void handleMuutostietoKotimainenOsoiteMuutettu() {
+        Tietoryhma osoiteLisatty = TilapainenKotimainenOsoite.builder()
+                .muutostapa(Muutostapa.LISATTY)
+                .lahiosoite("osoiteLisatty")
+                .postinumero("00001")
+                .startDate(LocalDate.now())
+                .build();
+        Tietoryhma osoiteMuutettu = TilapainenKotimainenOsoite.builder()
+                .muutostapa(Muutostapa.MUUTETTU)
+                .lahiosoite("osoiteMuutettu")
+                .postinumero("00002")
+                .startDate(LocalDate.now().minusYears(1))
+                .endDate(LocalDate.now().minusDays(1))
+                .build();
+        Tietoryhma osoiteLisatieto = TilapainenKotimainenOsoite.builder()
+                .muutostapa(Muutostapa.LISATIETO)
+                .lahiosoite("osoiteLisatieto")
+                .postinumero("00003")
+                .startDate(LocalDate.now())
+                .build();
+
+        HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRivi.setQueryHetu("hetu1");
+        henkiloMuutostietoRivi.setTietoryhmaList(asList(osoiteLisatty, osoiteMuutettu, osoiteLisatieto));
+
+        HenkiloDto henkiloDto = HenkiloDto.builder()
+                .yhteystiedotRyhma(new HashSet<>())
+                .build();
+        when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
+
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+
+        verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
+        assertThat(updateDto.getYhteystiedotRyhma()).hasOnlyOneElementSatisfying(yhteystietoryhma -> assertThat(yhteystietoryhma.getYhteystieto())
+                .extracting(YhteystietoDto::getYhteystietoTyyppi, YhteystietoDto::getYhteystietoArvo)
+                .containsExactlyInAnyOrder(
+                        tuple(YhteystietoTyyppi.YHTEYSTIETO_KATUOSOITE, "osoiteLisatty"),
+                        tuple(YhteystietoTyyppi.YHTEYSTIETO_POSTINUMERO, "00001")
+                ));
+    }
+
+    @Test
+    public void handleMuutostietoEtunimiJaKutsumanimiMuutos() {
+        Tietoryhma etunimi = HenkiloNameChange.builder()
+                .name("Mor'jes A.A.")
+                .nameType(NameType.ETUNIMI)
+                .startDate(LocalDate.now().minusDays(1))
+                .build();
+        Tietoryhma kutsumanimi = Kutsumanimi.builder()
+                .name("Mor'jes")
+                .startDate(LocalDate.now().minusDays(1))
+                .build();
+
+        HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRivi.setQueryHetu("hetu1");
+        henkiloMuutostietoRivi.setTietoryhmaList(asList(etunimi, kutsumanimi));
+
+        HenkiloDto henkiloDto = HenkiloDto.builder().build();
+        when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
+
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+
+        verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
+        assertThat(updateDto.getEtunimet()).isEqualTo("Mor'jes A.A.");
+        assertThat(updateDto.getKutsumanimi()).isEqualTo("Mor'jes");
+    }
+
+    @Test
+    public void handleMuutostietoEtunimiMuutosKutsumanimiPysyy() {
+        Tietoryhma henkiloName = HenkiloNameChange.builder()
+                .name("uusietunimi toinennimi")
+                .nameType(NameType.ETUNIMI)
+                .startDate(LocalDate.now().minusDays(1))
+                .build();
+
+        HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRivi.setQueryHetu("hetu1");
+        henkiloMuutostietoRivi.setTietoryhmaList(asList(henkiloName));
+
+        HenkiloDto henkiloDto = HenkiloDto.builder()
+                .etunimet("vanhanimi toinennimi")
+                .kutsumanimi("toinennimi")
+                .build();
+        when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
+
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+
+        verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
+        assertThat(updateDto.getEtunimet()).isEqualTo("uusietunimi toinennimi");
+        assertThat(updateDto.getKutsumanimi()).isNull();
+    }
+
+    @Test
+    public void handleMuutostietoEtunimiMuutosKutsumanimiMuuttuu() {
+        Tietoryhma henkiloName = HenkiloNameChange.builder()
+                .name("uusietunimi toinennimi")
+                .nameType(NameType.ETUNIMI)
+                .startDate(LocalDate.now().minusDays(1))
+                .build();
+
+        HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRivi.setQueryHetu("hetu1");
+        henkiloMuutostietoRivi.setTietoryhmaList(asList(henkiloName));
+
+        HenkiloDto henkiloDto = HenkiloDto.builder()
+                .etunimet("vanhanimi toinennimi")
+                .kutsumanimi("vanhanimi")
+                .build();
+        when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
+
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+
+        verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
+        assertThat(updateDto.getEtunimet()).isEqualTo("uusietunimi toinennimi");
+        assertThat(updateDto.getKutsumanimi()).isEqualTo("uusietunimi toinennimi");
+    }
+
+    @Test
+    public void handleMuutostietoKutsumanimiMuutos() {
+        Tietoryhma henkiloName = Kutsumanimi.builder()
+                .name("toinennimi")
+                .startDate(LocalDate.now().minusDays(1))
+                .build();
+
+        HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRivi.setQueryHetu("hetu1");
+        henkiloMuutostietoRivi.setTietoryhmaList(asList(henkiloName));
+
+        HenkiloDto henkiloDto = HenkiloDto.builder()
+                .etunimet("vanhanimi toinennimi")
+                .kutsumanimi("vanhanimi")
+                .build();
+        when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
+
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+
+        verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
+        assertThat(updateDto.getEtunimet()).isNull();
+        assertThat(updateDto.getKutsumanimi()).isEqualTo("toinennimi");
+    }
+
+    @Test
+    public void handleMuutostietoKutsumanimiMuutosViallinen() {
+        Tietoryhma henkiloName = Kutsumanimi.builder()
+                .name("uusinimi")
+                .startDate(LocalDate.now().minusDays(1))
+                .build();
+
+        HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
+        henkiloMuutostietoRivi.setQueryHetu("hetu1");
+        henkiloMuutostietoRivi.setTietoryhmaList(asList(henkiloName));
+
+        HenkiloDto henkiloDto = HenkiloDto.builder()
+                .etunimet("vanhanimi toinennimi")
+                .kutsumanimi("vanhanimi")
+                .build();
+        when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
+
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+
+        verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
+        assertThat(updateDto.getEtunimet()).isNull();
+        assertThat(updateDto.getKutsumanimi()).isEqualTo("vanhanimi toinennimi");
+    }
+
+}

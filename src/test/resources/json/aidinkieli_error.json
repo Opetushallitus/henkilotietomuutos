@@ -1,0 +1,20 @@
+{
+  "timestamp": 1529055799533,
+  "status": 400,
+  "error": "Bad Request",
+  "exception": "fi.vm.sade.oppijanumerorekisteri.exceptions.UnprocessableEntityException",
+  "message": null,
+  "path": "/oppijanumerorekisteri-service/s2s/henkilo/muutostiedot",
+  "globalErrors": [],
+  "fieldErrors": [
+    {
+      "code": "invalid.aidinkieli",
+      "arguments": [
+        "olematon"
+      ],
+      "message": "Tuntematon koodiston 'kieli' koodi olematon",
+      "field": "aidinkieli.kieliKoodi",
+      "rejectedValue": "olematon"
+    }
+  ]
+}

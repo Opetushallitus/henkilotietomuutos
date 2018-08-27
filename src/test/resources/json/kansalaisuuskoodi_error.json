@@ -1,0 +1,26 @@
+{
+  "timestamp": 1521207126559,
+  "status": 400,
+  "error": "Bad Request",
+  "exception": "fi.vm.sade.oppijanumerorekisteri.exceptions.UnprocessableEntityException",
+  "message": null,
+  "path": "/oppijanumerorekisteri-service/s2s/henkilo/muutostiedot",
+  "globalErrors": [],
+  "fieldErrors": [
+    {
+      "code": "invalid.kansalaisuusKoodi",
+      "arguments": [
+        [
+          "KOSOVO"
+        ]
+      ],
+      "message": "Tuntematon koodiston 'maatjavaltiot2' koodit [KOSOVO]",
+      "field": "kansalaisuus",
+      "rejectedValue": [
+        {
+          "kansalaisuusKoodi": "KOSOVO"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+#
+# TÄHÄN TIEDOSTOON EI SAA TALLENTAA YMPÄRISTÖKOHTAISIA ARVOJA MUUTOIN KUIN MUUTTUJINA!!!
+#
+# Tämä tiedosto toimii pohjana oph-configuration/common.properties tiedostolle,
+# joka asettaa tomcatin ympäristökohtaiset arvot.
+#
+
+# Aseta vähintään nämä ympäristökohtaiset arvot
+spring:
+  main:
+    banner-mode: "off"
+  jpa:
+    hibernate:
+      dialect: org.hibernate.dialect.PostgreSQL94Dialect
+      implicit-naming-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
+      ddl-auto: validate
+      use-new-id-generator-mappings: true
+    connection:
+      charset: utf-8
+    archive:
+      autodetection: class,hbm
+    show-sql: false
+    format-sql: false
+    current-session-context-class: org.springframework.orm.hibernate5.SpringSessionContext
+    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://{{host_postgresql_henkilotietomuutos}}:{{host_postgresql_henkilotietomuutos_port}}/henkilotietomuutos?ApplicationName=henkilotietomuutos-service
+    username: {{host_postgresql_henkilotietomuutos_user}}
+    password: {{host_postgresql_henkilotietomuutos_password}}
+    hikari:
+      maximum-pool-size: 20
+      connection-timeout: 10000
+      max-lifetime: 900000
+
+cas:
+  ldap:
+    url: ldap://{{host_ldap}}/dc=opintopolku,dc=fi
+    managed-dn: {{ldap_manager_userdn}}
+    password: {{ldap_manager_password}}
+    user-search-base: ou=People
+    user-search-filter: (|(mail={0})(uid={0}))
+    group-search-base: ou=groups
+    group-search-filter: (uniqueMember={0})
+    group-role-attribute: cn
+  service: https://{{host_virkailija}}/henkilotietomuutos-service
+  send-renew: false
+  key: henkilotietomuutos-service
+  url: https://{{host_cas}}/cas
+
+clients:
+  oppijanumerorekisteri:
+    username: {{henkilotietomuutos_service_user_username}}
+    password: {{henkilotietomuutos_service_user_password}}
+    no-update-mode: false
+  ftp:
+    user: {{henkilotietomuutos_service_ftp_username}}
+    password: {{henkilotietomuutos_service_ftp_password}}
+    downloadDir: {{henkilotietomuutos_service_ftp_download_dir}}
+    uploadDir: {{henkilotietomuutos_service_ftp_upload_dir}}
+    hostKey: {{henkilotietomuutos_service_ftp_host_key}}
+    host: {{henkilotietomuutos_service_ftp_host}}
+    port: {{henkilotietomuutos_service_ftp_port}}
+    deleteFiles: {{henkilotietomuutos_service_ftp_delete}}
+    localDownloadDir: {{henkilotietomuutos_service_ftp_local_download_dir}}
+    localImportDir: {{henkilotietomuutos_service_ftp_local_import_dir}}
+    localBackupDir: {{henkilotietomuutos_service_ftp_local_backup_dir}}
+    devMode: {{henkilotietomuutos_service_ftp_dev_mode}}
+  amazon:
+    enabled: {{henkilotietomuutos_service_amazon_enabled}}
+    region: {{henkilotietomuutos_service_amazon_region}}
+    bucket: {{henkilotietomuutos_service_amazon_bucket}}
+  viestinta:
+    username: {{henkilotietomuutos_service_ryhmasahkoposti_user_username}}
+    password: {{henkilotietomuutos_service_ryhmasahkoposti_user_password}}
+    defaultReceiverEmail: {{henkilotietomuutos_service_default_receiver_email}}
+    defaultReplyEmail: {{henkilotietomuutos_service_default_receiver_email | default('noreply@oph.fi')}}
+
+scheduling:
+  enabled: {{henkilotietomuutos_service_scheduling_enabled}}
+  enable:
+    importing: {{henkilotietomuutos_service_scheduling_muutostiedot_import_enabled}}
+    downloading: {{henkilotietomuutos_service_scheduling_muutostiedot_download_enabled}}
+    handling: {{henkilotietomuutos_service_scheduling_muutostiedot_handling_enabled}}
+    hetu-update: {{henkilotietomuutos_service_scheduling_muutostiedot_hetu_update_enabled}}
+  fixed-delay-in-millis:
+    handling: {{henkilotietomuutos_service_scheduling_muutostiedot_import_fixed_delay_in_millis}}
+    downloading: {{henkilotietomuutos_service_scheduling_muutostiedot_download_fixed_delay_in_millis}}
+  cron:
+    hetu-update: {{henkilotietomuutos_service_scheduling_muutostiedot_hetu_update_cron}}
+
+host:
+  host-virkailija: {{host_virkailija}}
+  host-cas: {{host_cas}}

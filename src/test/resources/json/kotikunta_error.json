@@ -1,0 +1,20 @@
+{
+  "timestamp": 1521207126559,
+  "status": 400,
+  "error": "Bad Request",
+  "exception": "fi.vm.sade.oppijanumerorekisteri.exceptions.UnprocessableEntityException",
+  "message": null,
+  "path": "/oppijanumerorekisteri-service/s2s/henkilo/muutostiedot",
+  "globalErrors": [],
+  "fieldErrors": [
+    {
+      "code": "invalid.kotikunta",
+      "arguments": [
+        "000"
+      ],
+      "message": "Tuntematon koodiston 'kunta' koodi 000",
+      "field": "kotikunta",
+      "rejectedValue": "000"
+    }
+  ]
+}
