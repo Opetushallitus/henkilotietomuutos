@@ -36,7 +36,7 @@ public class EmailNotificationAspectIntegrationTest {
     private MuutostietoService muutostietoService;
 
     @MockBean
-    private EmailService emailService;
+    private NotificationService notificationService;
 
     @MockBean
     private ViestintaProperties viestintaProperties;
@@ -56,33 +56,38 @@ public class EmailNotificationAspectIntegrationTest {
     @Before
     public void setup() {
         given(this.viestintaProperties.getDefaultReceiverEmail()).willReturn("email");
+        given(this.viestintaProperties.getFlowToken()).willReturn("token");
     }
 
     @Test
     public void updateHetusToVtjThrowIsNotified() {
         willThrow(new RuntimeException()).given(this.vtjDataRepository).findByVtjdataTimestampIsNull();
         assertThatThrownBy(() -> this.hetuService.updateHetusToVtj()).isInstanceOf(RuntimeException.class);
-        verify(emailService, times(1)).sendEmail(any(), any());
+        verify(notificationService, times(1)).sendEmailNotification(any(), any());
+        verify(notificationService, times(1)).sendFlowdocNotification(any(), any(), any());
     }
 
     @Test
     public void updateMuutostietosThrowIsNotified() {
         willThrow(new RuntimeException()).given(this.henkiloMuutostietoRepository).findDistinctUnprocessedTiedostoFileName();
         assertThatThrownBy(() -> this.muutostietoService.updateMuutostietos()).isInstanceOf(RuntimeException.class);
-        verify(emailService, times(1)).sendEmail(any(), any());
+        verify(notificationService, times(1)).sendEmailNotification(any(), any());
+        verify(notificationService, times(1)).sendFlowdocNotification(any(), any(), any());
     }
 
     @Test
     public void importMuutostiedotThrowIsNotified() throws Exception {
         given(this.fileService.findNextFile()).willThrow(new RuntimeException());
         assertThatThrownBy(() -> this.muutostietoService.importMuutostiedot(1)).isInstanceOf(RuntimeException.class);
-        verify(emailService, times(1)).sendEmail(any(), any());
+        verify(notificationService, times(1)).sendEmailNotification(any(), any());
+        verify(notificationService, times(1)).sendFlowdocNotification(any(), any(), any());
     }
 
     @Test
     public void downloadFilesThrowIsNotified() throws Exception {
         given(this.muutostietoService.downloadFiles()).willThrow(new RuntimeException());
         assertThatThrownBy(() -> this.muutostietoService.downloadFiles()).isInstanceOf(RuntimeException.class);
-        verify(emailService, times(1)).sendEmail(any(), any());
+        verify(notificationService, times(1)).sendEmailNotification(any(), any());
+        verify(notificationService, times(1)).sendFlowdocNotification(any(), any(), any());
     }
 }

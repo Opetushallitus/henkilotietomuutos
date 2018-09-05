@@ -13,5 +13,6 @@ public class UrlConfiguration extends OphProperties {
         addFiles("/henkilotietomuutos-service-oph.properties");
         addOverride("host-cas", environment.getRequiredProperty("host.host-cas"));
         addOverride("host-virkailija", environment.getRequiredProperty("host.host-virkailija"));
+        addOverride("host-flowdoc", environment.getRequiredProperty("host.host-flowdoc"));
     }
 }
