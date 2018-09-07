@@ -17,6 +17,11 @@ public class HenkiloUpdateUtil {
         if (etunimet == null || kutsumanimi == null) {
             return true;
         }
+
+        if("".equals(kutsumanimi)) {
+            return false;
+        }
+
         return isValidKutsumanimiCaseSensitive(etunimet.toLowerCase(), kutsumanimi.toLowerCase());
     }
 

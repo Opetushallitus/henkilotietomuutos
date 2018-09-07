@@ -17,6 +17,12 @@ public class HenkiloUpdateUtilTest {
     }
 
     @Test
+    public void emptyKutsumanimi() {
+        String etunimet = "Lauri-Matti Johannes";
+        assertThat(HenkiloUpdateUtil.isValidKutsumanimi(etunimet, "")).isFalse();
+    }
+
+    @Test
     public void isValidKutsumanimiWithNonAlphabet() {
         String etunimet = "As'ko";
         assertThat(HenkiloUpdateUtil.isValidKutsumanimi(etunimet, "As'ko")).isTrue();

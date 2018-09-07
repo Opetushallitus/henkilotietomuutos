@@ -109,6 +109,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
                     // etunimet ja/tai kutsumanimi muuttui -> validoidaan kutsumanimi
                     String etunimet = Optional.ofNullable(updateHenkilo.getEtunimet()).orElse(currentHenkilo.getEtunimet());
                     String kutsumanimi = Optional.ofNullable(updateHenkilo.getKutsumanimi()).orElse(currentHenkilo.getKutsumanimi());
+
                     if (!HenkiloUpdateUtil.isValidKutsumanimi(etunimet, kutsumanimi)) {
                         updateHenkilo.setKutsumanimi(etunimet);
                     }
