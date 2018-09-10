@@ -21,9 +21,32 @@ public class BIXClient implements Closeable {
         this.ftpProperties = ftpProperties;
         initializeSession();
     }
+
+    private static final Logger LOGWRAP=new Logger(){
+        public boolean isEnabled(int level) {
+            return true;
+        }
+        public void log(int level, String message) {
+            if(DEBUG == level) {
+                log.debug(message);
+            } else if(INFO == level) {
+                log.info(message);
+            } else if(WARN == level) {
+                log.warn(message);
+            } else if(ERROR == level) {
+                log.error(message);
+            } else if(FATAL == level) {
+                log.error(message);
+            }
+        }
+    };
+
     private void initializeSession() throws IOException {
         try {
             JSch jSch = new JSch();
+
+            JSch.setLogger(LOGWRAP);
+
             HostKeyRepository repository = jSch.getHostKeyRepository();
             if (ftpProperties.isDevMode()) {
                 repository.add(getHostKey("localhost"), null); // Enable ssh tunneling
