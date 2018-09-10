@@ -22,6 +22,39 @@ public class BIXClient implements Closeable {
         initializeSession();
     }
 
+    private static class UserInfoDebugger implements UserInfo {
+
+        @Override
+        public String getPassphrase() {
+            return null;
+        }
+
+        @Override
+        public String getPassword() {
+            return null;
+        }
+
+        @Override
+        public boolean promptPassword(String message) {
+            return false;
+        }
+
+        @Override
+        public boolean promptPassphrase(String message) {
+            return false;
+        }
+
+        @Override
+        public boolean promptYesNo(String message) {
+            return false;
+        }
+
+        @Override
+        public void showMessage(String message) {
+            log.info(message);
+        }
+    }
+
     private static final Logger LOGWRAP=new Logger(){
         public boolean isEnabled(int level) {
             return true;
@@ -51,12 +84,12 @@ public class BIXClient implements Closeable {
             if (ftpProperties.isDevMode()) {
                 repository.add(getHostKey("localhost"), null); // Enable ssh tunneling
             } else {
-                repository.add(getHostKey(ftpProperties.getHost()), null);
+                repository.add(getHostKey(ftpProperties.getHost()), new UserInfoDebugger());
             }
 
 
             if(repository.getHostKey() != null) {
-                log.warn("using hostkeys:" + Arrays.stream(repository.getHostKey()).map(HostKey::getHost).collect(Collectors.joining(",")));
+                log.info("using hostkeys:" + Arrays.stream(repository.getHostKey()).map(HostKey::getHost).collect(Collectors.joining(",")));
             }
 
             Session session = jSch.getSession(ftpProperties.getUser(), ftpProperties.getHost(), Integer.valueOf(ftpProperties.getPort()));
