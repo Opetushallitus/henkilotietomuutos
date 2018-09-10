@@ -5,6 +5,7 @@ import fi.oph.henkilotietomuutospalvelu.config.properties.FtpProperties;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Vector;
@@ -28,6 +29,11 @@ public class BIXClient implements Closeable {
                 repository.add(getHostKey("localhost"), null); // Enable ssh tunneling
             } else {
                 repository.add(getHostKey(ftpProperties.getHost()), null);
+            }
+
+
+            if(repository.getHostKey() != null) {
+                log.warn("using hostkeys:" + Arrays.stream(repository.getHostKey()).map(HostKey::getHost).collect(Collectors.joining(",")));
             }
 
             Session session = jSch.getSession(ftpProperties.getUser(), ftpProperties.getHost(), Integer.valueOf(ftpProperties.getPort()));
