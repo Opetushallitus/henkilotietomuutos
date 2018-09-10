@@ -95,6 +95,7 @@ public class BIXClient implements Closeable {
             Session session = jSch.getSession(ftpProperties.getUser(), ftpProperties.getHost(), Integer.valueOf(ftpProperties.getPort()));
             session.setConfig("StrictHostKeyChecking", "yes");
             session.setPassword(ftpProperties.getPassword());
+            session.setUserInfo(new UserInfoDebugger());
             session.connect();
 
             channel = (ChannelSftp) session.openChannel("sftp");
