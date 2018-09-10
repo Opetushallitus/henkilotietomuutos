@@ -17,6 +17,7 @@ import org.springframework.web.client.RestClientException;
 
 import javax.annotation.PostConstruct;
 
+import static org.apache.http.HttpStatus.SC_ACCEPTED;
 import static org.apache.http.HttpStatus.SC_OK;
 
 @Component
@@ -64,7 +65,7 @@ public class FlowdocClientImpl implements FlowdocClient {
                         .build())
                 .build();
         this.ophHttpClient.execute(ophHttpRequest)
-                .expectedStatus(SC_OK)
+                .expectedStatus(SC_OK, SC_ACCEPTED)
                 .ignoreResponse();
     }
 }
