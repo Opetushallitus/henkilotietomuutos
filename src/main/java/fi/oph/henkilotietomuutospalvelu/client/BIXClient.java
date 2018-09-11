@@ -87,11 +87,6 @@ public class BIXClient implements Closeable {
                 repository.add(getHostKey(ftpProperties.getHost()), new UserInfoDebugger());
             }
 
-
-            if(repository.getHostKey() != null) {
-                log.info("using hostkeys:" + Arrays.stream(repository.getHostKey()).map(HostKey::getHost).collect(Collectors.joining(",")));
-            }
-
             Session session = jSch.getSession(ftpProperties.getUser(), ftpProperties.getHost(), Integer.valueOf(ftpProperties.getPort()));
             session.setConfig("StrictHostKeyChecking", "yes");
             session.setPassword(ftpProperties.getPassword());

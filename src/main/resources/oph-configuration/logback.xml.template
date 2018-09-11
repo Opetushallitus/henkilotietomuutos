@@ -40,7 +40,7 @@
     <root level="INFO">
         <appender-ref ref="OPHLOGFILE" />
     </root>
-    <logger name="com.jcraft.jsch" level="INFO" />
+    <logger name="com.jcraft.jsch" level="WARN" />
     <logger name="org.springframework" level="WARN" />
     <logger name="org.springframework.security" level="WARN" />
     <logger name="org.springframework.boot.autoconfigure.security.AuthenticationManagerConfiguration" level="INFO" />
