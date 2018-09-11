@@ -47,6 +47,7 @@
     <logger name="fi.vm.sade.java_utils.security.OpintopolkuCasAuthenticationFilter" level="ERROR" />
     <logger name="org.hibernate.SQL" level="ERROR" />
     <logger name="fi.oph.henkilotietomuutospalvelu" level="INFO" />
+    <logger name="fi.oph.henkilotietomuutospalvelu.client.BIXClient" level="WARN" />
     <logger name="fi.oph" level="WARN" />
 
     <!-- Auditlog -->
