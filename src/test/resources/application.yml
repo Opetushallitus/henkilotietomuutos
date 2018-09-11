@@ -4,12 +4,13 @@ spring:
     exclude: org.spring
   cache:
     type: NONE
+  flyway:
+    enabled: false
+
 
 server:
-  context-path: /henkilotietomuutos-service
-
-flyway:
-  enabled: false
+  servlet:
+    context-path: /henkilotietomuutos-service
 
 scheduling:
   enabled: false

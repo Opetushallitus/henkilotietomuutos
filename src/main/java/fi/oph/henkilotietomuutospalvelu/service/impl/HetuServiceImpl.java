@@ -63,7 +63,7 @@ public class HetuServiceImpl implements HetuService {
                 hetuDto.getRemovedHetus().stream()
                         .map(hetu -> this.mapHetuToVtjData(hetu, VtjEventType.REMOVE)))
                 .collect(Collectors.toList());
-        this.vtjDataRepository.save(vtjDataList);
+        this.vtjDataRepository.saveAll(vtjDataList);
     }
 
     private VtjDataEvent mapHetuToVtjData(String hetu, VtjEventType vtjEventType) {

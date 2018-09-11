@@ -1,9 +1,19 @@
 spring:
   mandatory-file-encoding: UTF-8
   profiles.active: default
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+  flyway:
+    enabled: true
+    out-of-order: true
+    # Only for initial migration for non-empty DB. Change to false after prod installation.
+    baseline-on-migrate: true
+    baseline-version: 2018022615382893874
 
 server:
-  context-path: /henkilotietomuutos-service
+  servlet:
+    context-path: /henkilotietomuutos-service
 
 # console
 logging:
@@ -17,6 +27,3 @@ logging:
     fi.vm.sade.java_utils.security.OpintopolkuCasAuthenticationFilter: warn
     org.apache.http.client.protocol.ResponseProcessCookies: error
 
-flyway:
-  enabled: true
-  out-of-order: true

@@ -40,8 +40,8 @@ import java.util.stream.Stream;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -85,7 +85,7 @@ public class MuutostietoHandleServiceImplTest {
 
         this.muutostietoHandleService.importUnprocessedMuutostiedotToDb(muutostietoDtoList, fileName);
 
-        verify(this.henkiloMuutostietoRepository).save(this.listArgumentCaptor.capture());
+        verify(this.henkiloMuutostietoRepository).saveAll(this.listArgumentCaptor.capture());
 
         assertThat(this.listArgumentCaptor.getValue())
                 .extracting(HenkiloMuutostietoRivi::getRivi)
@@ -113,7 +113,7 @@ public class MuutostietoHandleServiceImplTest {
 
         this.muutostietoHandleService.importUnprocessedMuutostiedotToDb(muutostietoDtoList, fileName);
 
-        verify(this.henkiloMuutostietoRepository).save(this.listArgumentCaptor.capture());
+        verify(this.henkiloMuutostietoRepository).saveAll(this.listArgumentCaptor.capture());
 
         assertThat(this.listArgumentCaptor.getValue())
                 .extracting(HenkiloMuutostietoRivi::getRivi)

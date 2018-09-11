@@ -10,7 +10,6 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 @SpringBootApplication
-@EnableAutoConfiguration
 public class Application {
 
     public static void main(String[] args) throws Exception {

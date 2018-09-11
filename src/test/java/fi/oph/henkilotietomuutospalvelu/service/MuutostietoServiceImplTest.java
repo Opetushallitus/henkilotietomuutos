@@ -2,12 +2,11 @@ package fi.oph.henkilotietomuutospalvelu.service;
 
 import com.google.common.collect.Lists;
 import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
-import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.dto.type.MuutosType;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.oph.henkilotietomuutospalvelu.service.impl.MuutostietoServiceImpl;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -21,15 +20,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(SpringRunner.class)
 public class MuutostietoServiceImplTest {

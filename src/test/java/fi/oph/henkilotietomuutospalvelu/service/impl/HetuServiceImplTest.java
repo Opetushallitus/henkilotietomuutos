@@ -46,7 +46,7 @@ public class HetuServiceImplTest {
 
         this.hetuService.updateHetusToDb(hetuDto);
 
-        verify(this.vtjDataRepository).save(this.listArgumentCaptor.capture());
+        verify(this.vtjDataRepository).saveAll(this.listArgumentCaptor.capture());
         List<VtjDataEvent> savedData = this.listArgumentCaptor.getValue();
         assertThat(savedData)
                 .extracting(VtjDataEvent::getHetu, VtjDataEvent::getType)

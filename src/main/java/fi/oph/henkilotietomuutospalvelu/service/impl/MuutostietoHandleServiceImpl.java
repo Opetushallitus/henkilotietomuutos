@@ -62,7 +62,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
                 .map(this::mapMuutostietoToHenkiloMuutostietoRivi)
                 .collect(Collectors.toList());
         unprocessedHenkiloMuutostietoRiviList.forEach(henkiloMuutostietoRivi -> henkiloMuutostietoRivi.setTiedosto(tiedosto));
-        this.henkiloMuutostietoRepository.save(unprocessedHenkiloMuutostietoRiviList);
+        this.henkiloMuutostietoRepository.saveAll(unprocessedHenkiloMuutostietoRiviList);
     }
 
     private HenkiloMuutostietoRivi mapMuutostietoToHenkiloMuutostietoRivi(MuutostietoDto muutostietoDto) {
@@ -71,7 +71,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
         henkiloMuutostietoRivi.setQueryHetu(muutostietoDto.getHetu());
         List<Tietoryhma> tietoryhmaList = new ArrayList<>(muutostietoDto.getTietoryhmat());
         tietoryhmaList.forEach(tietoryhma -> tietoryhma.setHenkiloMuutostietoRivi(henkiloMuutostietoRivi));
-        this.tietoryhmaRepository.save(tietoryhmaList);
+        this.tietoryhmaRepository.saveAll(tietoryhmaList);
         henkiloMuutostietoRivi.setTietoryhmaList(tietoryhmaList);
         if (muutostietoDto.getRivi() % 1000 == 0) {
             log.info("Added {} lines to db", muutostietoDto.getRivi());

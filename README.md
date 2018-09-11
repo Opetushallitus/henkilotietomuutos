@@ -14,5 +14,5 @@ HTMP on Spring Boot -sovellus.
 ## Käynnistäminen kehitysmoodissa
 
  * Hae _henkilotietomuutospalvelu.yml_ luokalta
- * Aja `mvn clean install && java -jar -Dspring.config.location=henkilotietomuutospalvelu.yml -Dspring.profiles.active=dev -Dschedule=false target/henkilotietomuutospalvelu-0.0.1-SNAPSHOT.jar`
+ * Aja `mvn clean install && java -jar -Dspring.config.additional-location=henkilotietomuutospalvelu.yml -Dspring.profiles.active=dev -Dschedule=false target/henkilotietomuutospalvelu-0.0.1-SNAPSHOT.jar`
    * Muuta `Dschedule` -parametri arvoon _true_ (tai poista se ) mikäli haluat ajastuksen käyntiin. _false_ -arvolla voi käynnistää yhden päivitysajon kerrallaan esim. Swaggerin kautta (_/swagger-ui.html#!/vtj-sync-controller/startRemoteSyncWithVtjRajapintaUsingGET_)

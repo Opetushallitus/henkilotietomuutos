@@ -28,6 +28,7 @@ public class Huoltaja extends Tietoryhma {
      * 06 = muu huoltaja
      */
     private String laji;
+    // 0, 1, 2,... in DB
     private Huollonjako huollonjako;
     private Boolean voimassa;
 
