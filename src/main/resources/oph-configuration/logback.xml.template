@@ -51,7 +51,7 @@
     <logger name="fi.oph" level="WARN" />
 
     <!-- Auditlog -->
-    <logger name="fi.vm.sade.auditlog.Audit" level="INFO" additivity="false">
+    <logger name="fi.oph.henkilotietomuutospalvelu.audit.AuditHelper" level="INFO" additivity="false">
         <appender-ref ref="AUDITLOGFILE" />
     </logger>
 
