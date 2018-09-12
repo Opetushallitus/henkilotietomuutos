@@ -1,0 +1,32 @@
+sudo: required
+language: java
+jdk:
+  - oraclejdk8
+services:
+  - docker
+
+env:
+  global:
+    # AWS_ACCESS_KEY_ID
+    - secure: "uLACNTUEUEYOBdCq02ZSD/LkBW4GbXgxofH/JktqkI/5/mKd9PzzR3qNyBbO8PnQgqdsiMFr/WuxRriog71kQS1xY7UI9H2MgMBByQ9MiYXpcRLDv7P0JJZSkkDEhFW8JNsg4OL8cuuNEuy6tp/NXa0xAkETsNS5+wk/aEh1wCxCT0MfXafk2M/MAlbVSN4AYk9X22PGjwDkvURobt+Ue5l2OBZF2wsgqI7Jr6gnuvqms9lvaJXQ9PZIDgZgskV+dIsybidLaZFVCrlNCffclvT0rE4Sepfkf88RwLTg94QtHppxDHPO5y7RSJ8Tec18lVIaRwf9ANV7duptH/WuYUEEmewgK5fjI3cZwcOcIJRoXZ88MOOlYSwx0kjc3o1V7z8JSaPXnkCgkmi6LNoKfcLTRDIDTy8CCPWTq2jsV4ag8Ci7+j/IM0fB5e1AxMVZmd8XoQT2c//GFjfL3Qum3VZHGVrIbqGau7vDo3pvLzlVh2+j7XxU4cwzZUMhV+Q/h4MlxObmki6TrmLWqQ5tMtAUW7JCAx8jp/RqQwkJ9+8OpEk/7lXArxPsCGPxroDRsi2m2cUmTDSpolvAPDQT1VCtP3Su9kTydrz8GHpxpIVZ8YZaXqJXTYVmZBfy7t1zT9FEvlhF6FCJ6kInlOe79ZRsFHZ2JtyHIaCZChgq5pU="
+    # AWS_SECRET_ACCESS_KEY
+    - secure: "Dz4VZit4JjInLsCyKECL5RhFbUYEGfbXcpyegbZ4V/HpyuRY4brGeifu+iICxv3y+74qoShhP8gnf0acGxjU44s0NOWxG+tb3wZHkOkq+V69G9lm6S72cC2LBNMA37OCpFnzmgEaSb+obcV/B7Sg4ZlpfYJw063XjvE46UVqxM2jf7nq5AwCMlzFOqCW7qLc3V60womHMwg77e3uIuviz2CfDooZBYN6mbhdS/N0evh+evkChsfbbKKjguemJj7HZR/ocHaCpps+IzTCjH15nfCJLZprGeZdZpfpQMzVnipLGj31mIwvNKbSK6fDtT2ojCzWtzPZ+n0MMwWUPm9qItKhH1Ezf9ex6m53pJtcwR1le/vw0p2ldACM09HbOSsENzA9QDsUlN7WlJax+1utlcdPyar+1FWaM4sXmNo/e1onQZCvRH8uVMUwy/hCRZdrKuZXCJUaFoMJn5RmReXM8M+khr5vEOqYGBECBki/PCHLZIXTb4hHpcJOgPnIiFlo0fmBxWl6vtanvCjpZnHHqepQm7Ap/CHGO6OeLCIPfbEapewUV+xJtf24d6yPEpPdyaoLv9sZ892SRugczAf345/q48in+ZpQEBlqHaQ9LQ1QWi/SHgdaJ2DF0WcsqteJxXVKIa8wK7Dy2HWWlEhY5UmfRYTzi6Sd+Im56tAUZ70="
+
+install:
+  - git clone https://github.com/Opetushallitus/ci-tools.git
+  - source ci-tools/common/setup-tools.sh
+  - export ARTIFACT_NAME="henkilotietomuutos"
+
+script:
+  - mvn clean install
+
+  - mv target/henkilotietomuutospalvelu-*.jar $DOCKER_BUILD_DIR/artifact/${ARTIFACT_NAME}.jar
+  - cp -vr src/main/resources/* $DOCKER_BUILD_DIR/config/
+
+  - export BASE_IMAGE="base-legacy:0.1"
+  - ./ci-tools/common/pull-image.sh
+  - ./ci-tools/build/build-fatjar.sh $ARTIFACT_NAME
+
+deploy:
+  provider: script
+  script: ./ci-tools/build/upload-image.sh $ARTIFACT_NAME
