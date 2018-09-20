@@ -5,9 +5,7 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -24,12 +22,17 @@ public class EdunvalvontaValtuutettu extends Tietoryhma {
     @Column(name = "end_date")
     private LocalDate endDate;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "hetuton_henkilo")
+    private HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo;
+
     @Builder
     public EdunvalvontaValtuutettu(Ryhmatunnus ryhmatunnus, Muutostapa muutostapa, String hetu,
-                                   LocalDate startDate, LocalDate endDate) {
+                                   LocalDate startDate, LocalDate endDate, HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo) {
         super(ryhmatunnus, muutostapa);
         this.hetu = hetu;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.henkilotunnuksetonHenkilo = henkilotunnuksetonHenkilo;
     }
 }

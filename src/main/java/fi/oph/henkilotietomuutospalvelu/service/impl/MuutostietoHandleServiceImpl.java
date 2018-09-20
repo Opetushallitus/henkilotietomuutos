@@ -30,11 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.removeYhteystietoryhma;
@@ -86,6 +82,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
             HenkiloForceUpdateDto updateHenkilo = new HenkiloForceUpdateDto();
             updateHenkilo.setOidHenkilo(currentHenkilo.getOidHenkilo());
             updateHenkilo.setYhteystiedotRyhma(currentHenkilo.getYhteystiedotRyhma());
+            updateHenkilo.setHuoltajat(new HashSet<>());
 
             if (!currentHenkilo.isPassivoitu()) {
                 List<Tietoryhma> tietoryhmat = henkiloMuutostietoRivi.getTietoryhmaList().stream()
@@ -136,7 +133,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
             return Optional.ofNullable(koodit.get(koodiArvo))
                     .flatMap(koodi -> koodi.getMetadata().stream()
                             .sorted(Comparator.comparing(metadata -> metadata.getKieli().trim().toLowerCase(),
-                                    new CustomOrderComparator<String>(kieli, HenkiloUtils.KIELIKOODI_FI)))
+                                    new CustomOrderComparator<>(kieli, HenkiloUtils.KIELIKOODI_FI)))
                             .map(KoodiMetadataDto::getNimi)
                             .filter(StringUtils::hasLength)
                             .findFirst());

@@ -6,9 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -38,9 +36,14 @@ public class Edunvalvoja extends Tietoryhma {
     @Column(name = "end_date")
     private LocalDate endDate;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "hetuton_henkilo")
+    private HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo;
+
     @Builder
     public Edunvalvoja(Ryhmatunnus ryhmatunnus, Muutostapa muutostapa, String hetu, String yTunnus,
-                    String municipalityCode, String oikeusaputoimistoKoodi, LocalDate startDate, LocalDate endDate) {
+                       String municipalityCode, String oikeusaputoimistoKoodi, LocalDate startDate, LocalDate endDate,
+                       HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo) {
         super(ryhmatunnus, muutostapa);
         this.hetu = hetu;
         this.yTunnus = yTunnus;
@@ -48,6 +51,7 @@ public class Edunvalvoja extends Tietoryhma {
         this.oikeusaputoimistoKoodi = oikeusaputoimistoKoodi;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.henkilotunnuksetonHenkilo = henkilotunnuksetonHenkilo;
     }
 
 }

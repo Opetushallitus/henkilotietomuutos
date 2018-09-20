@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public enum Huollonjako {
-
+    // Do not change order. Enum number is used in db.
     SUORITETTU("1"),
     SUORITTAMATTA(" "),
     SISALLOSTA_SOVITTU("2");

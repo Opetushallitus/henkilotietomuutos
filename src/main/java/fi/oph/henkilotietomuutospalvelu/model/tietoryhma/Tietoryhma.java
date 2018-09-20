@@ -49,7 +49,7 @@ public abstract class Tietoryhma extends IdentifiableAndVersionedEntity {
     @JoinColumn(name = "tietoryhma_id")
     private HenkiloMuutostietoRivi henkiloMuutostietoRivi;
 
-    private static final EnumSet REDUNDANT_CHANGES =
+    private static final EnumSet<Muutostapa> REDUNDANT_CHANGES =
             EnumSet.of(Muutostapa.LISATIETO, Muutostapa.POISTETTU, Muutostapa.KORJATTAVAA);
 
     public Tietoryhma(Ryhmatunnus ryhmatunnus, Muutostapa muutostapa) {
@@ -59,7 +59,7 @@ public abstract class Tietoryhma extends IdentifiableAndVersionedEntity {
 
     public boolean isVoimassa() {
         return true;
-    };
+    }
 
     public void updateHenkilo(Context context, HenkiloForceUpdateDto henkilo) {
         if (!getRedundantChanges().contains(this.getMuutostapa())) {

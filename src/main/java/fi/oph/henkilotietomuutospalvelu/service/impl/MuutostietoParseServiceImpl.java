@@ -1,6 +1,7 @@
 package fi.oph.henkilotietomuutospalvelu.service.impl;
 
 import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Huoltaja;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.MuutosType;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoParseService;
@@ -34,16 +35,23 @@ public class MuutostietoParseServiceImpl implements MuutostietoParseService {
 
     private static List<Tietoryhma> deserializeTietoryhmat(String[] tietoryhmat) {
         List<Tietoryhma> ryhmat = new ArrayList<>();
-        for (int i = 1; i <= tietoryhmat.length -1; i++) {
+        for (int i = 1; i <= tietoryhmat.length - 1; i++) {
             Tietoryhma ryhma;
-            if (i < tietoryhmat.length - 1) {
+            if (i < tietoryhmat.length - 2) {
+                ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmat[i], tietoryhmat[i+1], tietoryhmat[i+2]);
+            }
+            else if (i < tietoryhmat.length - 1) {
                 ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmat[i], tietoryhmat[i+1]);
-            } else {
+            }
+            else {
                 ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmat[i]);
             }
 
             if (ryhma != null) {
                 ryhmat.add(ryhma);
+                if (ryhma instanceof Huoltaja && ((Huoltaja)ryhma).getHenkilotunnuksetonHenkilo() != null) {
+                    ryhmat.add(((Huoltaja)ryhma).getHenkilotunnuksetonHenkilo());
+                }
             }
         }
         return ryhmat;
