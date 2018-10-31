@@ -48,18 +48,33 @@ public class HenkiloUpdateUtil {
         return index == etunimet.length() || SALLITUT_KUTSUMANIMI_VALIMERKIT.contains(etunimet.charAt(index));
     }
 
+    /**
+     * Hyväksyttävät päivämäärät ovat joko voimassa tai niitä ei ole annettu.
+     * @param start alkupvm
+     * @param end loppupvm
+     * @return Onko aikaväli validi
+     */
     public static boolean localdateIsBetween(LocalDate start, LocalDate end) {
         return (start == null || LocalDate.now().isAfter(start))
                 && (end == null || LocalDate.now().isBefore(end));
     }
 
+    /**
+     * Hyväksyttävät päivämäärät ovat joko voimassa tai niitä ei ole annettu.
+     * @param start alkupvm
+     * @return Onko alkupvm validi
+     */
     public static boolean localdateExistsAndIsBeforeNow(LocalDate start) {
         return start != null && LocalDate.now().isAfter(start);
     }
 
+    /**
+     * Hyväksyttävät päivämäärät ovat joko voimassa tai niitä ei ole annettu.
+     * @param end loppupvm
+     * @return Onko loppupvm validi
+     */
     public static boolean localdateNotExistOrIsAfterNow(LocalDate end) {
         return end == null || LocalDate.now().isBefore(end);
     }
-
 
 }

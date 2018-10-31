@@ -116,7 +116,7 @@ public class TietoryhmaParserUtilTest {
         Assert.assertEquals("111177-094V", huoltaja.getHetu());
         Assert.assertEquals(LocalDate.of(2017, 2,14), huoltaja.getStartDate());
         Assert.assertEquals(LocalDate.of(2017, 2, 20), huoltaja.getResolutionDate());
-        Assert.assertEquals(null, huoltaja.getEndDate());
+        Assert.assertNull(huoltaja.getEndDate());
         Assert.assertEquals(true, huoltaja.getVoimassa());
         Assert.assertEquals(Huollonjako.SUORITTAMATTA, huoltaja.getHuollonjako());
     }
@@ -220,20 +220,33 @@ public class TietoryhmaParserUtilTest {
 
     @Test
     public void parseHetutonHenkiloWithValidCountryCode() {
-        String tietoryhma = "4510197002222Waltman                                                                    "
+        String huoltajaRaw = "3051111177-094V36 1201702140000000020170220";
+        String hetutonHenkiloRaw = "4510197002222Waltman                                                                    "
                 + "                         Vanessa                                                                  "
                 + "                           752";
 
-        Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhma);
-        Assert.assertTrue(ryhma instanceof HenkilotunnuksetonHenkilo);
+        Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(huoltajaRaw, hetutonHenkiloRaw);
+        Assert.assertTrue(ryhma instanceof Huoltaja);
 
-        HenkilotunnuksetonHenkilo henkilo = (HenkilotunnuksetonHenkilo) ryhma;
+        Huoltaja huoltaja = (Huoltaja) ryhma;
+        HenkilotunnuksetonHenkilo henkilo = huoltaja.getHenkilotunnuksetonHenkilo();
         Assert.assertEquals(Muutostapa.LISATIETO, henkilo.getMuutostapa());
         Assert.assertEquals(LocalDate.of(1970, 2, 22), henkilo.getDateOfBirth());
         Assert.assertEquals("Vanessa", henkilo.getFirstNames());
         Assert.assertEquals("Waltman", henkilo.getLastname());
         Assert.assertEquals(Gender.FEMALE, henkilo.getGender());
         Assert.assertEquals("752", henkilo.getNationality());
+    }
+
+    // This cannot exist alone
+    @Test
+    public void parseHetutonHenkiloTietoryhmaAlone() {
+        String tietoryhma = "4510197002222Waltman                                                                    "
+                + "                         Vanessa                                                                  "
+                + "                           752";
+
+        Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhma);
+        Assert.assertNull(ryhma);
     }
 
     @Test

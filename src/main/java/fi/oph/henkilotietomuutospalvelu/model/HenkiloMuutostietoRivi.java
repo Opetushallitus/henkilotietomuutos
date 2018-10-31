@@ -27,7 +27,7 @@ public class HenkiloMuutostietoRivi extends IdentifiableAndVersionedEntity {
     private String queryHetu;
 
     @OrderBy
-    @OneToMany(mappedBy = "henkiloMuutostietoRivi")
+    @OneToMany(mappedBy = "henkiloMuutostietoRivi", cascade = CascadeType.ALL)
     private List<Tietoryhma> tietoryhmaList = new ArrayList<>();
 
     @Column(name = "process_timestamp")

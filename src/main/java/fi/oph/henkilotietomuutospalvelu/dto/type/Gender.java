@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public enum Gender {
-
+    // Don't change order. db uses enum types.
     MALE("1"),
     FEMALE("2"),
     MISSING(" ");

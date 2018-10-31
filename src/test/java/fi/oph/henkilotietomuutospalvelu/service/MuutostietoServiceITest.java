@@ -7,13 +7,10 @@ import fi.oph.henkilotietomuutospalvelu.config.properties.FtpProperties;
 import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Huoltaja;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloUpdateDto;
-import fi.vm.sade.oppijanumerorekisteri.dto.KansalaisuusDto;
-import fi.vm.sade.oppijanumerorekisteri.dto.YhteystiedotRyhmaDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.*;
 import org.assertj.core.groups.Tuple;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,17 +24,21 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.filter;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -110,7 +111,7 @@ public class MuutostietoServiceITest {
         this.muutostietoService.updateMuutostietos();
 
         verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
-        HenkiloUpdateDto updatedHenkilo = captor.getValue();
+        HenkiloForceUpdateDto updatedHenkilo = captor.getValue();
         assertThat(updatedHenkilo)
                 .extracting(HenkiloUpdateDto::getOidHenkilo,
                         HenkiloUpdateDto::getEtunimet,
@@ -120,6 +121,20 @@ public class MuutostietoServiceITest {
                         "Tarja Annika",
                         "Pälömäki Täs",
                         "2");
+        assertThat(updatedHenkilo.getHuoltajat())
+                .extracting(HuoltajaCreateDto::getHetu)
+                .containsExactlyInAnyOrder("140434-0665", "");
+        assertThat(filter(updatedHenkilo.getHuoltajat()).with("hetu", "").get())
+                .extracting(HuoltajaCreateDto::getEtunimet,
+                        HuoltajaCreateDto::getSukunimi,
+                        HuoltajaCreateDto::getKansalaisuusKoodi,
+                        HuoltajaCreateDto::getHuoltajuustyyppiKoodi,
+                        HuoltajaCreateDto::getSyntymaaika)
+                .containsExactly(Tuple.tuple("Testi Test",
+                        "Testinen",
+                        Collections.singleton("246"),
+                        "03",
+                        null));
     }
 
     @Test
@@ -135,7 +150,7 @@ public class MuutostietoServiceITest {
         this.muutostietoService.updateMuutostietos();
 
         verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
-        HenkiloUpdateDto updatedHenkilo = captor.getValue();
+        HenkiloForceUpdateDto updatedHenkilo = captor.getValue();
         assertThat(updatedHenkilo)
                 .extracting(HenkiloUpdateDto::getOidHenkilo,
                         HenkiloUpdateDto::getEtunimet,
@@ -145,6 +160,7 @@ public class MuutostietoServiceITest {
                         "Matti",
                         "Köskinen",
                         "2");
+        assertThat(updatedHenkilo.getHuoltajat()).isEmpty();
     }
 
     @Test
@@ -179,6 +195,7 @@ public class MuutostietoServiceITest {
         assertThat(updatedHenkilo.getYhteystiedotRyhma())
                 .extracting(YhteystiedotRyhmaDto::getRyhmaAlkuperaTieto, YhteystiedotRyhmaDto::getRyhmaKuvaus)
                 .containsExactly(tuple("alkupera2", "yhteystietotyyppi2"));
+        assertThat(updatedHenkilo.getHuoltajat()).isEmpty();
     }
 
     @Test
@@ -198,7 +215,7 @@ public class MuutostietoServiceITest {
         this.muutostietoService.updateMuutostietos();
 
         verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
-        HenkiloUpdateDto updatedHenkilo = captor.getValue();
+        HenkiloForceUpdateDto updatedHenkilo = captor.getValue();
 
         assertThat(muutostietoDtos)
                 .hasSize(1)
@@ -217,5 +234,6 @@ public class MuutostietoServiceITest {
         // Muutostapa.LISATIETO won't be updated
         assertThat(updatedHenkilo.getEtunimet()).isNull();
         assertThat(updatedHenkilo.getSukunimi()).isNull();
+        assertThat(updatedHenkilo.getHuoltajat()).isEmpty();
     }
 }
