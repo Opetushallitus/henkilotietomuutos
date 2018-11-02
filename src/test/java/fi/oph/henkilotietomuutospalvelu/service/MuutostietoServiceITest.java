@@ -103,11 +103,9 @@ public class MuutostietoServiceITest {
     public void whenUtf8FileIsReadGenerateProperUpdateDto() throws Exception {
         mockFiles("test_data/aakkoset_test.PTT", "test_data/aakkoset_test.PTT_001.PART");
 
-        given(this.koodistoService.list(eq(Koodisto.MAAT_JA_VALTIOT_2)))
-                .willReturn(Arrays.asList(KoodiDto.builder().koodiArvo("246").build(),
-                        KoodiDto.builder().koodiArvo("512").build()));
-        given(this.koodistoService.list(eq(Koodisto.HUOLTAJUUSTYYPPI)))
-                .willReturn(Collections.singletonList(KoodiDto.builder().koodiArvo("03").build()));
+        given(this.koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("246"))).willReturn(true);
+        given(this.koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("512"))).willReturn(true);
+        given(this.koodistoService.isKoodiValid(eq(Koodisto.HUOLTAJUUSTYYPPI), eq("03"))).willReturn(true);
 
         HenkiloDto henkilo = new HenkiloDto();
         henkilo.setOidHenkilo("1.2.246.562.24.41327169638");
@@ -173,12 +171,9 @@ public class MuutostietoServiceITest {
     @Test
     public void henkiloAidinkieliKansalaisuusTurvakieltoChange() throws Exception {
         mockFiles("test_data/nimi_test.PTT", "test_data/nimi_test.PTT_001.PART");
-        given(this.koodistoService.list(eq(Koodisto.KIELI))).willReturn(Collections.singletonList(KoodiDto.builder()
-                .koodiArvo("fi")
-                .build()));
-        given(this.koodistoService.list(eq(Koodisto.MAAT_JA_VALTIOT_2)))
-                .willReturn(Arrays.asList(KoodiDto.builder().koodiArvo("246").build(),
-                        KoodiDto.builder().koodiArvo("512").build()));
+        given(this.koodistoService.isKoodiValid(eq(Koodisto.KIELI), eq("fi"))).willReturn(true);
+        given(this.koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("512"))).willReturn(true);
+        given(this.koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("246"))).willReturn(true);
 
         HenkiloDto henkilo = new HenkiloDto();
         henkilo.setOidHenkilo("1.2.246.562.24.41327169638");

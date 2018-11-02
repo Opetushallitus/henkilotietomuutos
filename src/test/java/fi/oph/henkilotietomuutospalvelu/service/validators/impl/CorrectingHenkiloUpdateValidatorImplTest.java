@@ -77,14 +77,14 @@ public class CorrectingHenkiloUpdateValidatorImplTest {
 
     @Test
     public void testAllValuesValid() {
-        given(this.koodistoService.list(eq(Koodisto.HUOLTAJUUSTYYPPI)))
-                .willReturn(Collections.singletonList(KoodiDto.builder().koodiArvo("validHuoltajuustyyppi").build()));
-        given(this.koodistoService.list(eq(Koodisto.KUNTA)))
-                .willReturn(Collections.singletonList(KoodiDto.builder().koodiArvo("validKunta").build()));
-        given(this.koodistoService.list(eq(Koodisto.MAAT_JA_VALTIOT_2)))
-                .willReturn(Collections.singletonList(KoodiDto.builder().koodiArvo("validMaa").build()));
-        given(this.koodistoService.list(eq(Koodisto.KIELI)))
-                .willReturn(Collections.singletonList(KoodiDto.builder().koodiArvo("validKieli").build()));
+        given(this.koodistoService.isKoodiValid(eq(Koodisto.HUOLTAJUUSTYYPPI), eq("validHuoltajuustyyppi")))
+                .willReturn(true);
+        given(this.koodistoService.isKoodiValid(eq(Koodisto.KUNTA), eq("validKunta")))
+                .willReturn(true);
+        given(this.koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("validMaa")))
+                .willReturn(true);
+        given(this.koodistoService.isKoodiValid(eq(Koodisto.KIELI), eq("validKieli")))
+                .willReturn(true);
         HenkiloForceUpdateDto henkiloForceUpdateDto = new HenkiloForceUpdateDto();
         henkiloForceUpdateDto.setKotikunta("validKunta");
         KansalaisuusDto invalidKansalaisuus = new KansalaisuusDto();

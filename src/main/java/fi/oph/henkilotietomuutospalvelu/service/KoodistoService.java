@@ -11,4 +11,6 @@ public interface KoodistoService {
     List<KoodiDto> list(Koodisto koodisto);
 
     Map<String, KoodiDto> listAsMap(Koodisto koodisto);
+
+    boolean isKoodiValid(Koodisto koodisto, String koodi);
 }

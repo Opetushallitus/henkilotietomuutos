@@ -30,42 +30,42 @@ public class CorrectingHenkiloUpdateValidatorImpl implements CorrectingHenkiloUp
     public void validateAndCorrectErrors(HenkiloForceUpdateDto henkiloForceUpdateDto) {
         Stream.<Consumer<HenkiloForceUpdateDto>>of(
                 (updateDto) -> Optional.ofNullable(updateDto.getKotikunta())
-                        .ifPresent(kotikunta -> this.replaceIfInvalid(this.koodistoService.list(Koodisto.KUNTA).stream()
-                                        .anyMatch(kuntaKoodi -> kuntaKoodi.getKoodiArvo().equals(kotikunta)),
+                        .ifPresent(kotikunta -> this.replaceIfInvalid(
+                                this.koodistoService.isKoodiValid(Koodisto.KUNTA, kotikunta),
                                 updateDto::setKotikunta,
                                 kotikunta,
                                 KUNTAKOODI_TUNTEMATON)),
                 (updateDto) -> Optional.ofNullable(updateDto.getAidinkieli())
-                        .ifPresent(aidinkieli -> this.replaceIfInvalid(this.koodistoService.list(Koodisto.KIELI).stream()
-                                        .anyMatch(kieliKoodi -> kieliKoodi.getKoodiArvo().equals(aidinkieli.getKieliKoodi())),
+                        .ifPresent(aidinkieli -> this.replaceIfInvalid(
+                                this.koodistoService.isKoodiValid(Koodisto.KIELI, aidinkieli.getKieliKoodi()),
                                 aidinkieli::setKieliKoodi,
                                 aidinkieli.getKieliKoodi(),
                                 KIELIKOODI_TUNTEMATON)),
                 (updateDto) -> Optional.ofNullable(updateDto.getKansalaisuus())
                         .ifPresent( kansalaisuudet ->
                                 kansalaisuudet.forEach(kansalaisuusDto -> Optional.ofNullable(kansalaisuusDto.getKansalaisuusKoodi())
-                                        .ifPresent(kansalaisuusKoodi -> this.replaceIfInvalid(this.koodistoService.list(Koodisto.MAAT_JA_VALTIOT_2).stream()
-                                                        .anyMatch(kieliKoodi -> kieliKoodi.getKoodiArvo().equals(kansalaisuusKoodi)),
+                                        .ifPresent(kansalaisuusKoodi -> this.replaceIfInvalid(
+                                                this.koodistoService.isKoodiValid(Koodisto.MAAT_JA_VALTIOT_2, kansalaisuusKoodi),
                                                 kansalaisuusDto::setKansalaisuusKoodi,
                                                 kansalaisuusKoodi,
                                                 KANSALAISUUSKOODI_TUNTEMATON)))),
                 (updateDto) -> Optional.ofNullable(henkiloForceUpdateDto.getHuoltajat())
                         .ifPresent(huoltajat -> huoltajat.forEach(this::validateAndCorrectErrors))
-        ).forEachOrdered(consumer -> consumer.accept(henkiloForceUpdateDto));
+        ).forEach(consumer -> consumer.accept(henkiloForceUpdateDto));
     }
 
     private void validateAndCorrectErrors(HuoltajaCreateDto huoltajaCreateDto) {
         Stream.<Consumer<HuoltajaCreateDto>>of(
                 (updateDto) -> Optional.ofNullable(updateDto.getKansalaisuusKoodi())
                         .ifPresent(kansalaisuuskoodit ->
-                                kansalaisuuskoodit.forEach(kansalaisuusKoodi -> this.replaceIfInvalid((koodi) -> this.koodistoService.list(Koodisto.MAAT_JA_VALTIOT_2).stream()
-                                                .anyMatch(kansalaisuusKoodiDto -> kansalaisuusKoodiDto.getKoodiArvo().equals(koodi)),
+                                kansalaisuuskoodit.forEach(kansalaisuusKoodi -> this.replaceIfInvalid(
+                                        (koodi) -> this.koodistoService.isKoodiValid(Koodisto.MAAT_JA_VALTIOT_2, koodi),
                                         updateDto::setKansalaisuusKoodi,
                                         updateDto.getKansalaisuusKoodi(),
                                         KANSALAISUUSKOODI_TUNTEMATON))),
                 (updateDto) -> Optional.ofNullable(updateDto.getHuoltajuustyyppiKoodi())
-                        .ifPresent(huoltajuustyyppi -> this.replaceIfInvalid(this.koodistoService.list(Koodisto.HUOLTAJUUSTYYPPI).stream()
-                                        .anyMatch(huoltajuustyyppiKoodi -> huoltajuustyyppiKoodi.getKoodiArvo().equals(huoltajuustyyppi)),
+                        .ifPresent(huoltajuustyyppi -> this.replaceIfInvalid(
+                                this.koodistoService.isKoodiValid(Koodisto.HUOLTAJUUSTYYPPI, huoltajuustyyppi),
                                 updateDto::setHuoltajuustyyppiKoodi,
                                 huoltajuustyyppi,
                                 HUOLTAJUUSTYYPPI_TUNTEMATON))
