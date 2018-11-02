@@ -1,9 +1,7 @@
 package fi.oph.henkilotietomuutospalvelu.service.impl;
 
 import fi.oph.henkilotietomuutospalvelu.annotations.NotifyOnError;
-import fi.oph.henkilotietomuutospalvelu.dto.KoodiDto;
 import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
-import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.MuutosType;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
@@ -24,10 +22,8 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +34,6 @@ public class MuutostietoServiceImpl implements MuutostietoService {
     private final FileService fileService;
     private final MuutostietoParseService muutostietoParseService;
     private final MuutostietoHandleService muutostietoHandleService;
-    private final KoodistoService koodistoService;
 
     private final HenkiloMuutostietoRepository henkiloMuutostietoRepository;
     private final TiedostoRepository tiedostoRepository;
@@ -107,15 +102,11 @@ public class MuutostietoServiceImpl implements MuutostietoService {
         List<String> unprocessedFileNames = this.henkiloMuutostietoRepository.findDistinctUnprocessedTiedostoFileName();
         Optional<String> firstFileToProcess = unprocessedFileNames.stream()
                 .min(this.fileService.byFileExtension().thenComparing(this.fileService.bySequentalNumbering()));
-        Map<String, KoodiDto> postitoimipaikat = koodistoService.list(Koodisto.POSTI).stream()
-                .collect(Collectors.toMap(KoodiDto::getKoodiArvo, Function.identity()));
-        Map<String, KoodiDto> maat = koodistoService.list(Koodisto.MAAT_JA_VALTIOT_2).stream()
-                .collect(Collectors.toMap(KoodiDto::getKoodiArvo, Function.identity()));
 
         firstFileToProcess.ifPresent(fileName ->
                 this.henkiloMuutostietoRepository
                         .findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(fileName)
-                        .forEach(rivi -> this.muutostietoHandleService.handleMuutostieto(rivi, postitoimipaikat, maat)));
+                        .forEach(this.muutostietoHandleService::handleMuutostieto));
     }
 
     /**

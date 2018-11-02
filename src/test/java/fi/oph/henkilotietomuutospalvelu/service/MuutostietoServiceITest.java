@@ -4,7 +4,9 @@ import fi.oph.henkilotietomuutospalvelu.IntegrationTest;
 import fi.oph.henkilotietomuutospalvelu.client.OnrServiceClient;
 import fi.oph.henkilotietomuutospalvelu.config.properties.AWSProperties;
 import fi.oph.henkilotietomuutospalvelu.config.properties.FtpProperties;
+import fi.oph.henkilotietomuutospalvelu.dto.KoodiDto;
 import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
+import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Huoltaja;
@@ -31,9 +33,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -42,6 +42,7 @@ import static org.assertj.core.api.Assertions.filter;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -101,6 +102,12 @@ public class MuutostietoServiceITest {
     @Test
     public void whenUtf8FileIsReadGenerateProperUpdateDto() throws Exception {
         mockFiles("test_data/aakkoset_test.PTT", "test_data/aakkoset_test.PTT_001.PART");
+
+        given(this.koodistoService.list(eq(Koodisto.MAAT_JA_VALTIOT_2)))
+                .willReturn(Arrays.asList(KoodiDto.builder().koodiArvo("246").build(),
+                        KoodiDto.builder().koodiArvo("512").build()));
+        given(this.koodistoService.list(eq(Koodisto.HUOLTAJUUSTYYPPI)))
+                .willReturn(Collections.singletonList(KoodiDto.builder().koodiArvo("03").build()));
 
         HenkiloDto henkilo = new HenkiloDto();
         henkilo.setOidHenkilo("1.2.246.562.24.41327169638");
@@ -166,6 +173,12 @@ public class MuutostietoServiceITest {
     @Test
     public void henkiloAidinkieliKansalaisuusTurvakieltoChange() throws Exception {
         mockFiles("test_data/nimi_test.PTT", "test_data/nimi_test.PTT_001.PART");
+        given(this.koodistoService.list(eq(Koodisto.KIELI))).willReturn(Collections.singletonList(KoodiDto.builder()
+                .koodiArvo("fi")
+                .build()));
+        given(this.koodistoService.list(eq(Koodisto.MAAT_JA_VALTIOT_2)))
+                .willReturn(Arrays.asList(KoodiDto.builder().koodiArvo("246").build(),
+                        KoodiDto.builder().koodiArvo("512").build()));
 
         HenkiloDto henkilo = new HenkiloDto();
         henkilo.setOidHenkilo("1.2.246.562.24.41327169638");

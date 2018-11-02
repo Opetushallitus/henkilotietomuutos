@@ -4,6 +4,7 @@ import fi.oph.henkilotietomuutospalvelu.client.OnrServiceClient;
 import fi.oph.henkilotietomuutospalvelu.dto.KoodiDto;
 import fi.oph.henkilotietomuutospalvelu.dto.KoodiMetadataDto;
 import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
+import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.KoodistoYhteystietoAlkupera;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.model.HenkiloMuutostietoRivi;
@@ -16,6 +17,7 @@ import fi.oph.henkilotietomuutospalvelu.repository.TietoryhmaRepository;
 import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoHandleService;
 import fi.oph.henkilotietomuutospalvelu.service.build.HenkiloUpdateUtil;
+import fi.oph.henkilotietomuutospalvelu.service.validators.CorrectingHenkiloUpdateValidator;
 import fi.oph.henkilotietomuutospalvelu.utils.CustomOrderComparator;
 import fi.oph.henkilotietomuutospalvelu.utils.HenkiloUtils;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
@@ -45,6 +47,8 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
     private final HenkiloMuutostietoRepository henkiloMuutostietoRepository;
     private final TietoryhmaRepository tietoryhmaRepository;
     private final TiedostoRepository tiedostoRepository;
+
+    private final CorrectingHenkiloUpdateValidator correctingHenkiloUpdateValidator;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
@@ -77,7 +81,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
-    public void handleMuutostieto(HenkiloMuutostietoRivi henkiloMuutostietoRivi, Map<String, KoodiDto> postitoimipaikat, Map<String, KoodiDto> maat) {
+    public void handleMuutostieto(HenkiloMuutostietoRivi henkiloMuutostietoRivi) {
         this.getCurrentHenkilo(henkiloMuutostietoRivi.getQueryHetu()).ifPresent(currentHenkilo -> {
             HenkiloForceUpdateDto updateHenkilo = new HenkiloForceUpdateDto();
             updateHenkilo.setOidHenkilo(currentHenkilo.getOidHenkilo());
@@ -96,7 +100,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
                         )
                         .collect(Collectors.toList());
                 for (Tietoryhma tietoryhma : tietoryhmat) {
-                    tietoryhma.updateHenkilo(new TietoryhmaContextImpl(currentHenkilo, postitoimipaikat, maat), updateHenkilo);
+                    tietoryhma.updateHenkilo(new TietoryhmaContextImpl(currentHenkilo, this.koodistoService), updateHenkilo);
                 }
                 if (Boolean.TRUE.equals(updateHenkilo.getTurvakielto())) {
                     // turvakielto meni päälle tässä muutoksessa -> poistetaan muutostietopalvelun alaiset yhteystiedot
@@ -111,6 +115,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
                         updateHenkilo.setKutsumanimi(etunimet);
                     }
                 }
+                this.correctingHenkiloUpdateValidator.validateAndCorrectErrors(updateHenkilo);
                 this.onrServiceClient.updateHenkilo(updateHenkilo, true);
             }
             else {
@@ -126,8 +131,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
     private static class TietoryhmaContextImpl implements Tietoryhma.Context {
 
         private final HenkiloDto currentHenkilo;
-        private final Map<String, KoodiDto> postitoimipaikat;
-        private final Map<String, KoodiDto> maat;
+        private final KoodistoService koodistoService;
 
         private static Optional<String> getKoodiNimi(Map<String, KoodiDto> koodit, String koodiArvo, String kieli) {
             return Optional.ofNullable(koodit.get(koodiArvo))
@@ -141,12 +145,12 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
 
         @Override
         public Optional<String> getPostitoimipaikka(String postinumero, String kieli) {
-            return getKoodiNimi(postitoimipaikat, postinumero, kieli);
+            return getKoodiNimi(this.koodistoService.listAsMap(Koodisto.POSTI), postinumero, kieli);
         }
 
         @Override
         public Optional<String> getMaa(String maakoodi, String kieli) {
-            return getKoodiNimi(maat, maakoodi, kieli);
+            return getKoodiNimi(this.koodistoService.listAsMap(Koodisto.MAAT_JA_VALTIOT_2), maakoodi, kieli);
         }
 
     }

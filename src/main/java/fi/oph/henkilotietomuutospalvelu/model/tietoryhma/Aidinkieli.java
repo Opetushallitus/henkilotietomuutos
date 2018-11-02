@@ -25,8 +25,6 @@ public class Aidinkieli extends Tietoryhma {
      * Poikkeustapauksissa kielikoodiksi on annettu "98" ja lisätiedoissa lukee selvennys.
      */
 
-    public static final String KIELIKOODI_TUNTEMATON = "99";
-
     @Column(name = "language_code")
     private String languageCode; // ISO639-standardin mukainen kielikoodi tai "98"
     @Column(name = "additional_information")

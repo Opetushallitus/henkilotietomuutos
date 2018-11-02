@@ -8,7 +8,10 @@ import lombok.RequiredArgsConstructor;
 public enum Koodisto {
 
     POSTI("posti"),
-    MAAT_JA_VALTIOT_2("maatjavaltiot2")
+    MAAT_JA_VALTIOT_2("maatjavaltiot2"),
+    KUNTA("kunta"),
+    KIELI("kieli"),
+    HUOLTAJUUSTYYPPI("huoltajuustyyppi")
     ;
 
     private final String uri;
