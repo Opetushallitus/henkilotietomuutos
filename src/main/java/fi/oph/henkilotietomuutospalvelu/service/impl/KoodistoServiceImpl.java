@@ -6,6 +6,7 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -30,8 +31,13 @@ public class KoodistoServiceImpl implements KoodistoService {
 
     @Override
     public boolean isKoodiValid(Koodisto koodisto, String koodi) {
+        if (StringUtils.isEmpty(koodi)) {
+            return false;
+        }
         return this.list(koodisto).stream()
-                .anyMatch(kuntaKoodi -> kuntaKoodi.getKoodiArvo().equals(koodi));
+                .map(KoodiDto::getKoodiArvo)
+                .map(String::toLowerCase)
+                .anyMatch(kuntaKoodi -> kuntaKoodi.equals(koodi.toLowerCase()));
     }
 
 }
