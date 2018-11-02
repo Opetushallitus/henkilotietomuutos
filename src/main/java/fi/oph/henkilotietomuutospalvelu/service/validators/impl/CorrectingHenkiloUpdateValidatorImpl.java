@@ -79,7 +79,7 @@ public class CorrectingHenkiloUpdateValidatorImpl implements CorrectingHenkiloUp
         Set<String> correctedValues = values.stream()
                 .map(value -> isValidCheck.apply(value) ? value : defaultValue.getKoodi())
                 .collect(Collectors.toSet());
-        if (values.stream().anyMatch(isValidCheck::apply)) {
+        if (values.stream().noneMatch(isValidCheck::apply)) {
             log.warn("Replacing {} containing invalid koodi values with {}", values, correctedValues);
         }
         setter.accept(correctedValues);

@@ -72,6 +72,7 @@ public class OnrServiceClientImpl implements OnrServiceClient {
                             .build())
                     .build();
             ophHttpClient.execute(request)
+                    .handleErrorStatus(400).with(returnString -> {throw new RestClientException(returnString);})
                     .expectedStatus(SC_OK)
                     .ignoreResponse();
         }
