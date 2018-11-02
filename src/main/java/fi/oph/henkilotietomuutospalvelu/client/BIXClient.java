@@ -94,7 +94,8 @@ public class BIXClient implements Closeable {
             session.connect();
 
             channel = (ChannelSftp) session.openChannel("sftp");
-            channel.connect();
+            int timeout = 60000;
+            channel.connect(timeout);
         } catch (JSchException e) {
             throw new IOException("Could not open sftp session.", e);
         }
