@@ -1,13 +1,16 @@
 package fi.oph.henkilotietomuutospalvelu.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 @Getter
 @Setter
-public class KoodiDto {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class KoodiDto implements Serializable {
 
     private String koodiArvo;
     private Collection<KoodiMetadataDto> metadata;

@@ -41,8 +41,6 @@ public class Kansalaisuus extends Tietoryhma {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    public static final String KANSALAISUUSKOODI_TUNTEMATON = "998";
-
     @Builder
     public Kansalaisuus(Ryhmatunnus ryhmatunnus, Muutostapa muutostapa, String code, Boolean valid,
                         LocalDate startDate, LocalDate endDate){

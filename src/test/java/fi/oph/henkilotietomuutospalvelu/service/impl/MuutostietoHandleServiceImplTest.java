@@ -11,6 +11,8 @@ import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TietoryhmaRepository;
+import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
+import fi.oph.henkilotietomuutospalvelu.service.validators.CorrectingHenkiloUpdateValidator;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.YhteystiedotRyhmaDto;
@@ -62,6 +64,12 @@ public class MuutostietoHandleServiceImplTest {
 
     @Captor
     private ArgumentCaptor<HenkiloForceUpdateDto> henkiloForceUpdateDtoArgumentCaptor;
+
+    @Mock
+    private CorrectingHenkiloUpdateValidator correctingHenkiloUpdateValidator;
+
+    @Mock
+    private KoodistoService koodistoService;
 
     @Test
     public void lastRowIsNotPresent() {
@@ -122,7 +130,7 @@ public class MuutostietoHandleServiceImplTest {
 
         given(this.onrServiceClient.getHenkiloByHetu(eq("hetu1"))).willReturn(Optional.empty());
 
-        this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+        this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
 
         assertThat(henkiloMuutostietoRivi)
                 .extracting(HenkiloMuutostietoRivi::getProcessTimestamp)
@@ -141,7 +149,7 @@ public class MuutostietoHandleServiceImplTest {
         given(this.onrServiceClient.getHenkiloByHetu(eq("hetu2"))).willReturn(Optional.empty());
         given(this.henkiloMuutostietoRepository.findHenkiloMuutostietoRiviByQueryHetu(eq("hetu1")))
                 .willReturn(Lists.newArrayList(henkiloMuutostietoRiviOtherHetu));
-        this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, null, null);
+        this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
 
         assertThat(henkiloMuutostietoRivi)
                 .extracting(HenkiloMuutostietoRivi::getProcessTimestamp)
@@ -177,7 +185,7 @@ public class MuutostietoHandleServiceImplTest {
         given(this.henkiloMuutostietoRepository.findHenkiloMuutostietoRiviByQueryHetu(eq("hetu1")))
                 .willReturn(Lists.newArrayList(henkiloMuutostietoRiviOtherHetu, henkiloMuutostietoRivi));
 
-        this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, null, null);
+        this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
         verify(this.onrServiceClient).updateHenkilo(this.henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
 
         assertThat(henkiloMuutostietoRivi)
@@ -211,7 +219,7 @@ public class MuutostietoHandleServiceImplTest {
 
         given(this.onrServiceClient.getHenkiloByHetu(eq("hetu1"))).willReturn(Optional.of(henkiloDto));
 
-        this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+        this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
         verify(this.onrServiceClient).updateHenkilo(this.henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
 
         assertThat(henkiloMuutostietoRivi)
@@ -255,7 +263,7 @@ public class MuutostietoHandleServiceImplTest {
                 .build();
         when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
 
-        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
 
         verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
@@ -301,7 +309,7 @@ public class MuutostietoHandleServiceImplTest {
                 .build();
         when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
 
-        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
 
         verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
@@ -345,7 +353,7 @@ public class MuutostietoHandleServiceImplTest {
                 .build();
         when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
 
-        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
 
         verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
@@ -376,7 +384,7 @@ public class MuutostietoHandleServiceImplTest {
         HenkiloDto henkiloDto = HenkiloDto.builder().build();
         when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
 
-        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
 
         verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
@@ -402,7 +410,7 @@ public class MuutostietoHandleServiceImplTest {
                 .build();
         when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
 
-        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
 
         verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
@@ -428,7 +436,7 @@ public class MuutostietoHandleServiceImplTest {
                 .build();
         when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
 
-        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
 
         verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
@@ -453,7 +461,7 @@ public class MuutostietoHandleServiceImplTest {
                 .build();
         when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
 
-        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
 
         verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
@@ -478,7 +486,7 @@ public class MuutostietoHandleServiceImplTest {
                 .build();
         when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
 
-        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi, Collections.emptyMap(), Collections.emptyMap());
+        muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
 
         verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();

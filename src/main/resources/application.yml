@@ -11,6 +11,11 @@ spring:
     baseline-on-migrate: false
     baseline-version: 2018022615382893874
     table: flyway_schema_history
+  cache:
+    type: jcache
+    jcache:
+      provider: org.ehcache.jsr107.EhcacheCachingProvider
+    cache-names: koodisto
 
 server:
   servlet:

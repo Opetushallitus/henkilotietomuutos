@@ -23,7 +23,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Kotikunta extends Tietoryhma {
 
-    public static final String KUNTAKOODI_TUNTEMATON = "999";
     /**
      * Kolmenumeroinen kuntanumero.
      */

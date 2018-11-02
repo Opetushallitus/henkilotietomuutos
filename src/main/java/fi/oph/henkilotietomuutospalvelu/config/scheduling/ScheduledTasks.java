@@ -2,7 +2,9 @@ package fi.oph.henkilotietomuutospalvelu.config.scheduling;
 
 import fi.oph.henkilotietomuutospalvelu.config.properties.SchedulingProperties;
 import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
+import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.service.HetuService;
+import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,8 @@ public class ScheduledTasks {
     private final HetuService hetuService;
 
     private final SchedulingProperties schedulingProperties;
+
+    private final KoodistoService koodistoService;
 
     @Scheduled(fixedDelayString = "${scheduling.fixed-delay-in-millis.downloading}", initialDelay = 3500)
     public void downloadMuutostiedot() {
