@@ -81,6 +81,7 @@ public class Huoltaja extends Tietoryhma {
                 huoltajaCreateDto.setSukunimi(this.henkilotunnuksetonHenkilo.getLastname());
                 huoltajaCreateDto.setKansalaisuusKoodi(Collections.singleton(this.henkilotunnuksetonHenkilo.getNationality()));
                 huoltajaCreateDto.setSyntymaaika(this.henkilotunnuksetonHenkilo.getDateOfBirth());
+                huoltajaCreateDto.setHetu(null);
             }
             henkilo.getHuoltajat().add(huoltajaCreateDto);
         }

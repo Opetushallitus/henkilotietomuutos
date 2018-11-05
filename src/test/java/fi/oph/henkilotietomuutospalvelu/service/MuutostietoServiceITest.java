@@ -128,8 +128,8 @@ public class MuutostietoServiceITest {
                         "2");
         assertThat(updatedHenkilo.getHuoltajat())
                 .extracting(HuoltajaCreateDto::getHetu)
-                .containsExactlyInAnyOrder("140434-0665", "");
-        assertThat(filter(updatedHenkilo.getHuoltajat()).with("hetu", "").get())
+                .containsExactlyInAnyOrder("140434-0665", null);
+        assertThat(filter(updatedHenkilo.getHuoltajat()).with("hetu", null).get())
                 .extracting(HuoltajaCreateDto::getEtunimet,
                         HuoltajaCreateDto::getSukunimi,
                         HuoltajaCreateDto::getKansalaisuusKoodi,
