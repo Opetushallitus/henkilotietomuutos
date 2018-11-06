@@ -235,6 +235,6 @@ public class HenkilotunnuskorjausTest {
         henkilotunnuskorjausLisatieto.updateHenkilo(context, henkilo);
         henkilotunnuskorjausMuutettu.updateHenkilo(context, henkilo);
 
-        assertThat(henkilo.getYksiloityHetu()).containsExactlyInAnyOrder("hetu1", "hetu2", "hetu3");
+        assertThat(henkilo.getKaikkiHetut()).containsExactlyInAnyOrder("hetu1", "hetu2", "hetu3");
     }
 }

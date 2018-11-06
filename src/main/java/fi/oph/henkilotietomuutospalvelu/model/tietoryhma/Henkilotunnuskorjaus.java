@@ -64,10 +64,10 @@ public class Henkilotunnuskorjaus extends Tietoryhma {
                 henkilo.setHetu(hetu);
         }
 
-        if (henkilo.getYksiloityHetu() == null) {
-            henkilo.setYksiloityHetu(new HashSet<>());
+        if (henkilo.getKaikkiHetut() == null) {
+            henkilo.setKaikkiHetut(new HashSet<>());
         }
-        henkilo.getYksiloityHetu().add(hetu);
+        henkilo.getKaikkiHetut().add(hetu);
     }
 
     private boolean isActiveAndModifies(String currentHetu) {
