@@ -2,7 +2,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +13,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 
 @Entity
 @DiscriminatorValue("henkilotunnuskorjaus")
@@ -63,6 +63,11 @@ public class Henkilotunnuskorjaus extends Tietoryhma {
         if (this.isActiveAndModifies(context.getCurrentHenkilo().getHetu())) {
                 henkilo.setHetu(hetu);
         }
+
+        if (henkilo.getKaikkiHetut() == null) {
+            henkilo.setKaikkiHetut(new HashSet<>());
+        }
+        henkilo.getKaikkiHetut().add(hetu);
     }
 
     private boolean isActiveAndModifies(String currentHetu) {
