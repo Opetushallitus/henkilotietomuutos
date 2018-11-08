@@ -4,8 +4,9 @@ import com.jcraft.jsch.*;
 import fi.oph.henkilotietomuutospalvelu.config.properties.FtpProperties;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.*;
-import java.util.Arrays;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Vector;
@@ -91,6 +92,7 @@ public class BIXClient implements Closeable {
             session.setConfig("StrictHostKeyChecking", "yes");
             session.setPassword(ftpProperties.getPassword());
             session.setUserInfo(new UserInfoDebugger());
+            session.setTimeout(60000);
             session.connect();
 
             channel = (ChannelSftp) session.openChannel("sftp");
