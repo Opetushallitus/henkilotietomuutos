@@ -1,8 +1,10 @@
 package fi.oph.henkilotietomuutospalvelu.service.impl;
 
+import fi.oph.henkilotietomuutospalvelu.client.OnrServiceClient;
 import fi.oph.henkilotietomuutospalvelu.client.VtjServiceClient;
 import fi.oph.henkilotietomuutospalvelu.config.OrikaConfiguration;
 import fi.oph.henkilotietomuutospalvelu.service.VtjService;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HuoltajaCreateDto;
 import fi.vm.sade.rajapinnat.vtj.api.YksiloityHenkilo;
@@ -12,6 +14,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,6 +25,7 @@ import static fi.oph.henkilotietomuutospalvelu.service.validators.UnknownKoodi.H
 @RequiredArgsConstructor
 public class VtjServiceImpl implements VtjService {
     private final VtjServiceClient vtjServiceClient;
+    private final OnrServiceClient onrServiceClient;
 
     private final OrikaConfiguration orikaConfiguration;
 
@@ -29,19 +34,35 @@ public class VtjServiceImpl implements VtjService {
 
     @Override
     public void rikastaHuoltajatVtjTiedoilla(HenkiloForceUpdateDto henkiloForceUpdateDto) {
-        // Hetulliset
+        // Hetulliset yksilöidyt
+        Set<String> ennestaanLoytyvatYksiloidytHetut = henkiloForceUpdateDto.getHuoltajat().stream()
+                .filter(huoltajaCreateDto -> StringUtils.hasLength(huoltajaCreateDto.getHetu()))
+                .map(huoltajaCreateDto -> onrServiceClient.getHenkiloByHetu(huoltajaCreateDto.getHetu()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(HenkiloDto::isYksiloityVTJ)
+                .flatMap(henkiloDto -> Stream.concat(Stream.of(henkiloDto.getHetu()), henkiloDto.getKaikkiHetut().stream()))
+                .collect(Collectors.toSet());
+        Stream<HuoltajaCreateDto> hetullisetYksiloidytHuoltajat = henkiloForceUpdateDto.getHuoltajat().stream()
+                .filter(huoltajaCreateDto -> ennestaanLoytyvatYksiloidytHetut.contains(huoltajaCreateDto.getHetu()));
+        // Hetulliset ei yksilöidyt
         Stream<HuoltajaCreateDto> rikastetutHetulisetHuoltajat = henkiloForceUpdateDto.getHuoltajat().stream()
                 .filter(huoltajaCreateDto -> StringUtils.hasLength(huoltajaCreateDto.getHetu()))
+                .filter(huoltajaCreateDto -> !ennestaanLoytyvatYksiloidytHetut.contains(huoltajaCreateDto.getHetu()))
                 .map(huoltajaCreateDto -> vtjServiceClient.getHenkiloByHetu(huoltajaCreateDto.getHetu()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .filter(YksiloityHenkilo::isPassivoitu)
+                .filter(yksiloityHenkilo -> !yksiloityHenkilo.isPassivoitu())
                 .map(yksiloityHenkilo -> this.orikaConfiguration.map(yksiloityHenkilo, HuoltajaCreateDto.class))
                 .map(huoltajaCreateDto -> this.setHuoltajuusTyyppikoodit(huoltajaCreateDto, henkiloForceUpdateDto.getHuoltajat()));
         // Hetuttomat (ei tehdä muutoksia)
         Stream<HuoltajaCreateDto> hetuttomatHuoltajat = henkiloForceUpdateDto.getHuoltajat().stream()
                 .filter(huoltajaCreateDto -> StringUtils.isEmpty(huoltajaCreateDto.getHetu()));
-        henkiloForceUpdateDto.setHuoltajat(Stream.concat(rikastetutHetulisetHuoltajat, hetuttomatHuoltajat).collect(Collectors.toSet()));
+
+        Set<HuoltajaCreateDto> huoltajaCreateDtos = Stream.of(rikastetutHetulisetHuoltajat, hetuttomatHuoltajat, hetullisetYksiloidytHuoltajat)
+                .flatMap(streamOfStreams -> streamOfStreams)
+                .collect(Collectors.toSet());
+        henkiloForceUpdateDto.setHuoltajat(huoltajaCreateDtos);
     }
 
     private HuoltajaCreateDto setHuoltajuusTyyppikoodit(HuoltajaCreateDto huoltajaCreateDto, Collection<HuoltajaCreateDto> kaikkiHuoltajat) {
