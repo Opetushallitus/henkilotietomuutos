@@ -2,7 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.mapping;
 
 import fi.oph.henkilotietomuutospalvelu.config.OrikaConfiguration;
 import fi.oph.henkilotietomuutospalvelu.config.OrikaMapperFactory;
-import fi.oph.henkilotietomuutospalvelu.mappers.HenkiloDuplicateDtoConverter;
+import fi.oph.henkilotietomuutospalvelu.mappers.OsoitetietoToYhteystiedotRyhmaConverter;
 import fi.vm.sade.oppijanumerorekisteri.dto.HuoltajaCreateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.YhteystiedotRyhmaDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.YhteystietoDto;
@@ -23,7 +23,7 @@ import static fi.vm.sade.oppijanumerorekisteri.dto.YhteystietoTyyppi.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-        classes = {OrikaConfiguration.class, OrikaMapperFactory.class, HenkiloDuplicateDtoConverter.class})
+        classes = {OrikaConfiguration.class, OrikaMapperFactory.class, OsoitetietoToYhteystiedotRyhmaConverter.class})
 @RunWith(SpringRunner.class)
 public class OrikaMappingTest {
     @Autowired

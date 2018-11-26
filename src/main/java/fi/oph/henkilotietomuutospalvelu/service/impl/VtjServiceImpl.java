@@ -9,18 +9,19 @@ import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HuoltajaCreateDto;
 import fi.vm.sade.rajapinnat.vtj.api.YksiloityHenkilo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static fi.oph.henkilotietomuutospalvelu.service.validators.UnknownKoodi.HUOLTAJUUSTYYPPI_TUNTEMATON;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VtjServiceImpl implements VtjService {
@@ -33,7 +34,7 @@ public class VtjServiceImpl implements VtjService {
     public static final String RYHMAKUVAUS_VTJ_SAHKOINEN_OSOITE = "yhteystietotyyppi8";
 
     @Override
-    public void rikastaHuoltajatVtjTiedoilla(HenkiloForceUpdateDto henkiloForceUpdateDto) {
+    public void yksiloiHuoltajatTarvittaessa(HenkiloForceUpdateDto henkiloForceUpdateDto) {
         // Hetulliset yksilöidyt
         Set<String> ennestaanLoytyvatYksiloidytHetut = henkiloForceUpdateDto.getHuoltajat().stream()
                 .filter(huoltajaCreateDto -> StringUtils.hasLength(huoltajaCreateDto.getHetu()))
@@ -52,7 +53,7 @@ public class VtjServiceImpl implements VtjService {
                 .map(huoltajaCreateDto -> vtjServiceClient.getHenkiloByHetu(huoltajaCreateDto.getHetu()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .filter(yksiloityHenkilo -> !yksiloityHenkilo.isPassivoitu())
+                .filter(this::filterPassivoitu)
                 .map(yksiloityHenkilo -> this.orikaConfiguration.map(yksiloityHenkilo, HuoltajaCreateDto.class))
                 .map(huoltajaCreateDto -> this.setHuoltajuusTyyppikoodit(huoltajaCreateDto, henkiloForceUpdateDto.getHuoltajat()));
         // Hetuttomat (ei tehdä muutoksia)
@@ -67,6 +68,7 @@ public class VtjServiceImpl implements VtjService {
 
     private HuoltajaCreateDto setHuoltajuusTyyppikoodit(HuoltajaCreateDto huoltajaCreateDto, Collection<HuoltajaCreateDto> kaikkiHuoltajat) {
         String huoltajuustyyppikoodi = kaikkiHuoltajat.stream()
+                .filter(huoltaja -> StringUtils.hasLength(huoltaja.getHetu()))
                 .filter(huoltaja -> huoltaja.getHetu().equals(huoltajaCreateDto.getHetu()))
                 .map(HuoltajaCreateDto::getHuoltajuustyyppiKoodi)
                 .findFirst()
@@ -75,4 +77,10 @@ public class VtjServiceImpl implements VtjService {
         return huoltajaCreateDto;
     }
 
+    private boolean filterPassivoitu(YksiloityHenkilo yksiloityHenkilo) {
+        if (yksiloityHenkilo.isPassivoitu()) {
+            log.warn("Got passivoitu huoltaja from VTJ with hetu {}", yksiloityHenkilo.getHetu());
+        }
+        return !yksiloityHenkilo.isPassivoitu();
+    }
 }

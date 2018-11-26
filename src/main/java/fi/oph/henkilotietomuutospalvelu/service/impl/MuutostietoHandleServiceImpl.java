@@ -117,7 +117,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
                         updateHenkilo.setKutsumanimi(etunimet);
                     }
                 }
-                this.vtjService.rikastaHuoltajatVtjTiedoilla(updateHenkilo);
+                this.vtjService.yksiloiHuoltajatTarvittaessa(updateHenkilo);
                 this.correctingHenkiloUpdateValidator.validateAndCorrectErrors(updateHenkilo);
                 this.onrServiceClient.updateHenkilo(updateHenkilo, true);
             }

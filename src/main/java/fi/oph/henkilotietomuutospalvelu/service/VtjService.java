@@ -12,5 +12,5 @@ public interface VtjService {
      * merkataan huoltaja yksilöidyksi.
      * @param henkiloForceUpdateDto Päivitettävän henkilön tiedot
      */
-    void rikastaHuoltajatVtjTiedoilla(HenkiloForceUpdateDto henkiloForceUpdateDto);
+    void yksiloiHuoltajatTarvittaessa(HenkiloForceUpdateDto henkiloForceUpdateDto);
 }

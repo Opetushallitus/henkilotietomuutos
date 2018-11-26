@@ -54,6 +54,7 @@ public class OrikaConfiguration extends OrikaSpringMapper {
                         huoltajaCreateDto.setYhteystiedotRyhma(huoltajaCreateDto.getYhteystiedotRyhma().stream()
                                 .filter(yhteystiedotRyhmaDto -> !CollectionUtils.isEmpty(yhteystiedotRyhmaDto.getYhteystieto()))
                                 .collect(Collectors.toSet()));
+                        huoltajaCreateDto.setYksiloityVTJ(true);
                     }
                 })
                 .register();

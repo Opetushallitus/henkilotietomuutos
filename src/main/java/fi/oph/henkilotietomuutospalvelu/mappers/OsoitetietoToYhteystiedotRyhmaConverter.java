@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 import static fi.oph.henkilotietomuutospalvelu.service.impl.VtjServiceImpl.RYHMAALKUPERA_VTJ;
 
 @Component
-public class HenkiloDuplicateDtoConverter extends CustomConverter<YksiloityHenkilo.OsoiteTieto, YhteystiedotRyhmaDto> {
+public class OsoitetietoToYhteystiedotRyhmaConverter extends CustomConverter<YksiloityHenkilo.OsoiteTieto, YhteystiedotRyhmaDto> {
 
     @Override
     public YhteystiedotRyhmaDto convert(YksiloityHenkilo.OsoiteTieto osoiteTieto, Type<? extends YhteystiedotRyhmaDto> type, MappingContext mappingContext) {
