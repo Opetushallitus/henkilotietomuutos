@@ -14,13 +14,16 @@ import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TietoryhmaRepository;
+import fi.oph.henkilotietomuutospalvelu.service.FileService;
 import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoHandleService;
 import fi.oph.henkilotietomuutospalvelu.service.VtjService;
 import fi.oph.henkilotietomuutospalvelu.service.build.HenkiloUpdateUtil;
 import fi.oph.henkilotietomuutospalvelu.service.validators.CorrectingHenkiloUpdateValidator;
 import fi.oph.henkilotietomuutospalvelu.utils.CustomOrderComparator;
+import fi.oph.henkilotietomuutospalvelu.utils.HenkiloMuutostietoRiviComparator;
 import fi.oph.henkilotietomuutospalvelu.utils.HenkiloUtils;
+import fi.oph.henkilotietomuutospalvelu.utils.TiedostoComparator;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import lombok.Getter;
@@ -45,6 +48,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
     private final OnrServiceClient onrServiceClient;
     private final KoodistoService koodistoService;
     private final VtjService vtjService;
+    private final FileService fileService;
 
     private final HenkiloMuutostietoRepository henkiloMuutostietoRepository;
     private final TietoryhmaRepository tietoryhmaRepository;
@@ -84,18 +88,25 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void handleMuutostieto(HenkiloMuutostietoRivi henkiloMuutostietoRivi) {
-        this.getCurrentHenkilo(henkiloMuutostietoRivi.getQueryHetu()).ifPresent(currentHenkilo -> {
+        Optional<HenkiloDto> currentHenkiloOptional = this.getCurrentHenkilo(henkiloMuutostietoRivi.getQueryHetu());
+        currentHenkiloOptional.ifPresent(currentHenkilo -> {
+            List<Tietoryhma> kaikkiTietoryhmat = getKaikkiTietoryhmatByHetu(currentHenkilo.getHetu());
+
             HenkiloForceUpdateDto updateHenkilo = new HenkiloForceUpdateDto();
             updateHenkilo.setOidHenkilo(currentHenkilo.getOidHenkilo());
             updateHenkilo.setYhteystiedotRyhma(currentHenkilo.getYhteystiedotRyhma());
             updateHenkilo.setHuoltajat(new HashSet<>());
 
             if (!currentHenkilo.isPassivoitu()) {
-                List<Tietoryhma> tietoryhmat = henkiloMuutostietoRivi.getTietoryhmaList().stream()
+                List<Tietoryhma> tietoryhmat = kaikkiTietoryhmat.stream()
                         .sorted(Comparator
+                                // käsitellään tiedostot vanhimmasta uusimpaan
+                                .comparing((Tietoryhma tietoryhma) -> tietoryhma.getHenkiloMuutostietoRivi()
+                                        .getTiedosto(), new TiedostoComparator(fileService))
+                                .thenComparing(Tietoryhma::getHenkiloMuutostietoRivi, new HenkiloMuutostietoRiviComparator())
                                 // käsitellään poistot ensin koska samassa muutostietorivissä voi olla sekä poistoja
                                 // että korjauksia samoihin yhteystietotyyppeihin
-                                .comparing(Tietoryhma::getMuutostapa, new CustomOrderComparator<>(Muutostapa.POISTETTU))
+                                .thenComparing(Tietoryhma::getMuutostapa, new CustomOrderComparator<>(Muutostapa.POISTETTU))
                                 // käsitellään voimassaolevat viimeiseksi koska samassa muutostietorivissä voi olla
                                 // sekä muokkauksia (esim. passivointi) että lisäyksiä samoihin yhteystietoihin
                                 .thenComparing(Tietoryhma::isVoimassa)
@@ -124,9 +135,24 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
             else {
                 log.error("Henkilo '{}' has already been passivoitu and cannot be further modified.", currentHenkilo.getOidHenkilo());
             }
+            kaikkiTietoryhmat.stream().map(Tietoryhma::getHenkiloMuutostietoRivi).distinct().forEach(muutostietoRivi -> {
+                LocalDateTime now = LocalDateTime.now();
+                muutostietoRivi.setProcessTimestamp(now);
+                henkiloMuutostietoRepository.save(muutostietoRivi);
+            });
         });
-        henkiloMuutostietoRivi.setProcessTimestamp(LocalDateTime.now());
-        this.henkiloMuutostietoRepository.save(henkiloMuutostietoRivi);
+        if (!currentHenkiloOptional.isPresent()) {
+            henkiloMuutostietoRivi.setProcessTimestamp(LocalDateTime.now());
+            this.henkiloMuutostietoRepository.save(henkiloMuutostietoRivi);
+        }
+    }
+
+    private List<Tietoryhma> getKaikkiTietoryhmatByHetu(String hetu) {
+        return henkiloMuutostietoRepository
+                .findByQueryHetu(hetu)
+                .stream()
+                .flatMap(HenkiloMuutostietoRivi::getTietoryhmaStream)
+                .collect(Collectors.toList());
     }
 
     @Getter
