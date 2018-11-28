@@ -17,6 +17,7 @@ import org.springframework.web.client.RestClientException;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
@@ -62,7 +63,11 @@ public class VtjServiceClientImpl implements VtjServiceClient {
         if (!yksiloityHenkilo.isPresent()) {
             log.warn("Could not find henkilo from VTJ with hetu {}", hetu);
         }
-
+        try {
+            TimeUnit.MILLISECONDS.sleep(200);
+        } catch (InterruptedException ie) {
+            log.warn("Sleep was interrupted", ie);
+        }
         return yksiloityHenkilo;
     }
 }
