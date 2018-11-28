@@ -12,6 +12,7 @@ import fi.oph.henkilotietomuutospalvelu.model.Tiedosto;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Henkilotunnuskorjaus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
+import fi.oph.henkilotietomuutospalvelu.repository.HenkilotunnuskorjausRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TietoryhmaRepository;
 import fi.oph.henkilotietomuutospalvelu.service.FileService;
@@ -52,6 +53,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
 
     private final HenkiloMuutostietoRepository henkiloMuutostietoRepository;
     private final TietoryhmaRepository tietoryhmaRepository;
+    private final HenkilotunnuskorjausRepository henkilotunnuskorjausRepository;
     private final TiedostoRepository tiedostoRepository;
 
     private final CorrectingHenkiloUpdateValidator correctingHenkiloUpdateValidator;
@@ -148,8 +150,9 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
     }
 
     private List<Tietoryhma> getKaikkiTietoryhmatByHetu(String hetu) {
-        return henkiloMuutostietoRepository
-                .findByQueryHetu(hetu)
+        Set<String> kaikkiHetut = henkilotunnuskorjausRepository.findHetuByHenkilotunnuskorjausHetu(hetu);
+        kaikkiHetut.add(hetu);
+        return henkiloMuutostietoRepository.findByQueryHetuIn(kaikkiHetut)
                 .stream()
                 .flatMap(HenkiloMuutostietoRivi::getTietoryhmaStream)
                 .collect(Collectors.toList());

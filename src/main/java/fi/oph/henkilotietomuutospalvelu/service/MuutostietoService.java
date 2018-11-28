@@ -20,6 +20,11 @@ public interface MuutostietoService {
     void updateMuutostietos();
 
     /**
+     * Update all unhandled muutostiedot from database to oppijanumerorekisteri-service.
+     */
+    void updateAllMuutostietos();
+
+    /**
      * Download basic or change info through SFTP
      * @return file names
      * @throws IOException anything related to file handling

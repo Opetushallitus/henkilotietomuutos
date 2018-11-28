@@ -9,6 +9,7 @@ import fi.oph.henkilotietomuutospalvelu.model.HenkiloMuutostietoRivi;
 import fi.oph.henkilotietomuutospalvelu.model.Tiedosto;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
+import fi.oph.henkilotietomuutospalvelu.repository.HenkilotunnuskorjausRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TietoryhmaRepository;
 import fi.oph.henkilotietomuutospalvelu.service.FileService;
@@ -53,6 +54,9 @@ public class MuutostietoHandleServiceImplTest {
 
     @Mock
     private TietoryhmaRepository tietoryhmaRepository;
+
+    @Mock
+    private HenkilotunnuskorjausRepository henkilotunnuskorjausRepository;
 
     @Mock
     private TiedostoRepository tiedostoRepository;
@@ -173,7 +177,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.setTiedosto(new Tiedosto());
         henkiloMuutostietoRivi.setQueryHetu("hetu1");
         henkiloMuutostietoRivi.addTietoryhma(tietoryhma);
-        when(henkiloMuutostietoRepository.findByQueryHetu(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
+        when(henkiloMuutostietoRepository.findByQueryHetuIn(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
         HenkiloMuutostietoRivi henkiloMuutostietoRiviOtherHetu = new HenkiloMuutostietoRivi();
         henkiloMuutostietoRiviOtherHetu.setTiedosto(new Tiedosto());
@@ -217,7 +221,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.setTiedosto(new Tiedosto());
         henkiloMuutostietoRivi.setQueryHetu("hetu1");
         henkiloMuutostietoRivi.addTietoryhma(tietoryhma);
-        when(henkiloMuutostietoRepository.findByQueryHetu(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
+        when(henkiloMuutostietoRepository.findByQueryHetuIn(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
         HenkiloDto henkiloDto = HenkiloDto.builder()
                 .hetu("hetu1")
@@ -266,7 +270,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.setTiedosto(new Tiedosto());
         henkiloMuutostietoRivi.setQueryHetu("hetu1");
         henkiloMuutostietoRivi.addTietoryhma(osoiteKorjattu, osoiteKorjattavaa, osoiteLisatieto, osoitePoistettu);
-        when(henkiloMuutostietoRepository.findByQueryHetu(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
+        when(henkiloMuutostietoRepository.findByQueryHetuIn(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
         HenkiloDto henkiloDto = HenkiloDto.builder()
                 .yhteystiedotRyhma(new HashSet<>())
@@ -297,7 +301,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.setTiedosto(new Tiedosto());
         henkiloMuutostietoRivi.setQueryHetu("hetu1");
         henkiloMuutostietoRivi.addTietoryhma(osoitePoistettu);
-        when(henkiloMuutostietoRepository.findByQueryHetu(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
+        when(henkiloMuutostietoRepository.findByQueryHetuIn(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
         HenkiloDto henkiloDto = HenkiloDto.builder()
                 .yhteystiedotRyhma(Stream.of(
@@ -360,7 +364,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.setTiedosto(new Tiedosto());
         henkiloMuutostietoRivi.setQueryHetu("hetu1");
         henkiloMuutostietoRivi.addTietoryhma(osoiteLisatty, osoiteMuutettu, osoiteLisatieto);
-        when(henkiloMuutostietoRepository.findByQueryHetu(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
+        when(henkiloMuutostietoRepository.findByQueryHetuIn(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
         HenkiloDto henkiloDto = HenkiloDto.builder()
                 .yhteystiedotRyhma(new HashSet<>())
@@ -395,7 +399,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.setTiedosto(new Tiedosto());
         henkiloMuutostietoRivi.setQueryHetu("hetu1");
         henkiloMuutostietoRivi.addTietoryhma(etunimi, kutsumanimi);
-        when(henkiloMuutostietoRepository.findByQueryHetu(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
+        when(henkiloMuutostietoRepository.findByQueryHetuIn(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
         HenkiloDto henkiloDto = HenkiloDto.builder().build();
         when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
@@ -420,7 +424,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.setTiedosto(new Tiedosto());
         henkiloMuutostietoRivi.setQueryHetu("hetu1");
         henkiloMuutostietoRivi.addTietoryhma(henkiloName);
-        when(henkiloMuutostietoRepository.findByQueryHetu(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
+        when(henkiloMuutostietoRepository.findByQueryHetuIn(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
         HenkiloDto henkiloDto = HenkiloDto.builder()
                 .etunimet("vanhanimi toinennimi")
@@ -448,7 +452,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.setTiedosto(new Tiedosto());
         henkiloMuutostietoRivi.setQueryHetu("hetu1");
         henkiloMuutostietoRivi.addTietoryhma(henkiloName);
-        when(henkiloMuutostietoRepository.findByQueryHetu(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
+        when(henkiloMuutostietoRepository.findByQueryHetuIn(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
         HenkiloDto henkiloDto = HenkiloDto.builder()
                 .etunimet("vanhanimi toinennimi")
@@ -475,7 +479,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.setTiedosto(new Tiedosto());
         henkiloMuutostietoRivi.setQueryHetu("hetu1");
         henkiloMuutostietoRivi.addTietoryhma(henkiloName);
-        when(henkiloMuutostietoRepository.findByQueryHetu(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
+        when(henkiloMuutostietoRepository.findByQueryHetuIn(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
         HenkiloDto henkiloDto = HenkiloDto.builder()
                 .etunimet("vanhanimi toinennimi")
@@ -502,7 +506,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.setTiedosto(new Tiedosto());
         henkiloMuutostietoRivi.setQueryHetu("hetu1");
         henkiloMuutostietoRivi.addTietoryhma(henkiloName);
-        when(henkiloMuutostietoRepository.findByQueryHetu(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
+        when(henkiloMuutostietoRepository.findByQueryHetuIn(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
         HenkiloDto henkiloDto = HenkiloDto.builder()
                 .etunimet("vanhanimi toinennimi")

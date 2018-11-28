@@ -60,7 +60,7 @@ public class Henkilotunnuskorjaus extends Tietoryhma {
 
     @Override
     protected void updateHenkiloInternal(Context context, HenkiloForceUpdateDto henkilo) {
-        if (this.isActiveAndModifies(context.getCurrentHenkilo().getHetu())) {
+        if (this.isActiveAndModifies(context.getCurrentHenkilo().getHetu(), henkilo.getHetu())) {
                 henkilo.setHetu(hetu);
         }
 
@@ -70,7 +70,8 @@ public class Henkilotunnuskorjaus extends Tietoryhma {
         henkilo.getKaikkiHetut().add(hetu);
     }
 
-    private boolean isActiveAndModifies(String currentHetu) {
-        return Boolean.TRUE.equals(this.active) && StringUtils.hasLength(this.hetu) && !this.hetu.equals(currentHetu);
+    private boolean isActiveAndModifies(String currentHetu, String modifiedHetu) {
+        return Boolean.TRUE.equals(this.active) && StringUtils.hasLength(this.hetu)
+                && (!this.hetu.equals(currentHetu) || modifiedHetu != null && !this.hetu.equals(modifiedHetu));
     }
 }

@@ -6,13 +6,17 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Transactional(propagation = Propagation.MANDATORY)
 @Repository
 public interface HenkiloMuutostietoRepository extends CrudRepository<HenkiloMuutostietoRivi, Long>, HenkiloMuutostietoRepositoryCustom {
     List<HenkiloMuutostietoRivi> findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(String fileName);
 
-    List<HenkiloMuutostietoRivi> findByQueryHetu(String hetu);
+    Stream<HenkiloMuutostietoRivi> streamByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(String fileName);
+
+    List<HenkiloMuutostietoRivi> findByQueryHetuIn(Collection<String> hetu);
 
 }

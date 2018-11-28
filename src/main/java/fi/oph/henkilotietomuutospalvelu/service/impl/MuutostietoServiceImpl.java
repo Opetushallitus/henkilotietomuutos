@@ -6,10 +6,10 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.MuutosType;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.oph.henkilotietomuutospalvelu.service.FileService;
-import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoHandleService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoParseService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoService;
+import fi.oph.henkilotietomuutospalvelu.utils.TiedostoNimiComparator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -107,6 +107,17 @@ public class MuutostietoServiceImpl implements MuutostietoService {
                 this.henkiloMuutostietoRepository
                         .findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(fileName)
                         .forEach(this.muutostietoHandleService::handleMuutostieto));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @NotifyOnError(NotifyOnError.NotifyType.UPDATE)
+    public void updateAllMuutostietos() {
+        henkiloMuutostietoRepository.findDistinctUnprocessedTiedostoFileName()
+                .stream()
+                .sorted(new TiedostoNimiComparator(fileService))
+                .flatMap(henkiloMuutostietoRepository::streamByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi)
+                .forEach(muutostietoHandleService::handleMuutostieto);
     }
 
     /**

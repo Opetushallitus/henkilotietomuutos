@@ -9,8 +9,11 @@ import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.model.Tiedosto;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Henkilotunnuskorjaus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
+import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.vm.sade.oppijanumerorekisteri.dto.*;
 import fi.vm.sade.rajapinnat.vtj.api.YksiloityHenkilo;
 import org.assertj.core.groups.Tuple;
@@ -36,13 +39,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @IntegrationTest
@@ -59,6 +63,9 @@ public class MuutostietoServiceITest {
 
     @Autowired
     private MuutostietoHandleService muutostietoHandleService;
+
+    @Autowired
+    private TiedostoRepository tiedostoRepository;
 
     @SpyBean
     private FileService fileService;
@@ -116,7 +123,7 @@ public class MuutostietoServiceITest {
         henkilo.setOidHenkilo("1.2.246.562.24.41327169638");
         henkilo.setHetu("100271-008M");
         henkilo.setPassivoitu(false);
-        Mockito.when(onrServiceClient.getHenkiloByHetu("100271-008M")).thenReturn(Optional.of(henkilo));
+        when(onrServiceClient.getHenkiloByHetu("100271-008M")).thenReturn(Optional.of(henkilo));
 
         this.muutostietoService.importMuutostiedot(0);
         this.muutostietoService.updateMuutostietos();
@@ -156,7 +163,7 @@ public class MuutostietoServiceITest {
         henkilo.setOidHenkilo("1.2.246.562.24.41327169638");
         henkilo.setHetu("030552-085W");
         henkilo.setPassivoitu(false);
-        Mockito.when(onrServiceClient.getHenkiloByHetu("030552-085W")).thenReturn(Optional.of(henkilo));
+        when(onrServiceClient.getHenkiloByHetu("030552-085W")).thenReturn(Optional.of(henkilo));
 
         this.muutostietoService.importMuutostiedot(0);
         this.muutostietoService.updateMuutostietos();
@@ -192,7 +199,7 @@ public class MuutostietoServiceITest {
                 YhteystiedotRyhmaDto.builder().ryhmaAlkuperaTieto("alkupera1").ryhmaKuvaus("yhteystietotyyppi5").build(),
                 YhteystiedotRyhmaDto.builder().ryhmaAlkuperaTieto("alkupera2").ryhmaKuvaus("yhteystietotyyppi2").build()
         ).collect(toSet()));
-        Mockito.when(onrServiceClient.getHenkiloByHetu("030552-085W")).thenReturn(Optional.of(henkilo));
+        when(onrServiceClient.getHenkiloByHetu("030552-085W")).thenReturn(Optional.of(henkilo));
 
         this.muutostietoService.importMuutostiedot(0);
         this.muutostietoService.updateMuutostietos();
@@ -225,7 +232,7 @@ public class MuutostietoServiceITest {
         henkilo.setSukupuoli("2");
         henkilo.setEtunimet("Vanhaetunimi");
         henkilo.setSukunimi("Vanhasukunimi");
-        Mockito.when(this.onrServiceClient.getHenkiloByHetu("250198-9606")).thenReturn(Optional.of(henkilo));
+        when(this.onrServiceClient.getHenkiloByHetu("250198-9606")).thenReturn(Optional.of(henkilo));
 
         List<MuutostietoDto> muutostietoDtos = this.muutostietoService.importMuutostiedot(0);
         this.muutostietoService.updateMuutostietos();
@@ -252,4 +259,149 @@ public class MuutostietoServiceITest {
         assertThat(updatedHenkilo.getSukunimi()).isNull();
         assertThat(updatedHenkilo.getHuoltajat()).isEmpty();
     }
+
+    @Test
+    public void uudelleenkasittelyHenkilotunnuskorjausOppijanumerorekisteriEiTunnistaVanhojaHetuja() {
+        String hetu1 = "281198-911L";
+        String hetu2 = "281198-9540";
+
+        HenkiloDto readDto = new HenkiloDto();
+        readDto.setHetu(hetu1);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu1))).thenReturn(Optional.of(readDto));
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.empty());
+
+        // hetukorjaus 1
+        String tiedostonimi1 = "test_001.PTT";
+        tallennaTiedosto(tiedostonimi1, MuutostietoDto.builder()
+                .hetu(hetu1)
+                .tietoryhmat(asList(
+                        Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(hetu1).active(false).build(),
+                        Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(hetu2).active(true).build()
+                ))
+                .tiedostoNimi(tiedostonimi1)
+                .build());
+
+        muutostietoService.updateAllMuutostietos();
+
+        verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
+        assertThat(captor.getValue()).returns(hetu2, HenkiloUpdateDto::getHetu);
+
+        // hetukorjaus 2
+        String hetu3 = "281198-9019";
+        readDto.setHetu(hetu2);
+        reset(onrServiceClient);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu1))).thenReturn(Optional.empty());
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.of(readDto));
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu3))).thenReturn(Optional.empty());
+
+        String tiedostonimi2 = "test_001.MTT";
+        tallennaTiedosto(tiedostonimi2, MuutostietoDto.builder()
+                .hetu(hetu2)
+                .tietoryhmat(asList(
+                        Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(hetu1).active(false).build(),
+                        Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(hetu2).active(false).build(),
+                        Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(hetu3).active(true).build()
+                ))
+                .tiedostoNimi(tiedostonimi2)
+                .build());
+
+        muutostietoService.updateAllMuutostietos();
+
+        verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
+        assertThat(captor.getValue()).returns(hetu3, HenkiloUpdateDto::getHetu);
+
+        // uudelleenkäsittely
+        henkiloMuutostietoRepository.findAll().forEach(h -> {
+            h.setProcessTimestamp(null);
+            henkiloMuutostietoRepository.save(h);
+        });
+        readDto.setHetu(hetu3);
+        reset(onrServiceClient);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu1))).thenReturn(Optional.empty());
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.empty());
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu3))).thenReturn(Optional.of(readDto));
+
+        muutostietoService.updateAllMuutostietos();
+
+        verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
+        assertThat(captor.getValue()).returns(hetu3, HenkiloUpdateDto::getHetu);
+    }
+
+    @Test
+    public void uudelleenkasittelyHenkilotunnuskorjausOppijanumerorekisteriTunnistaaVanhatHetut() {
+        String hetu1 = "281198-911L";
+        String hetu2 = "281198-9540";
+
+        HenkiloDto readDto = new HenkiloDto();
+        readDto.setHetu(hetu1);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu1))).thenReturn(Optional.of(readDto));
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.empty());
+
+        // hetukorjaus 1
+        String tiedostonimi1 = "test_001.PTT";
+        tallennaTiedosto(tiedostonimi1, MuutostietoDto.builder()
+                .hetu(hetu1)
+                .tietoryhmat(asList(
+                        Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(hetu1).active(false).build(),
+                        Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(hetu2).active(true).build()
+                ))
+                .tiedostoNimi(tiedostonimi1)
+                .build());
+
+        muutostietoService.updateAllMuutostietos();
+
+        verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
+        assertThat(captor.getValue()).returns(hetu2, HenkiloUpdateDto::getHetu);
+
+        // hetukorjaus 2
+        String hetu3 = "281198-9019";
+        readDto.setHetu(hetu2);
+        reset(onrServiceClient);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu1))).thenReturn(Optional.of(readDto));
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.of(readDto));
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu3))).thenReturn(Optional.empty());
+
+        String tiedostonimi2 = "test_001.MTT";
+        tallennaTiedosto(tiedostonimi2, MuutostietoDto.builder()
+                .hetu(hetu2)
+                .tietoryhmat(asList(
+                        Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(hetu1).active(false).build(),
+                        Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(hetu2).active(false).build(),
+                        Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(hetu3).active(true).build()
+                ))
+                .tiedostoNimi(tiedostonimi2)
+                .build());
+
+        muutostietoService.updateAllMuutostietos();
+
+        verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
+        assertThat(captor.getValue()).returns(hetu3, HenkiloUpdateDto::getHetu);
+
+        // uudelleenkäsittely
+        henkiloMuutostietoRepository.findAll().forEach(h -> {
+            h.setProcessTimestamp(null);
+            henkiloMuutostietoRepository.save(h);
+        });
+        readDto.setHetu(hetu3);
+        reset(onrServiceClient);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu1))).thenReturn(Optional.of(readDto));
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.of(readDto));
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu3))).thenReturn(Optional.of(readDto));
+
+        muutostietoService.updateAllMuutostietos();
+
+        verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
+        assertThat(captor.getValue()).returns(hetu3, HenkiloUpdateDto::getHetu);
+    }
+
+    private void tallennaTiedosto(String tiedostonimi, MuutostietoDto muutostieto) {
+        tallennaTiedosto(tiedostonimi, singletonList(muutostieto));
+    }
+
+    private void tallennaTiedosto(String tiedostonimi, List<MuutostietoDto> muutostiedot) {
+        tiedostoRepository.findByFileName(tiedostonimi)
+                .orElseGet(() -> tiedostoRepository.save(new Tiedosto(tiedostonimi, 0)));
+        muutostietoHandleService.importUnprocessedMuutostiedotToDb(muutostiedot, tiedostonimi);
+    }
+
 }
