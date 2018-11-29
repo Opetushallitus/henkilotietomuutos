@@ -11,7 +11,9 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.Tiedosto;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Henkilotunnuskorjaus;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.KotimainenOsoite;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Turvakielto;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.vm.sade.oppijanumerorekisteri.dto.*;
@@ -34,6 +36,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -334,6 +337,93 @@ public class MuutostietoServiceITest {
 
         verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
         assertThat(captor.getValue()).returns(hetu3, HenkiloUpdateDto::getHetu);
+    }
+
+    @Test
+    public void uudelleenkasittelyTurvakieltoFalseSailyttaaYhteystiedot() {
+        String hetu = "281198-911L";
+
+        String tiedostonimi1 = "test_001.PTT";
+        tallennaTiedosto(tiedostonimi1, MuutostietoDto.builder()
+                .hetu(hetu)
+                .tietoryhmat(asList(
+                        KotimainenOsoite.builder().lahiosoite("osoite1").postinumero("00001").build()
+                ))
+                .tiedostoNimi(tiedostonimi1)
+                .build());
+        String tiedostonimi2 = "test_001.MTT";
+        tallennaTiedosto(tiedostonimi2, MuutostietoDto.builder()
+                .hetu(hetu)
+                .tietoryhmat(asList(
+                        Turvakielto.builder().build()
+                ))
+                .tiedostoNimi(tiedostonimi2)
+                .build());
+        String tiedostonimi3 = "test_002.MTT";
+        tallennaTiedosto(tiedostonimi3, MuutostietoDto.builder()
+                .hetu(hetu)
+                .tietoryhmat(asList(
+                        Turvakielto.builder().endDate(LocalDate.now().minusDays(1L)).build(),
+                        KotimainenOsoite.builder().lahiosoite("osoite2").postinumero("00002").build()
+                ))
+                .tiedostoNimi(tiedostonimi3)
+                .build());
+
+        HenkiloDto readDto = new HenkiloDto();
+        readDto.setHetu(hetu);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
+
+        muutostietoService.updateAllMuutostietos();
+
+        verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = captor.getValue();
+        assertThat(updateDto)
+                .returns(false, HenkiloForceUpdateDto::getTurvakielto)
+                .satisfies(t -> {
+                    assertThat(t.getYhteystiedotRyhma())
+                            .extracting(YhteystiedotRyhmaDto::getRyhmaKuvaus)
+                            .containsExactly("yhteystietotyyppi4");
+                    assertThat(t.getYhteystiedotRyhma().iterator().next().getYhteystieto())
+                            .extracting(YhteystietoDto::getYhteystietoTyyppi, YhteystietoDto::getYhteystietoArvo)
+                            .containsExactlyInAnyOrder(
+                                    tuple(YhteystietoTyyppi.YHTEYSTIETO_KATUOSOITE, "osoite2"),
+                                    tuple(YhteystietoTyyppi.YHTEYSTIETO_POSTINUMERO, "00002")
+                            );
+                });
+    }
+
+    @Test
+    public void uudelleenkasittelyTurvakieltoTruePoistaaYhteystiedot() {
+        String hetu = "281198-911L";
+
+        String tiedostonimi1 = "test_001.PTT";
+        tallennaTiedosto(tiedostonimi1, MuutostietoDto.builder()
+                .hetu(hetu)
+                .tietoryhmat(asList(
+                        KotimainenOsoite.builder().lahiosoite("osoite1").postinumero("00001").build()
+                ))
+                .tiedostoNimi(tiedostonimi1)
+                .build());
+        String tiedostonimi2 = "test_001.MTT";
+        tallennaTiedosto(tiedostonimi2, MuutostietoDto.builder()
+                .hetu(hetu)
+                .tietoryhmat(asList(
+                        Turvakielto.builder().build()
+                ))
+                .tiedostoNimi(tiedostonimi2)
+                .build());
+
+        HenkiloDto readDto = new HenkiloDto();
+        readDto.setHetu(hetu);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
+
+        muutostietoService.updateAllMuutostietos();
+
+        verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = captor.getValue();
+        assertThat(updateDto)
+                .returns(true, HenkiloForceUpdateDto::getTurvakielto)
+                .returns(0, t -> t.getYhteystiedotRyhma().size());
     }
 
     private void tallennaTiedosto(String tiedostonimi, MuutostietoDto muutostieto) {
