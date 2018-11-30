@@ -16,12 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class KansalaisuusTest {
 
-    private static KansalaisuusDto kansalaisuusDto(String koodi) {
-        KansalaisuusDto dto = new KansalaisuusDto();
-        dto.setKansalaisuusKoodi(koodi);
-        return dto;
-    }
-
     @Test
     public void validAndUpToDateKansalaisuusIsSet() {
         HenkiloForceUpdateDto updateDto = new HenkiloForceUpdateDto();
@@ -106,7 +100,7 @@ public class KansalaisuusTest {
         LocalDate now = LocalDate.of(2022, 1, 1);
 
         HenkiloDto readDto = new HenkiloDto();
-        readDto.setKansalaisuus(singleton(kansalaisuusDto("kansalaisuus1")));
+        readDto.setKansalaisuus(singleton(KansalaisuusDto.fromKansalaisuusKoodi("kansalaisuus1")));
 
         HenkiloForceUpdateDto updateDto = new HenkiloForceUpdateDto();
         updateDto.setKansalaisuus(null);
@@ -134,7 +128,7 @@ public class KansalaisuusTest {
         LocalDate now = LocalDate.of(2022, 1, 1);
 
         HenkiloDto readDto = new HenkiloDto();
-        readDto.setKansalaisuus(Stream.of("kansalaisuus2", "kansalaisuus3").map(KansalaisuusTest::kansalaisuusDto).collect(toSet()));
+        readDto.setKansalaisuus(Stream.of("kansalaisuus2", "kansalaisuus3").map(KansalaisuusDto::fromKansalaisuusKoodi).collect(toSet()));
 
         HenkiloForceUpdateDto updateDto = new HenkiloForceUpdateDto();
 

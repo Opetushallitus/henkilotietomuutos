@@ -71,11 +71,7 @@ public class Kansalaisuus extends Tietoryhma {
         if (updateFunc != null && updateFunc.apply(kansalaisuudet, code)) {
             henkilo.setKansalaisuus(kansalaisuudet
                     .stream()
-                    .map(koodi -> {
-                        KansalaisuusDto kansalaisuusDto = new KansalaisuusDto();
-                        kansalaisuusDto.setKansalaisuusKoodi(koodi);
-                        return kansalaisuusDto;
-                    })
+                    .map(KansalaisuusDto::fromKansalaisuusKoodi)
                     .collect(toSet()));
         }
     }

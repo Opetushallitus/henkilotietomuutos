@@ -276,7 +276,7 @@ public class MuutostietoServiceITest {
 
         HenkiloDto readDto = new HenkiloDto();
         readDto.setHetu(hetu);
-        readDto.setKansalaisuus(singleton(kansalaisuusDto("kansalaisuus1")));
+        readDto.setKansalaisuus(singleton(KansalaisuusDto.fromKansalaisuusKoodi("kansalaisuus1")));
         when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
 
         when(koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("kansalaisuus1"))).thenReturn(true);
@@ -452,12 +452,6 @@ public class MuutostietoServiceITest {
         assertThat(updateDto)
                 .returns(true, HenkiloForceUpdateDto::getTurvakielto)
                 .returns(0, t -> t.getYhteystiedotRyhma().size());
-    }
-
-    private KansalaisuusDto kansalaisuusDto(String koodi) {
-        KansalaisuusDto dto = new KansalaisuusDto();
-        dto.setKansalaisuusKoodi(koodi);
-        return dto;
     }
 
     private void tallennaTiedosto(String tiedostonimi, MuutostietoDto muutostieto) {
