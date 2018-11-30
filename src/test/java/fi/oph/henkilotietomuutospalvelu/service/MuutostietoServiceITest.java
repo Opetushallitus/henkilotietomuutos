@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.service;
 
 import fi.oph.henkilotietomuutospalvelu.IntegrationTest;
 import fi.oph.henkilotietomuutospalvelu.client.OnrServiceClient;
+import fi.oph.henkilotietomuutospalvelu.client.VtjServiceClient;
 import fi.oph.henkilotietomuutospalvelu.config.properties.AWSProperties;
 import fi.oph.henkilotietomuutospalvelu.config.properties.FtpProperties;
 import fi.oph.henkilotietomuutospalvelu.dto.KoodiDto;
@@ -13,6 +14,7 @@ import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Huoltaja;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
 import fi.vm.sade.oppijanumerorekisteri.dto.*;
+import fi.vm.sade.rajapinnat.vtj.api.YksiloityHenkilo;
 import org.assertj.core.groups.Tuple;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,6 +76,9 @@ public class MuutostietoServiceITest {
     @MockBean
     private OnrServiceClient onrServiceClient;
 
+    @MockBean
+    private VtjServiceClient vtjServiceClient;
+
     @Autowired
     private HenkiloMuutostietoRepository henkiloMuutostietoRepository;
 
@@ -106,6 +111,10 @@ public class MuutostietoServiceITest {
         given(this.koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("246"))).willReturn(true);
         given(this.koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("512"))).willReturn(true);
         given(this.koodistoService.isKoodiValid(eq(Koodisto.HUOLTAJUUSTYYPPI), eq("03"))).willReturn(true);
+
+        YksiloityHenkilo yksiloityHenkilo = new YksiloityHenkilo();
+        yksiloityHenkilo.setHetu("140434-0665");
+        given(this.vtjServiceClient.getHenkiloByHetu("140434-0665")).willReturn(Optional.of(yksiloityHenkilo));
 
         HenkiloDto henkilo = new HenkiloDto();
         henkilo.setOidHenkilo("1.2.246.562.24.41327169638");

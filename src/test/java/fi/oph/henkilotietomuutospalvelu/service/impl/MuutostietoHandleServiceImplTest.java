@@ -12,6 +12,7 @@ import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TietoryhmaRepository;
 import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
+import fi.oph.henkilotietomuutospalvelu.service.VtjService;
 import fi.oph.henkilotietomuutospalvelu.service.validators.CorrectingHenkiloUpdateValidator;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
@@ -70,6 +71,9 @@ public class MuutostietoHandleServiceImplTest {
 
     @Mock
     private KoodistoService koodistoService;
+
+    @Mock
+    private VtjService vtjService;
 
     @Test
     public void lastRowIsNotPresent() {

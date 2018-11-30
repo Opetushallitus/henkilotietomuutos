@@ -16,6 +16,7 @@ import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TietoryhmaRepository;
 import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoHandleService;
+import fi.oph.henkilotietomuutospalvelu.service.VtjService;
 import fi.oph.henkilotietomuutospalvelu.service.build.HenkiloUpdateUtil;
 import fi.oph.henkilotietomuutospalvelu.service.validators.CorrectingHenkiloUpdateValidator;
 import fi.oph.henkilotietomuutospalvelu.utils.CustomOrderComparator;
@@ -43,6 +44,7 @@ import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.removeYhte
 public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
     private final OnrServiceClient onrServiceClient;
     private final KoodistoService koodistoService;
+    private final VtjService vtjService;
 
     private final HenkiloMuutostietoRepository henkiloMuutostietoRepository;
     private final TietoryhmaRepository tietoryhmaRepository;
@@ -115,6 +117,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
                         updateHenkilo.setKutsumanimi(etunimet);
                     }
                 }
+                this.vtjService.yksiloiHuoltajatTarvittaessa(updateHenkilo);
                 this.correctingHenkiloUpdateValidator.validateAndCorrectErrors(updateHenkilo);
                 this.onrServiceClient.updateHenkilo(updateHenkilo, true);
             }
