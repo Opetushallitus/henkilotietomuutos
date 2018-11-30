@@ -4,20 +4,29 @@ import fi.oph.henkilotietomuutospalvelu.dto.KoodiMetadataDto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 class TestTietoryhmaContextImpl implements Tietoryhma.Context {
 
     private final HenkiloDto henkiloDto;
     private Optional<KoodistoService> koodistoService = Optional.empty();
+    private LocalDate now;
+
+    public TestTietoryhmaContextImpl(HenkiloDto henkiloDto) {
+        this(henkiloDto, LocalDate.now());
+    }
 
     public TestTietoryhmaContextImpl(HenkiloDto henkiloDto, KoodistoService koodistoService) {
-        this.henkiloDto = henkiloDto;
-        this.koodistoService = Optional.of(koodistoService);
+        this(henkiloDto, Optional.of(koodistoService), LocalDate.now());
+    }
+
+    public TestTietoryhmaContextImpl(HenkiloDto henkiloDto, LocalDate now) {
+        this(henkiloDto, Optional.empty(), now);
     }
 
     @Override
@@ -49,4 +58,7 @@ class TestTietoryhmaContextImpl implements Tietoryhma.Context {
                         .findFirst()));
     }
 
+    public LocalDate getLocalDateNow() {
+        return now;
+    }
 }

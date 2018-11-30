@@ -1,23 +1,25 @@
 package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
-import com.google.common.collect.Sets;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.KansalaisuusDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
+
+import static java.util.stream.Collectors.toSet;
 
 @Entity
 @DiscriminatorValue("kansalaisuus")
@@ -52,49 +54,47 @@ public class Kansalaisuus extends Tietoryhma {
     }
 
     @Override
+    protected Set<Muutostapa> getRedundantChanges() {
+        return EnumSet.of(Muutostapa.LISATIETO, Muutostapa.KORJATTAVAA);
+    }
+
+    @Override
     protected void updateHenkiloInternal(Context context, HenkiloForceUpdateDto henkilo) {
         // We don't schedule upcoming updates so startDate is ignored
-        if (this.valid && (this.endDate == null || LocalDate.now().isBefore(this.endDate))) {
-            KansalaisuusDto newKansalaisuus = new KansalaisuusDto();
-            newKansalaisuus.setKansalaisuusKoodi(this.code);
+        boolean voimassa = this.valid && (this.endDate == null || context.getLocalDateNow().isBefore(this.endDate));
 
-            // New info so overriding any old ones
-            if (this.getMuutostapa().equals(Muutostapa.LISATTY)) {
-                if (CollectionUtils.isEmpty(henkilo.getKansalaisuus())) {
-                    henkilo.setKansalaisuus(Sets.newHashSet(newKansalaisuus));
-                }
-                // Kaksoiskansalaisuus (in other)
-                else {
-                    Set<KansalaisuusDto> multipleNewKansalaisuusSet = Sets.newHashSet(henkilo.getKansalaisuus());
-                    multipleNewKansalaisuusSet.add(newKansalaisuus);
-                    henkilo.setKansalaisuus(multipleNewKansalaisuusSet);
-                }
-            }
-            // Fix or change so add if not already in kansalaisuus list
-            else {
-                HenkiloDto currentHenkilo = context.getCurrentHenkilo();
-                if (currentHenkilo.getKansalaisuus().stream()
-                        .map(KansalaisuusDto::getKansalaisuusKoodi)
-                        .noneMatch(kansalaisuusKoodi -> kansalaisuusKoodi.equals(this.code))) {
-                    if (CollectionUtils.isEmpty(henkilo.getKansalaisuus())) {
-                        Set<KansalaisuusDto> kansalaisuusDtos = new HashSet<>(currentHenkilo.getKansalaisuus());
-                        kansalaisuusDtos.add(newKansalaisuus);
-                        henkilo.setKansalaisuus(kansalaisuusDtos);
-                    }
-                    // Something already written in UpdateDto (has multiple kansalaisuus)
-                    else {
-                        Set<KansalaisuusDto> multipleNewKansalaisuusSet = Sets.newHashSet(henkilo.getKansalaisuus());
-                        multipleNewKansalaisuusSet.add(newKansalaisuus);
-                        henkilo.setKansalaisuus(multipleNewKansalaisuusSet);
-                    }
-                }
-                else {
-                    log.warn(String.format("Kansalaisuuskoodi %s already exist in henkilo %s data", this.code, currentHenkilo.getOidHenkilo()));
-                }
-            }
-        }
-        else {
-            log.warn(String.format("Received invalid or outdated kansalaisuus for henkio %s", henkilo.getOidHenkilo()));
+        Set<String> kansalaisuudet = Optional.ofNullable(henkilo.getKansalaisuus())
+                .orElseGet(() -> context.getCurrentHenkilo().getKansalaisuus())
+                .stream().map(KansalaisuusDto::getKansalaisuusKoodi).collect(toSet());
+
+        BiFunction<Collection, String, Boolean> updateFunc = getUpdateFunc(voimassa);
+        if (updateFunc != null && updateFunc.apply(kansalaisuudet, code)) {
+            henkilo.setKansalaisuus(kansalaisuudet
+                    .stream()
+                    .map(koodi -> {
+                        KansalaisuusDto kansalaisuusDto = new KansalaisuusDto();
+                        kansalaisuusDto.setKansalaisuusKoodi(koodi);
+                        return kansalaisuusDto;
+                    })
+                    .collect(toSet()));
         }
     }
+
+    private BiFunction<Collection, String, Boolean> getUpdateFunc(boolean voimassa) {
+        switch (getMuutostapa()) {
+            case LISATTY:
+            case MUUTETTU:
+            case KORJATTU:
+                if (voimassa) {
+                    return Collection::add;
+                } else {
+                    return Collection::remove;
+                }
+            case POISTETTU:
+                return Collection::remove;
+            default:
+                throw new IllegalArgumentException("Tuntematon muutostapa: " + getMuutostapa());
+        }
+    }
+
 }

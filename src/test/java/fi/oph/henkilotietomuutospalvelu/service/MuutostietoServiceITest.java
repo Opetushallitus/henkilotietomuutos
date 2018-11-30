@@ -10,10 +10,7 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.Tiedosto;
-import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Henkilotunnuskorjaus;
-import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.KotimainenOsoite;
-import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
-import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Turvakielto;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.vm.sade.oppijanumerorekisteri.dto.*;
@@ -43,6 +40,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.*;
@@ -264,6 +262,36 @@ public class MuutostietoServiceITest {
     }
 
     @Test
+    public void kansalaisuusLisays() {
+        String hetu = "281198-911L";
+
+        String tiedostonimi2 = "test_001.PTT";
+        tallennaTiedosto(tiedostonimi2, MuutostietoDto.builder()
+                .hetu(hetu)
+                .tietoryhmat(asList(
+                        Kansalaisuus.builder().muutostapa(Muutostapa.LISATTY).valid(true).code("kansalaisuus2").build()
+                ))
+                .tiedostoNimi(tiedostonimi2)
+                .build());
+
+        HenkiloDto readDto = new HenkiloDto();
+        readDto.setHetu(hetu);
+        readDto.setKansalaisuus(singleton(kansalaisuusDto("kansalaisuus1")));
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
+
+        when(koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("kansalaisuus1"))).thenReturn(true);
+        when(koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("kansalaisuus2"))).thenReturn(true);
+
+        muutostietoService.updateAllMuutostietos();
+
+        verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = captor.getValue();
+        assertThat(updateDto.getKansalaisuus())
+                .extracting(KansalaisuusDto::getKansalaisuusKoodi)
+                .containsExactlyInAnyOrder("kansalaisuus1", "kansalaisuus2");
+    }
+
+    @Test
     public void uudelleenkasittelyHenkilotunnuskorjausOppijanumerorekisteriEiTunnistaVanhojaHetuja() {
         String hetu1 = "281198-911L";
         String hetu2 = "281198-9540";
@@ -424,6 +452,12 @@ public class MuutostietoServiceITest {
         assertThat(updateDto)
                 .returns(true, HenkiloForceUpdateDto::getTurvakielto)
                 .returns(0, t -> t.getYhteystiedotRyhma().size());
+    }
+
+    private KansalaisuusDto kansalaisuusDto(String koodi) {
+        KansalaisuusDto dto = new KansalaisuusDto();
+        dto.setKansalaisuusKoodi(koodi);
+        return dto;
     }
 
     private void tallennaTiedosto(String tiedostonimi, MuutostietoDto muutostieto) {

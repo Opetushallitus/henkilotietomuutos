@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -185,6 +186,10 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
             return getKoodiNimi(this.koodistoService.listAsMap(Koodisto.MAAT_JA_VALTIOT_2), maakoodi, kieli);
         }
 
+        @Override
+        public LocalDate getLocalDateNow() {
+            return LocalDate.now();
+        }
     }
 
     @NotNull
