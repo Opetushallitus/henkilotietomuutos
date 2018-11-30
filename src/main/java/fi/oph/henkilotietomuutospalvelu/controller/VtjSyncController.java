@@ -27,7 +27,7 @@ public class VtjSyncController {
 
     private final HetuService hetuService;
 
-    @PreAuthorize("hasAnyRole('APP_HENKILONHALLINTA_OPHREKISTERI', 'APP_HENKILONHALLINTA_MUUTOSTIETOPALVELU')")
+    @PreAuthorize("hasAnyRole('APP_HENKILOTIETOMUUTOS_REKISTERINPITAJA', 'APP_HENKILOTIETOMUUTOS_PALVELUKAYTTAJA')")
     @RequestMapping(
             value = "/hetus",
             method = RequestMethod.POST,
