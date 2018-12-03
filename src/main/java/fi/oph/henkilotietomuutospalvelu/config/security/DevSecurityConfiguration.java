@@ -25,6 +25,6 @@ public class DevSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("oph").password("oph").roles("APP_HENKILONHALLINTA_OPHREKISTERI");
+        auth.inMemoryAuthentication().withUser("oph").password("oph").roles("APP_HENKILOTIETOMUUTOS_REKISTERINPITAJA");
     }
 }
