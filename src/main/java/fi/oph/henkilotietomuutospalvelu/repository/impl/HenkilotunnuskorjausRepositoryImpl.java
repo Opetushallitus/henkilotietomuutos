@@ -2,7 +2,6 @@ package fi.oph.henkilotietomuutospalvelu.repository.impl;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
-import fi.oph.henkilotietomuutospalvelu.model.QHenkiloMuutostietoRivi;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Henkilotunnuskorjaus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.QHenkilotunnuskorjaus;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkilotunnuskorjausRepositoryCustom;
@@ -22,18 +21,16 @@ public class HenkilotunnuskorjausRepositoryImpl implements HenkilotunnuskorjausR
     }
 
     public Set<String> findHetuByHenkilotunnuskorjausHetu(String hetu) {
-        QHenkilotunnuskorjaus qHenkilotunnuskorjaus = QHenkilotunnuskorjaus.henkilotunnuskorjaus;
-        QHenkilotunnuskorjaus qHenkilotunnuskorjausSub = new QHenkilotunnuskorjaus("qHenkilotunnuskorjausSub");
-        QHenkiloMuutostietoRivi qHenkiloMuutostietoRiviSub = QHenkiloMuutostietoRivi.henkiloMuutostietoRivi;
+        QHenkilotunnuskorjaus qHenkilotunnuskorjaus1 = new QHenkilotunnuskorjaus("henkilotunnuskorjaus1");
+        QHenkilotunnuskorjaus qHenkilotunnuskorjaus2 = new QHenkilotunnuskorjaus("henkilotunnuskorjaus2");
 
         List<String> hetut = new JPAQuery<>(entityManager)
-                .from(qHenkilotunnuskorjaus)
-                .where(qHenkilotunnuskorjaus.henkiloMuutostietoRivi.in(JPAExpressions
-                        .select(qHenkiloMuutostietoRiviSub)
-                        .from(qHenkilotunnuskorjausSub)
-                        .join(qHenkilotunnuskorjausSub.henkiloMuutostietoRivi, qHenkiloMuutostietoRiviSub)
-                        .where(qHenkilotunnuskorjausSub.hetu.eq(hetu))))
-                .select(qHenkilotunnuskorjaus.hetu)
+                .from(qHenkilotunnuskorjaus1)
+                .where(qHenkilotunnuskorjaus1.henkiloMuutostietoRivi.id.in(JPAExpressions
+                        .selectFrom(qHenkilotunnuskorjaus2)
+                        .select(qHenkilotunnuskorjaus2.henkiloMuutostietoRivi.id)
+                        .where(qHenkilotunnuskorjaus2.hetu.eq(hetu))))
+                .select(qHenkilotunnuskorjaus1.hetu)
                 .distinct()
                 .fetch();
         return new LinkedHashSet<>(hetut);
