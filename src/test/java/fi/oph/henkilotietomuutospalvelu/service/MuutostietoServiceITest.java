@@ -9,6 +9,7 @@ import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.model.HenkiloMuutostietoRivi;
 import fi.oph.henkilotietomuutospalvelu.model.Tiedosto;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
@@ -34,6 +35,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -70,6 +72,9 @@ public class MuutostietoServiceITest {
 
     @SpyBean
     private FileService fileService;
+
+    @SpyBean
+    private TimeService timeService;
 
     @MockBean
     private FtpProperties ftpProperties;
@@ -330,6 +335,51 @@ public class MuutostietoServiceITest {
         assertThat(captor.getAllValues())
                 .extracting(HenkiloUpdateDto::getOidHenkilo, HenkiloUpdateDto::getHetu, HenkiloForceUpdateDto::getKaikkiHetut)
                 .containsExactlyInAnyOrder(tuple("oid1", null, singleton(hetu1)), tuple("oid2", null, singleton(hetu2)));
+    }
+
+    @Test
+    public void uudelleenkasittelyAsettaaProcessTimestampKentat() {
+        String hetu1 = "281198-911L";
+        String hetu2 = "281198-9540";
+
+        String tiedostonimi1 = "test_001.PTT";
+        tallennaTiedosto(tiedostonimi1, MuutostietoDto.builder()
+                .hetu(hetu1)
+                .tiedostoNimi(tiedostonimi1)
+                .build());
+        String tiedostonimi2 = "test_001.MTT";
+        tallennaTiedosto(tiedostonimi2, MuutostietoDto.builder()
+                .hetu(hetu1)
+                .tiedostoNimi(tiedostonimi2)
+                .build());
+        String tiedostonimi3 = "test_002.PTT";
+        tallennaTiedosto(tiedostonimi3, MuutostietoDto.builder()
+                .hetu(hetu2)
+                .tiedostoNimi(tiedostonimi3)
+                .build());
+
+        HenkiloDto readDto = new HenkiloDto();
+        readDto.setHetu(hetu1);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu1))).thenReturn(Optional.of(readDto));
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.empty());
+
+        LocalDateTime time1 = LocalDateTime.of(2018, 12, 5, 11, 31, 46);
+        when(timeService.getLocalDateTime()).thenReturn(time1);
+
+        muutostietoService.updateMuutostietos();
+
+        assertThat(henkiloMuutostietoRepository.findAll())
+                .extracting(HenkiloMuutostietoRivi::getQueryHetu, HenkiloMuutostietoRivi::getProcessTimestamp)
+                .containsExactlyInAnyOrder(tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu2, null));
+
+        LocalDateTime time2 = LocalDateTime.of(2019, 4, 3, 23, 12, 59);
+        when(timeService.getLocalDateTime()).thenReturn(time2);
+
+        muutostietoService.updateMuutostietos();
+
+        assertThat(henkiloMuutostietoRepository.findAll())
+                .extracting(HenkiloMuutostietoRivi::getQueryHetu, HenkiloMuutostietoRivi::getProcessTimestamp)
+                .containsExactlyInAnyOrder(tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu2, time2));
     }
 
     @Test

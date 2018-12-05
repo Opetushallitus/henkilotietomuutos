@@ -14,6 +14,7 @@ import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TietoryhmaRepository;
 import fi.oph.henkilotietomuutospalvelu.service.FileService;
 import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
+import fi.oph.henkilotietomuutospalvelu.service.TimeService;
 import fi.oph.henkilotietomuutospalvelu.service.VtjService;
 import fi.oph.henkilotietomuutospalvelu.service.validators.CorrectingHenkiloUpdateValidator;
 import fi.vm.sade.oppijanumerorekisteri.dto.*;
@@ -48,6 +49,9 @@ public class MuutostietoHandleServiceImplTest {
 
     @Spy
     private FileService fileService = new FileServiceImpl(null, null, null);
+
+    @Spy
+    private TimeService timeService = new TimeServiceImpl();
 
     @Mock
     private HenkiloMuutostietoRepository henkiloMuutostietoRepository;
