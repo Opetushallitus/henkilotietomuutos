@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
  */
 @IntegrationTest
 @RunWith(SpringRunner.class)
-public class EmailNotificationAspectIntegrationTest {
+public class ExternalNotificationAspectIntegrationTest {
     @Autowired
     private HetuService hetuService;
 

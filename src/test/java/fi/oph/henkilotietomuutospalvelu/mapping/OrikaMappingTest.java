@@ -45,7 +45,7 @@ public class OrikaMappingTest {
         yksiloityHenkilo.setSahkoposti("sähköposti");
 
         yksiloityHenkilo.addKansalaisuusKoodi("kansalaisuus");
-        YksiloityHenkilo.OsoiteTieto osoiteTieto = new YksiloityHenkilo().new OsoiteTieto("tyyppi", "katusuomi", "katuruotsi", "postinumero", "kaupunkisuomi", "kaupunkiruotsi", "maasuomi", "maaruotsi");
+        YksiloityHenkilo.OsoiteTieto osoiteTieto = new YksiloityHenkilo.OsoiteTieto("tyyppi", "katusuomi", "katuruotsi", "postinumero", "kaupunkisuomi", "kaupunkiruotsi", "maasuomi", "maaruotsi");
         yksiloityHenkilo.addOsoiteTieto(osoiteTieto);
         HuoltajaCreateDto huoltajaCreateDto = this.orikaConfiguration.map(yksiloityHenkilo, HuoltajaCreateDto.class);
 
@@ -73,7 +73,7 @@ public class OrikaMappingTest {
         YksiloityHenkilo yksiloityHenkilo = new YksiloityHenkilo();
         yksiloityHenkilo.setSahkoposti("sähköposti");
 
-        YksiloityHenkilo.OsoiteTieto osoiteTieto = new YksiloityHenkilo().new OsoiteTieto("tyyppi", "", "katuruotsi", "postinumero", "", "kaupunkiruotsi", "", "maaruotsi");
+        YksiloityHenkilo.OsoiteTieto osoiteTieto = new YksiloityHenkilo.OsoiteTieto("tyyppi", "", "katuruotsi", "postinumero", "", "kaupunkiruotsi", "", "maaruotsi");
         yksiloityHenkilo.addOsoiteTieto(osoiteTieto);
         HuoltajaCreateDto huoltajaCreateDto = this.orikaConfiguration.map(yksiloityHenkilo, HuoltajaCreateDto.class);
 
@@ -98,7 +98,7 @@ public class OrikaMappingTest {
         YksiloityHenkilo yksiloityHenkilo = new YksiloityHenkilo();
         yksiloityHenkilo.setSahkoposti("sähköposti");
 
-        YksiloityHenkilo.OsoiteTieto osoiteTieto = new YksiloityHenkilo().new OsoiteTieto("tyyppi", "", "", "", "", "", "", "");
+        YksiloityHenkilo.OsoiteTieto osoiteTieto = new YksiloityHenkilo.OsoiteTieto("tyyppi", "", "", "", "", "", "", "");
         yksiloityHenkilo.addOsoiteTieto(osoiteTieto);
         HuoltajaCreateDto huoltajaCreateDto = this.orikaConfiguration.map(yksiloityHenkilo, HuoltajaCreateDto.class);
 
@@ -118,7 +118,7 @@ public class OrikaMappingTest {
         YksiloityHenkilo yksiloityHenkilo = new YksiloityHenkilo();
         yksiloityHenkilo.setSahkoposti("");
 
-        YksiloityHenkilo.OsoiteTieto osoiteTieto = new YksiloityHenkilo().new OsoiteTieto("tyyppi", "", "", "", "", "", "", "");
+        YksiloityHenkilo.OsoiteTieto osoiteTieto = new YksiloityHenkilo.OsoiteTieto("tyyppi", "", "", "", "", "", "", "");
         yksiloityHenkilo.addOsoiteTieto(osoiteTieto);
         HuoltajaCreateDto huoltajaCreateDto = this.orikaConfiguration.map(yksiloityHenkilo, HuoltajaCreateDto.class);
 

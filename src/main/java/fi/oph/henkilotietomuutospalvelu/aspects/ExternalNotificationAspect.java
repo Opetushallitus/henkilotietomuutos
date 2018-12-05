@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class EmailNotificationAspect {
+public class ExternalNotificationAspect {
 
     private final NotificationService notificationService;
     private final ViestintaProperties viestintaProperties;
