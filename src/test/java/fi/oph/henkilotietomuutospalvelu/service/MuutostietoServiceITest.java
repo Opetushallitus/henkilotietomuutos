@@ -282,7 +282,7 @@ public class MuutostietoServiceITest {
         when(koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("kansalaisuus1"))).thenReturn(true);
         when(koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("kansalaisuus2"))).thenReturn(true);
 
-        muutostietoService.updateAllMuutostietos();
+        muutostietoService.updateMuutostietos();
 
         verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = captor.getValue();
@@ -324,7 +324,7 @@ public class MuutostietoServiceITest {
         readDto2.setHetu(hetu2);
         when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.of(readDto2));
 
-        muutostietoService.updateAllMuutostietos();
+        muutostietoService.updateMuutostietos();
 
         verify(onrServiceClient, times(2)).updateHenkilo(captor.capture(), eq(true));
         assertThat(captor.getAllValues())
@@ -364,7 +364,8 @@ public class MuutostietoServiceITest {
         when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.empty());
         when(onrServiceClient.getHenkiloByHetu(eq(hetu3))).thenReturn(Optional.of(readDto));
 
-        muutostietoService.updateAllMuutostietos();
+        muutostietoService.updateMuutostietos(); // henkilöä ei löydy hetulla 1 -> mitään tietoryhmiä ei käsitellä
+        muutostietoService.updateMuutostietos();
 
         verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
         assertThat(captor.getValue())
@@ -404,7 +405,7 @@ public class MuutostietoServiceITest {
         when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.of(readDto));
         when(onrServiceClient.getHenkiloByHetu(eq(hetu3))).thenReturn(Optional.of(readDto));
 
-        muutostietoService.updateAllMuutostietos();
+        muutostietoService.updateMuutostietos();
 
         verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
         assertThat(captor.getValue())
@@ -446,7 +447,7 @@ public class MuutostietoServiceITest {
         readDto.setHetu(hetu);
         when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
 
-        muutostietoService.updateAllMuutostietos();
+        muutostietoService.updateMuutostietos();
 
         verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = captor.getValue();
@@ -490,7 +491,7 @@ public class MuutostietoServiceITest {
         readDto.setHetu(hetu);
         when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
 
-        muutostietoService.updateAllMuutostietos();
+        muutostietoService.updateMuutostietos();
 
         verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = captor.getValue();
