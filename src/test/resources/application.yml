@@ -6,7 +6,11 @@ spring:
     type: NONE
   flyway:
     enabled: false
-
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: false
 
 server:
   servlet:

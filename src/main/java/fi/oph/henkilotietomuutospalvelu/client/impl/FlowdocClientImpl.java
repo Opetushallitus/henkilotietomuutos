@@ -10,6 +10,7 @@ import fi.vm.sade.javautils.http.OphHttpClient;
 import fi.vm.sade.javautils.http.OphHttpEntity;
 import fi.vm.sade.javautils.http.OphHttpRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.ContentType;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -17,9 +18,11 @@ import org.springframework.web.client.RestClientException;
 
 import javax.annotation.PostConstruct;
 
-import static org.apache.http.HttpStatus.SC_ACCEPTED;
-import static org.apache.http.HttpStatus.SC_OK;
+import java.util.Optional;
 
+import static org.apache.http.HttpStatus.*;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class FlowdocClientImpl implements FlowdocClient {
@@ -65,6 +68,10 @@ public class FlowdocClientImpl implements FlowdocClient {
                         .build())
                 .build();
         this.ophHttpClient.execute(ophHttpRequest)
+                .handleErrorStatus(SC_GONE).with(errorMessage -> {
+                    log.warn("Could not send flowdoc notification with error {}", errorMessage);
+                    return Optional.empty();
+                })
                 .expectedStatus(SC_OK, SC_ACCEPTED)
                 .ignoreResponse();
     }

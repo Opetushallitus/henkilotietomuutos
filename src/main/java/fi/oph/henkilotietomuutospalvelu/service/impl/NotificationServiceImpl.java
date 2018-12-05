@@ -9,10 +9,12 @@ import fi.vm.sade.ryhmasahkoposti.api.dto.EmailData;
 import fi.vm.sade.ryhmasahkoposti.api.dto.EmailMessage;
 import fi.vm.sade.ryhmasahkoposti.api.dto.EmailRecipient;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
@@ -41,7 +43,11 @@ public class NotificationServiceImpl implements NotificationService {
         EmailMessage emailMessage = new EmailMessage(CALLING_PROCESS, defaultReplyEmail, defaultReplyEmail, topic, message);
         emailData.setEmail(emailMessage);
 
-        this.ryhmasahkopostiClient.sendRyhmasahkoposti(emailData);
+        try {
+            this.ryhmasahkopostiClient.sendRyhmasahkoposti(emailData);
+        } catch (RuntimeException e) {
+            log.warn("Could not send email notification", e);
+        }
     }
 
     @Override

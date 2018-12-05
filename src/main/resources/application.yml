@@ -4,6 +4,8 @@ spring:
   jackson:
     serialization:
       write-dates-as-timestamps: true
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: false
   flyway:
     enabled: true
     out-of-order: true
