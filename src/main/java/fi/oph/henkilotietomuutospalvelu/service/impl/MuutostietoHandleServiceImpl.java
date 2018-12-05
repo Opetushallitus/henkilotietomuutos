@@ -42,6 +42,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.removeYhteystietoryhma;
+import static java.util.Collections.singleton;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toSet;
 
 @Slf4j
 @Service
@@ -93,7 +96,8 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
     public void handleMuutostieto(HenkiloMuutostietoRivi henkiloMuutostietoRivi) {
         Optional<HenkiloDto> currentHenkiloOptional = this.getCurrentHenkilo(henkiloMuutostietoRivi.getQueryHetu());
         currentHenkiloOptional.ifPresent(currentHenkilo -> {
-            List<Tietoryhma> kaikkiTietoryhmat = getKaikkiTietoryhmatByHetu(currentHenkilo.getHetu());
+            Set<String> kaikkiHetut = getKaikkiHetut(currentHenkilo.getHetu());
+            List<Tietoryhma> kaikkiTietoryhmat = getKaikkiTietoryhmatByHetu(kaikkiHetut);
 
             HenkiloForceUpdateDto updateHenkilo = new HenkiloForceUpdateDto();
             updateHenkilo.setOidHenkilo(currentHenkilo.getOidHenkilo());
@@ -131,6 +135,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
                         updateHenkilo.setKutsumanimi(etunimet);
                     }
                 }
+                updateHenkilo.setKaikkiHetut(kaikkiHetut);
                 this.vtjService.yksiloiHuoltajatTarvittaessa(updateHenkilo);
                 this.correctingHenkiloUpdateValidator.validateAndCorrectErrors(updateHenkilo);
                 this.onrServiceClient.updateHenkilo(updateHenkilo, true);
@@ -150,9 +155,22 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
         }
     }
 
-    private List<Tietoryhma> getKaikkiTietoryhmatByHetu(String hetu) {
+    private Set<String> getKaikkiHetut(String hetu) {
         Set<String> kaikkiHetut = henkilotunnuskorjausRepository.findHetuByHenkilotunnuskorjausHetu(hetu);
-        kaikkiHetut.add(hetu);
+        if (kaikkiHetut.isEmpty()) {
+            // henkilöllä ei ole ollut muita hetuja
+            return singleton(hetu);
+        }
+        // henkilöllä on ollut muita hetuja -> tarkistetaan ettei vanha hetu ole ollut kenenkään muun henkilön käytössä
+        return henkilotunnuskorjausRepository.findQueryHetuByHenkilotunnuskorjausHetu(kaikkiHetut)
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().stream().allMatch(kaikkiHetut::contains))
+                .map(Map.Entry::getKey)
+                .collect(collectingAndThen(toSet(), Collections::unmodifiableSet));
+    }
+
+    private List<Tietoryhma> getKaikkiTietoryhmatByHetu(Collection<String> kaikkiHetut) {
         return henkiloMuutostietoRepository.findByQueryHetuIn(kaikkiHetut)
                 .stream()
                 .flatMap(HenkiloMuutostietoRivi::getTietoryhmaStream)

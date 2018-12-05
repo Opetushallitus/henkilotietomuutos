@@ -2,15 +2,17 @@ package fi.oph.henkilotietomuutospalvelu.repository.impl;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
+import fi.oph.henkilotietomuutospalvelu.model.QHenkiloMuutostietoRivi;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Henkilotunnuskorjaus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.QHenkilotunnuskorjaus;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkilotunnuskorjausRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaContext;
 
 import javax.persistence.EntityManager;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.group.GroupBy.list;
 
 public class HenkilotunnuskorjausRepositoryImpl implements HenkilotunnuskorjausRepositoryCustom {
 
@@ -34,6 +36,18 @@ public class HenkilotunnuskorjausRepositoryImpl implements HenkilotunnuskorjausR
                 .distinct()
                 .fetch();
         return new LinkedHashSet<>(hetut);
+    }
+
+    @Override
+    public Map<String, List<String>> findQueryHetuByHenkilotunnuskorjausHetu(Collection<String> hetut) {
+        QHenkilotunnuskorjaus qHenkilotunnuskorjaus = QHenkilotunnuskorjaus.henkilotunnuskorjaus;
+        QHenkiloMuutostietoRivi qHenkiloMuutostietoRivi = QHenkiloMuutostietoRivi.henkiloMuutostietoRivi;
+
+        return new JPAQuery<>(entityManager)
+                .from(qHenkilotunnuskorjaus)
+                .join(qHenkilotunnuskorjaus.henkiloMuutostietoRivi, qHenkiloMuutostietoRivi)
+                .where(qHenkilotunnuskorjaus.hetu.in(hetut))
+                .transform(groupBy(qHenkilotunnuskorjaus.hetu).as(list(qHenkiloMuutostietoRivi.queryHetu)));
     }
 
 }

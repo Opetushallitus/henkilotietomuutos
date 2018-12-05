@@ -292,6 +292,47 @@ public class MuutostietoServiceITest {
     }
 
     @Test
+    public void henkilotunnuskorjausYhteinenHetuEiTallennuKaikkiHetutListaan() {
+        String yhteinenHetu = "281198-911L";
+        String hetu1 = "281198-9540";
+        String hetu2 = "281198-9019";
+
+        String tiedostonimi1 = "test_001.PTT";
+        tallennaTiedosto(tiedostonimi1, asList(MuutostietoDto.builder()
+                        .hetu(hetu1)
+                        .tietoryhmat(asList(
+                                Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(yhteinenHetu).active(false).build(),
+                                Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(hetu1).active(true).build()
+                        ))
+                        .tiedostoNimi(tiedostonimi1)
+                        .build(),
+                MuutostietoDto.builder()
+                        .hetu(hetu2)
+                        .tietoryhmat(asList(
+                                Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(yhteinenHetu).active(false).build(),
+                                Henkilotunnuskorjaus.builder().muutostapa(Muutostapa.LISATTY).hetu(hetu2).active(true).build()
+                        ))
+                        .tiedostoNimi(tiedostonimi1)
+                        .build()));
+
+        HenkiloDto readDto1 = new HenkiloDto();
+        readDto1.setOidHenkilo("oid1");
+        readDto1.setHetu(hetu1);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu1))).thenReturn(Optional.of(readDto1));
+        HenkiloDto readDto2 = new HenkiloDto();
+        readDto2.setOidHenkilo("oid2");
+        readDto2.setHetu(hetu2);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.of(readDto2));
+
+        muutostietoService.updateAllMuutostietos();
+
+        verify(onrServiceClient, times(2)).updateHenkilo(captor.capture(), eq(true));
+        assertThat(captor.getAllValues())
+                .extracting(HenkiloUpdateDto::getOidHenkilo, HenkiloUpdateDto::getHetu, HenkiloForceUpdateDto::getKaikkiHetut)
+                .containsExactlyInAnyOrder(tuple("oid1", null, singleton(hetu1)), tuple("oid2", null, singleton(hetu2)));
+    }
+
+    @Test
     public void uudelleenkasittelyHenkilotunnuskorjausOppijanumerorekisteriEiTunnistaVanhojaHetuja() {
         String hetu1 = "281198-911L";
         String hetu2 = "281198-9540";
@@ -326,7 +367,9 @@ public class MuutostietoServiceITest {
         muutostietoService.updateAllMuutostietos();
 
         verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
-        assertThat(captor.getValue()).returns(hetu3, HenkiloUpdateDto::getHetu);
+        assertThat(captor.getValue())
+                .returns(hetu3, HenkiloUpdateDto::getHetu)
+                .returns(Stream.of(hetu1, hetu2, hetu3).collect(toSet()), HenkiloForceUpdateDto::getKaikkiHetut);
     }
 
     @Test
@@ -364,7 +407,9 @@ public class MuutostietoServiceITest {
         muutostietoService.updateAllMuutostietos();
 
         verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
-        assertThat(captor.getValue()).returns(hetu3, HenkiloUpdateDto::getHetu);
+        assertThat(captor.getValue())
+                .returns(hetu3, HenkiloUpdateDto::getHetu)
+                .returns(Stream.of(hetu1, hetu2, hetu3).collect(toSet()), HenkiloForceUpdateDto::getKaikkiHetut);
     }
 
     @Test
