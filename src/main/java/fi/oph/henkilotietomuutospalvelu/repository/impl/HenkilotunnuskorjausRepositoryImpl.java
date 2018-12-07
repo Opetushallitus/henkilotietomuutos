@@ -22,6 +22,7 @@ public class HenkilotunnuskorjausRepositoryImpl implements HenkilotunnuskorjausR
         this.entityManager = jpaContext.getEntityManagerByManagedType(Henkilotunnuskorjaus.class);
     }
 
+    @Override
     public Set<String> findHetuByHenkilotunnuskorjausHetu(String hetu) {
         QHenkilotunnuskorjaus qHenkilotunnuskorjaus1 = new QHenkilotunnuskorjaus("henkilotunnuskorjaus1");
         QHenkilotunnuskorjaus qHenkilotunnuskorjaus2 = new QHenkilotunnuskorjaus("henkilotunnuskorjaus2");
