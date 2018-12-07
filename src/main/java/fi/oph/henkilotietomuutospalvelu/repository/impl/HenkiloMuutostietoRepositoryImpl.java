@@ -64,4 +64,18 @@ public class HenkiloMuutostietoRepositoryImpl implements HenkiloMuutostietoRepos
                 .where(tietoryhma.active.isTrue())
                 .fetch();
     }
+
+    @Override
+    public List<Long> findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(String fileName) {
+        QHenkiloMuutostietoRivi henkiloMuutostietoRivi = QHenkiloMuutostietoRivi.henkiloMuutostietoRivi;
+        QTiedosto tiedosto = QTiedosto.tiedosto;
+
+        return jpa().select(henkiloMuutostietoRivi.id)
+                .from(henkiloMuutostietoRivi)
+                .join(henkiloMuutostietoRivi.tiedosto, tiedosto)
+                .where(henkiloMuutostietoRivi.processTimestamp.isNull())
+                .where(tiedosto.fileName.eq(fileName))
+                .orderBy(henkiloMuutostietoRivi.rivi.asc())
+                .fetch();
+    }
 }

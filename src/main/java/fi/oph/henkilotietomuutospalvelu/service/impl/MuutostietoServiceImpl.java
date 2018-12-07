@@ -3,6 +3,7 @@ package fi.oph.henkilotietomuutospalvelu.service.impl;
 import fi.oph.henkilotietomuutospalvelu.annotations.NotifyOnError;
 import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.MuutosType;
+import fi.oph.henkilotietomuutospalvelu.model.HenkiloMuutostietoRivi;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.oph.henkilotietomuutospalvelu.service.FileService;
@@ -105,7 +106,11 @@ public class MuutostietoServiceImpl implements MuutostietoService {
         firstFileToProcess.ifPresent(fileName ->
                 this.henkiloMuutostietoRepository
                         .findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(fileName)
-                        .forEach(this.muutostietoHandleService::handleMuutostieto));
+                        .forEach(id -> {
+                            HenkiloMuutostietoRivi henkiloMuutostietoRivi = this.henkiloMuutostietoRepository.findById(id)
+                                    .orElseThrow(() -> new IllegalStateException(String.format("Could not find HenkiloMuutostietoRivi by id %d", id)));
+                            this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
+                        }));
     }
 
     /**
