@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Entity
 @Table(name = "henkilo_muutostieto_rivi", schema = "public")
@@ -32,4 +33,16 @@ public class HenkiloMuutostietoRivi extends IdentifiableAndVersionedEntity {
 
     @Column(name = "process_timestamp")
     private LocalDateTime processTimestamp;
+
+    public void addTietoryhma(Tietoryhma... tietoryhmat) {
+        for (Tietoryhma tietoryhma : tietoryhmat) {
+            tietoryhma.setHenkiloMuutostietoRivi(this);
+            tietoryhmaList.add(tietoryhma);
+        }
+    }
+
+    public Stream<Tietoryhma> getTietoryhmaStream() {
+        return tietoryhmaList.stream();
+    }
+
 }

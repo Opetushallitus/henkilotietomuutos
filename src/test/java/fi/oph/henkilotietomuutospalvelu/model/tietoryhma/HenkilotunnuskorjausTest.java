@@ -207,34 +207,4 @@ public class HenkilotunnuskorjausTest {
 
         assertThat(henkilo.getHetu()).isEqualTo("hetu2");
     }
-
-    @Test
-    public void tallentaaKaikkiHetut() {
-        HenkiloForceUpdateDto henkilo = new HenkiloForceUpdateDto();
-        HenkiloDto currentHenkilo = HenkiloDto.builder()
-                .hetu("hetu1")
-                .build();
-        Tietoryhma.Context context = new TestTietoryhmaContextImpl(currentHenkilo);
-        Henkilotunnuskorjaus henkilotunnuskorjausLisatty = Henkilotunnuskorjaus.builder()
-                .muutostapa(Muutostapa.LISATIETO)
-                .hetu("hetu1")
-                .active(false)
-                .build();
-        Henkilotunnuskorjaus henkilotunnuskorjausLisatieto = Henkilotunnuskorjaus.builder()
-                .muutostapa(Muutostapa.LISATIETO)
-                .hetu("hetu2")
-                .active(false)
-                .build();
-        Henkilotunnuskorjaus henkilotunnuskorjausMuutettu = Henkilotunnuskorjaus.builder()
-                .muutostapa(Muutostapa.MUUTETTU)
-                .hetu("hetu3")
-                .active(true)
-                .build();
-
-        henkilotunnuskorjausLisatty.updateHenkilo(context, henkilo);
-        henkilotunnuskorjausLisatieto.updateHenkilo(context, henkilo);
-        henkilotunnuskorjausMuutettu.updateHenkilo(context, henkilo);
-
-        assertThat(henkilo.getKaikkiHetut()).containsExactlyInAnyOrder("hetu1", "hetu2", "hetu3");
-    }
 }

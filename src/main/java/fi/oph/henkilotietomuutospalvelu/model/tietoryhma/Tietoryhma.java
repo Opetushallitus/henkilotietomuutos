@@ -24,6 +24,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
+import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
@@ -82,6 +83,7 @@ public abstract class Tietoryhma extends IdentifiableAndVersionedEntity {
         HenkiloDto getCurrentHenkilo();
         Optional<String> getPostitoimipaikka(String postinumero, String kieli);
         Optional<String> getMaa(String maakoodi, String kieli);
+        LocalDate getLocalDateNow();
     }
 
 }
