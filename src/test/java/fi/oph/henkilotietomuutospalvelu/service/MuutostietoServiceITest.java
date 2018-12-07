@@ -380,6 +380,21 @@ public class MuutostietoServiceITest {
         assertThat(henkiloMuutostietoRepository.findAll())
                 .extracting(HenkiloMuutostietoRivi::getQueryHetu, HenkiloMuutostietoRivi::getProcessTimestamp)
                 .containsExactlyInAnyOrder(tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu2, time2));
+
+        String tiedostonimi4 = "test_002.MTT";
+        tallennaTiedosto(tiedostonimi4, MuutostietoDto.builder()
+                .hetu(hetu1)
+                .tiedostoNimi(tiedostonimi4)
+                .build());
+
+        LocalDateTime time3 = LocalDateTime.of(2020, 7, 1, 4, 2, 10);
+        when(timeService.getLocalDateTime()).thenReturn(time3);
+
+        muutostietoService.updateMuutostietos();
+
+        assertThat(henkiloMuutostietoRepository.findAll())
+                .extracting(HenkiloMuutostietoRivi::getQueryHetu, HenkiloMuutostietoRivi::getProcessTimestamp)
+                .containsExactlyInAnyOrder(tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu2, time2), tuple(hetu1, time3));
     }
 
     @Test
@@ -419,7 +434,7 @@ public class MuutostietoServiceITest {
 
         verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
         assertThat(captor.getValue())
-                .returns(hetu3, HenkiloUpdateDto::getHetu)
+                .returns(null, HenkiloUpdateDto::getHetu)
                 .returns(Stream.of(hetu1, hetu2, hetu3).collect(toSet()), HenkiloForceUpdateDto::getKaikkiHetut);
     }
 

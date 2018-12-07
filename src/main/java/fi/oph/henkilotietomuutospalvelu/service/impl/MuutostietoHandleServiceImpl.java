@@ -93,7 +93,8 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
         Optional<HenkiloDto> currentHenkiloOptional = this.getCurrentHenkilo(henkiloMuutostietoRivi.getQueryHetu());
         currentHenkiloOptional.ifPresent(currentHenkilo -> {
             Set<String> kaikkiHetut = getKaikkiHetut(currentHenkilo.getHetu());
-            List<HenkiloMuutostietoRivi> kaikkiMuutostietoRivit = henkiloMuutostietoRepository.findByQueryHetuIn(kaikkiHetut);
+            List<HenkiloMuutostietoRivi> kaikkiMuutostietoRivit = henkiloMuutostietoRepository
+                    .findByQueryHetuInAndProcessTimestampIsNull(kaikkiHetut);
             List<Tietoryhma> kaikkiTietoryhmat = kaikkiMuutostietoRivit
                     .stream()
                     .flatMap(HenkiloMuutostietoRivi::getTietoryhmaStream)

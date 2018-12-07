@@ -14,6 +14,6 @@ import java.util.List;
 public interface HenkiloMuutostietoRepository extends CrudRepository<HenkiloMuutostietoRivi, Long>, HenkiloMuutostietoRepositoryCustom {
     List<HenkiloMuutostietoRivi> findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(String fileName);
 
-    List<HenkiloMuutostietoRivi> findByQueryHetuIn(Collection<String> hetu);
+    List<HenkiloMuutostietoRivi> findByQueryHetuInAndProcessTimestampIsNull(Collection<String> hetu);
 
 }
