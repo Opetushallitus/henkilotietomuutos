@@ -12,8 +12,6 @@ import java.util.List;
 @Transactional(propagation = Propagation.MANDATORY)
 @Repository
 public interface HenkiloMuutostietoRepository extends CrudRepository<HenkiloMuutostietoRivi, Long>, HenkiloMuutostietoRepositoryCustom {
-    List<HenkiloMuutostietoRivi> findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(String fileName);
-
     List<HenkiloMuutostietoRivi> findByQueryHetuInAndProcessTimestampIsNull(Collection<String> hetu);
 
 }

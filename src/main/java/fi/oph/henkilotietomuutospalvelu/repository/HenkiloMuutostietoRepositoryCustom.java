@@ -11,4 +11,8 @@ public interface HenkiloMuutostietoRepositoryCustom {
     Optional<Integer> findLastRowByTiedostoNimi(String fileName);
 
     List<HenkiloMuutostietoRivi> findHenkiloMuutostietoRiviByQueryHetu(String queryHetu);
+
+    List<Long> findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(String fileName);
+
+
 }
