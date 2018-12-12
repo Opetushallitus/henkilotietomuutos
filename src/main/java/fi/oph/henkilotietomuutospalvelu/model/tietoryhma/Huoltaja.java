@@ -4,7 +4,6 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.Huollonjako;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.service.build.HenkiloUpdateUtil;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloCreateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HuoltajaCreateDto;
 import lombok.Builder;
@@ -15,9 +14,8 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Optional;
 
 @Slf4j
 @Entity
@@ -73,7 +71,14 @@ public class Huoltaja extends Tietoryhma {
     protected void updateHenkiloInternal(Context context, HenkiloForceUpdateDto henkilo) {
         if (Boolean.TRUE.equals(this.voimassa)
                 && HenkiloUpdateUtil.localdateIsBetween(this.startDate, this.endDate)) {
-            HuoltajaCreateDto huoltajaCreateDto = new HuoltajaCreateDto();
+            // Samaan huoltajaan voi olla useita tietoryhmiä samalla rivillä
+            HuoltajaCreateDto huoltajaCreateDto = Optional.ofNullable(henkilo.getHuoltajat())
+                    .filter(huoltajat -> !huoltajat.isEmpty())
+                    .map(huoltajat -> huoltajat.stream().filter(this::isHuoltajaAlreadyUpdated).findFirst())
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .orElseGet(HuoltajaCreateDto::new);
+
             huoltajaCreateDto.setHetu(this.hetu);
             huoltajaCreateDto.setHuoltajuustyyppiKoodi(this.laji);
             if (StringUtils.isEmpty(this.hetu)) {
@@ -88,6 +93,22 @@ public class Huoltaja extends Tietoryhma {
         else {
             log.warn("Huoltajuus ei voimassa. Ei käsitellä.");
         }
+    }
+
+    private boolean isHuoltajaAlreadyUpdated(HuoltajaCreateDto huoltajaCreateDto) {
+        return Optional.ofNullable(this.hetu)
+                .filter(StringUtils::hasLength)
+                .map(hetu -> hetu.equals(huoltajaCreateDto.getHetu()))
+                .orElseGet(() -> this.henkilotunnuksetonHenkilo != null
+                        && this.existAndIsEqual(huoltajaCreateDto.getEtunimet(), this.henkilotunnuksetonHenkilo.getFirstNames())
+                        && this.existAndIsEqual(huoltajaCreateDto.getSukunimi(), this.henkilotunnuksetonHenkilo.getLastname()));
+    }
+
+    private boolean existAndIsEqual(String a, String b) {
+        return Optional.ofNullable(a)
+                .filter(StringUtils::hasLength)
+                .map(string -> string.equals(b))
+                .orElse(false);
     }
 
 }
