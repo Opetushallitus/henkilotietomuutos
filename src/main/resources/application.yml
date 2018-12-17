@@ -13,6 +13,10 @@ spring:
     baseline-on-migrate: false
     baseline-version: 2018022615382893874
     table: flyway_schema_history
+  jpa:
+    properties:
+      # https://hibernate.atlassian.net/browse/HHH-12368
+      hibernate.jdbc.lob.non_contextual_creation: true
   cache:
     type: jcache
     jcache:
