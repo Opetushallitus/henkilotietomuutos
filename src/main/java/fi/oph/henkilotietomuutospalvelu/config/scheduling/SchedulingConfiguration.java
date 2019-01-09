@@ -18,9 +18,4 @@ import java.util.concurrent.Executors;
 @ConditionalOnProperty(name = "scheduling.enabled", havingValue = "true")
 public class SchedulingConfiguration {
 
-    @Bean(destroyMethod = "shutdown")
-    public Executor taskScheduler() {
-        // Set to 2 so single long task won't block everything
-        return Executors.newScheduledThreadPool(1);
-    }
 }
