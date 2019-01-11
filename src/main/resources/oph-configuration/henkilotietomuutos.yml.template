@@ -63,6 +63,7 @@ clients:
     defaultReceiverEmail: {{henkilotietomuutos_service_default_receiver_email}}
     defaultReplyEmail: {{henkilotietomuutos_service_default_receiver_email | default('noreply@oph.fi')}}
     flowToken: {{henkilotietomuutos_service_flowdoc_flowtoken | default('')}}
+    maxNotificationIntervalInMinutes: {{henkilotietomuutos_service_max_notification_interval_minutes | default('60')}}
 
 scheduling:
   enabled: {{henkilotietomuutos_service_scheduling_enabled}}
