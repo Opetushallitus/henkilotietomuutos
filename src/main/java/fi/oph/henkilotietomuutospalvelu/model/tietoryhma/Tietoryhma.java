@@ -47,7 +47,7 @@ public abstract class Tietoryhma extends IdentifiableAndVersionedEntity {
     private Muutostapa muutostapa;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tietoryhma_id")
+    @JoinColumn(name = "muutostieto_rivi_id")
     private HenkiloMuutostietoRivi henkiloMuutostietoRivi;
 
     private static final EnumSet<Muutostapa> REDUNDANT_CHANGES =
