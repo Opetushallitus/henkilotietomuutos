@@ -14,6 +14,9 @@ import java.time.LocalDateTime;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 
+/**
+ * Huom. ei thread turvallinen.
+ */
 @Aspect
 @Component
 @RequiredArgsConstructor
