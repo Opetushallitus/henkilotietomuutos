@@ -68,6 +68,17 @@ public class ExternalNotificationAspectIntegrationTest {
     }
 
     @Test
+    public void maxNotificationIntervalShouldBeRespected() {
+        given(this.viestintaProperties.getMaxNotificationIntervalInMinutes()).willReturn(60);
+        willThrow(new RuntimeException()).given(this.vtjDataRepository).findByVtjdataTimestampIsNull();
+        assertThatThrownBy(() -> this.hetuService.updateHetusToVtj()).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> this.hetuService.updateHetusToVtj()).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> this.hetuService.updateHetusToVtj()).isInstanceOf(RuntimeException.class);
+        verify(notificationService, times(1)).sendEmailNotification(any(), any());
+        verify(notificationService, times(1)).sendFlowdocNotification(any(), any(), any());
+    }
+
+    @Test
     public void updateMuutostietosThrowIsNotified() {
         willThrow(new RuntimeException()).given(this.henkiloMuutostietoRepository).findDistinctUnprocessedTiedostoFileName();
         assertThatThrownBy(() -> this.muutostietoService.updateMuutostietos()).isInstanceOf(RuntimeException.class);

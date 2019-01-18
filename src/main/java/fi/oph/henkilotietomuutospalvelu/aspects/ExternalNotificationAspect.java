@@ -12,6 +12,11 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
+import static java.time.temporal.ChronoUnit.MINUTES;
+
+/**
+ * Huom. ei thread turvallinen.
+ */
 @Aspect
 @Component
 @RequiredArgsConstructor
@@ -19,6 +24,7 @@ public class ExternalNotificationAspect {
 
     private final NotificationService notificationService;
     private final ViestintaProperties viestintaProperties;
+    private LocalDateTime lastNotificationSent;
 
     @AfterThrowing(value = "@annotation(notifyOnError)", throwing = "exception")
     public void notifyOnException(JoinPoint joinPoint, NotifyOnError notifyOnError, Exception exception) {
@@ -26,11 +32,14 @@ public class ExternalNotificationAspect {
         String topic = String.format("Virhe henkilötietomuutospalvelun prosessissa: %s", process);
         String errorMessage = String.format("%s: %s", LocalDateTime.now(), exception);
 
-        if (StringUtils.hasLength(this.viestintaProperties.getDefaultReceiverEmail())) {
-            this.notificationService.sendEmailNotification(topic, errorMessage);
-        }
-        if (StringUtils.hasLength(this.viestintaProperties.getFlowToken())) {
-            this.notificationService.sendFlowdocNotification(topic, errorMessage, notifyOnError);
+        if (lastNotificationSent == null || MINUTES.between(lastNotificationSent, LocalDateTime.now()) >= this.viestintaProperties.getMaxNotificationIntervalInMinutes()) {
+            if (StringUtils.hasLength(this.viestintaProperties.getDefaultReceiverEmail())) {
+                this.notificationService.sendEmailNotification(topic, errorMessage);
+            }
+            if (StringUtils.hasLength(this.viestintaProperties.getFlowToken())) {
+                this.notificationService.sendFlowdocNotification(topic, errorMessage, notifyOnError);
+            }
+            this.lastNotificationSent = LocalDateTime.now();
         }
     }
 }
