@@ -45,4 +45,8 @@ public class HenkiloMuutostietoRivi extends IdentifiableAndVersionedEntity {
         return tietoryhmaList.stream();
     }
 
+    public boolean isPerustietoaineisto() {
+        return tiedosto.isPerustietoaineisto();
+    }
+
 }

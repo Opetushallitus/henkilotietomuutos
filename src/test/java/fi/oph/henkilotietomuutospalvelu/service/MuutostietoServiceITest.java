@@ -42,8 +42,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.*;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -186,6 +185,46 @@ public class MuutostietoServiceITest {
                         "Köskinen",
                         "2");
         assertThat(updatedHenkilo.getHuoltajat()).isEmpty();
+    }
+
+    @Test
+    public void turvakieltoOletusarvoFalsePerustietoaineisto() {
+        String tiedostonimi = "test_001.PTT";
+        String hetu = "281198-911L";
+        tallennaTiedosto(tiedostonimi, MuutostietoDto.builder()
+                .tiedostoNimi(tiedostonimi)
+                .hetu(hetu)
+                .tietoryhmat(emptyList())
+                .build());
+        HenkiloDto readDto = new HenkiloDto();
+        readDto.setHetu(hetu);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
+
+        muutostietoService.updateMuutostietos();
+
+        verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = captor.getValue();
+        assertThat(updateDto).returns(false, HenkiloForceUpdateDto::getTurvakielto);
+    }
+
+    @Test
+    public void turvakieltoOletusarvoNullMuutostietoaineisto() {
+        String tiedostonimi = "test_001.MTT";
+        String hetu = "281198-911L";
+        tallennaTiedosto(tiedostonimi, MuutostietoDto.builder()
+                .tiedostoNimi(tiedostonimi)
+                .hetu(hetu)
+                .tietoryhmat(emptyList())
+                .build());
+        HenkiloDto readDto = new HenkiloDto();
+        readDto.setHetu(hetu);
+        when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
+
+        muutostietoService.updateMuutostietos();
+
+        verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = captor.getValue();
+        assertThat(updateDto).returns(null, HenkiloForceUpdateDto::getTurvakielto);
     }
 
     @Test

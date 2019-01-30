@@ -102,6 +102,12 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
 
             HenkiloForceUpdateDto updateHenkilo = new HenkiloForceUpdateDto();
             updateHenkilo.setOidHenkilo(currentHenkilo.getOidHenkilo());
+            // oppijanumerorekisterissä saattaa olla vanhaa tietoa turvakiellon osalta
+            // -> jos käsitellään perustietoaineistosta lähtien, asetetaan oletuksena turvakielto pois päältä
+            // -> jos käsitellään vain muutostietoaineistoja, pidetään oletuksena nykyinen arvo
+            if (kaikkiMuutostietoRivit.stream().anyMatch(HenkiloMuutostietoRivi::isPerustietoaineisto)) {
+                updateHenkilo.setTurvakielto(false);
+            }
             updateHenkilo.setYhteystiedotRyhma(currentHenkilo.getYhteystiedotRyhma());
             updateHenkilo.setHuoltajat(new HashSet<>());
 
