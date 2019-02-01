@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 
 import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.removeYhteystietoryhma;
 import static java.util.Collections.singleton;
+import static java.util.Map.Entry.comparingByKey;
 import static java.util.stream.Collectors.*;
 
 @Slf4j
@@ -93,40 +94,46 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
         Optional<HenkiloDto> currentHenkiloOptional = this.getCurrentHenkilo(henkiloMuutostietoRivi.getQueryHetu());
         currentHenkiloOptional.ifPresent(currentHenkilo -> {
             Set<String> kaikkiHetut = getKaikkiHetut(currentHenkilo.getHetu());
-            List<HenkiloMuutostietoRivi> kaikkiMuutostietoRivit = henkiloMuutostietoRepository
-                    .findByQueryHetuInAndProcessTimestampIsNull(kaikkiHetut);
-            List<Tietoryhma> kaikkiTietoryhmat = kaikkiMuutostietoRivit
+            Map<Tiedosto, List<HenkiloMuutostietoRivi>> kaikkiMuutostietoRivit = henkiloMuutostietoRepository
+                    .findByQueryHetuInAndProcessTimestampIsNull(kaikkiHetut)
                     .stream()
-                    .flatMap(HenkiloMuutostietoRivi::getTietoryhmaStream)
-                    .collect(toList());
+                    .collect(groupingBy(HenkiloMuutostietoRivi::getTiedosto));
 
             HenkiloForceUpdateDto updateHenkilo = new HenkiloForceUpdateDto();
             updateHenkilo.setOidHenkilo(currentHenkilo.getOidHenkilo());
+            // oppijanumerorekisterissä saattaa olla vanhaa tietoa turvakiellon osalta
+            // -> jos käsitellään perustietoaineistosta lähtien, asetetaan oletuksena turvakielto pois päältä
+            // -> jos käsitellään vain muutostietoaineistoja, pidetään oletuksena nykyinen arvo
+            if (kaikkiMuutostietoRivit.keySet().stream().anyMatch(Tiedosto::isPerustietoaineisto)) {
+                updateHenkilo.setTurvakielto(false);
+            }
             updateHenkilo.setYhteystiedotRyhma(currentHenkilo.getYhteystiedotRyhma());
             updateHenkilo.setHuoltajat(new HashSet<>());
 
             if (!currentHenkilo.isPassivoitu()) {
-                List<Tietoryhma> tietoryhmat = kaikkiTietoryhmat.stream()
-                        .sorted(Comparator
-                                // käsitellään tiedostot vanhimmasta uusimpaan
-                                .comparing((Tietoryhma tietoryhma) -> tietoryhma.getHenkiloMuutostietoRivi()
-                                        .getTiedosto(), new TiedostoComparator(fileService))
-                                .thenComparing(Tietoryhma::getHenkiloMuutostietoRivi, new HenkiloMuutostietoRiviComparator())
-                                // käsitellään poistot ensin koska samassa muutostietorivissä voi olla sekä poistoja
-                                // että korjauksia samoihin yhteystietotyyppeihin
-                                .thenComparing(Tietoryhma::getMuutostapa, new CustomOrderComparator<>(Muutostapa.POISTETTU))
-                                // käsitellään voimassaolevat viimeiseksi koska samassa muutostietorivissä voi olla
-                                // sekä muokkauksia (esim. passivointi) että lisäyksiä samoihin yhteystietoihin
-                                .thenComparing(Tietoryhma::isVoimassa)
-                        )
-                        .collect(Collectors.toList());
-                for (Tietoryhma tietoryhma : tietoryhmat) {
-                    tietoryhma.updateHenkilo(new TietoryhmaContextImpl(currentHenkilo, this.koodistoService, this.timeService), updateHenkilo);
-                }
-                if (Boolean.TRUE.equals(updateHenkilo.getTurvakielto())) {
-                    // turvakielto meni päälle tässä muutoksessa -> poistetaan muutostietopalvelun alaiset yhteystiedot
-                    removeYhteystietoryhma(updateHenkilo.getYhteystiedotRyhma(), KoodistoYhteystietoAlkupera.VTJ);
-                }
+                TietoryhmaContextImpl tietoryhmaContext = new TietoryhmaContextImpl(currentHenkilo, this.koodistoService, this.timeService);
+                kaikkiMuutostietoRivit.entrySet().stream()
+                        // käsitellään tiedostot vanhimmasta uusimpaan
+                        .sorted(comparingByKey(new TiedostoComparator(fileService)))
+                        .map(Map.Entry::getValue)
+                        .forEach(muutostietoRivit -> {
+                            Boolean turvakielto = updateHenkilo.getTurvakielto();
+                            muutostietoRivit.stream()
+                                    .sorted(new HenkiloMuutostietoRiviComparator())
+                                    .flatMap(HenkiloMuutostietoRivi::getTietoryhmaStream)
+                                    .sorted(Comparator
+                                            // käsitellään poistot ensin koska samassa tiedostossa voi olla sekä poistoja
+                                            // että korjauksia samoihin yhteystietotyyppeihin
+                                            .comparing(Tietoryhma::getMuutostapa, new CustomOrderComparator<>(Muutostapa.POISTETTU))
+                                            // käsitellään voimassaolevat viimeiseksi koska samassa tiedostossa voi olla
+                                            // sekä muokkauksia (esim. passivointi) että lisäyksiä samoihin yhteystietoihin
+                                            .thenComparing(Tietoryhma::isVoimassa))
+                                    .forEach(tietoryhma -> tietoryhma.updateHenkilo(tietoryhmaContext, updateHenkilo));
+                            if (Boolean.TRUE.equals(updateHenkilo.getTurvakielto()) && !Boolean.TRUE.equals(turvakielto)) {
+                                // turvakielto meni päälle tässä tiedostossa -> poistetaan muutostietopalvelun alaiset yhteystiedot
+                                removeYhteystietoryhma(updateHenkilo.getYhteystiedotRyhma(), KoodistoYhteystietoAlkupera.VTJ);
+                            }
+                        });
                 if (updateHenkilo.getEtunimet() != null || updateHenkilo.getKutsumanimi() != null) {
                     // etunimet ja/tai kutsumanimi muuttui -> validoidaan kutsumanimi
                     String etunimet = Optional.ofNullable(updateHenkilo.getEtunimet()).orElse(currentHenkilo.getEtunimet());
@@ -144,7 +151,10 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
             else {
                 log.error("Henkilo '{}' has already been passivoitu and cannot be further modified.", currentHenkilo.getOidHenkilo());
             }
-            kaikkiMuutostietoRivit.forEach(this::updateProcessTimestamp);
+            kaikkiMuutostietoRivit.values()
+                    .stream()
+                    .flatMap(List::stream)
+                    .forEach(this::updateProcessTimestamp);
         });
         if (!currentHenkiloOptional.isPresent()) {
             updateProcessTimestamp(henkiloMuutostietoRivi);

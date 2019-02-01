@@ -2,7 +2,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +13,8 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import java.time.LocalDate;
+import java.util.EnumSet;
+import java.util.Set;
 
 @Entity
 @DiscriminatorValue("turvakielto")
@@ -23,9 +24,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Turvakielto extends Tietoryhma {
 
-    /** Turvakiellon alkupäivä on sama kuin tunnisteosassa annettava muutospäivä. */
-    @Column(name = "start_date")
-    private LocalDate startDate;
+    private static final EnumSet<Muutostapa> REDUNDANT_CHANGES =
+            EnumSet.of(Muutostapa.LISATIETO, Muutostapa.KORJATTAVAA);
 
     /** Päättymispäivä on null, jos turvakielto on toistaiseksi voimassa. */
     @Column(name = "end_date")
@@ -38,9 +38,17 @@ public class Turvakielto extends Tietoryhma {
     }
 
     @Override
+    protected Set<Muutostapa> getRedundantChanges() {
+        return REDUNDANT_CHANGES;
+    }
+
+    @Override
     protected void updateHenkiloInternal(Context context, HenkiloForceUpdateDto henkilo) {
-        // We don't schedule upcoming updates se we ignore startDate
-        if (this.endDate == null || LocalDate.now().isBefore(this.endDate)) {
+        if (Muutostapa.POISTETTU.equals(getMuutostapa())) {
+            henkilo.setTurvakielto(false);
+            return;
+        }
+        if (this.endDate == null || context.getLocalDateNow().isBefore(this.endDate)) {
             henkilo.setTurvakielto(true);
         }
         else {
