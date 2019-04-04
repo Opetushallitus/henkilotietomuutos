@@ -208,7 +208,7 @@ public class FileServiceImpl implements FileService {
                 s3Client.putObject(new PutObjectRequest(bucketName, path.getFileName().toString(), path.toFile()));
             }
         } catch (AmazonServiceException e) {
-            throw new IOException(String.format("Failed to copy files to S3. Region: %s, Bucket: %s", awsProperties.getRegion(), awsProperties.getBucket()));
+            throw new IOException(String.format("Failed to copy files to S3. Region: %s, Bucket: %s", awsProperties.getRegion(), awsProperties.getBucket()), e);
         } finally {
             if (s3Client != null) {
                 s3Client.shutdown();
