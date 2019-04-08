@@ -1,7 +1,6 @@
 package fi.oph.henkilotietomuutospalvelu.service.impl;
 
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -21,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -195,11 +197,8 @@ public class FileServiceImpl implements FileService {
 
     private void copyFilesToAWS(List<Path> filePaths) throws IOException {
         AmazonS3 s3Client = null;
-        InstanceProfileCredentialsProvider credProvider = null;
         try {
-            credProvider = InstanceProfileCredentialsProvider.createAsyncRefreshingProvider(true);
             s3Client = AmazonS3ClientBuilder.standard()
-                .withCredentials(credProvider)
                 .withRegion(awsProperties.getRegion())
                 .build();
             String bucketName = awsProperties.getBucket();
@@ -212,9 +211,6 @@ public class FileServiceImpl implements FileService {
         } finally {
             if (s3Client != null) {
                 s3Client.shutdown();
-            }
-            if (credProvider != null) {
-                credProvider.close();
             }
         }
     }
