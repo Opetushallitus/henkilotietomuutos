@@ -3,6 +3,7 @@ package fi.oph.henkilotietomuutospalvelu.client.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fi.oph.henkilotietomuutospalvelu.client.FlowdocClient;
+import fi.oph.henkilotietomuutospalvelu.config.ConfigEnums;
 import fi.oph.henkilotietomuutospalvelu.config.UrlConfiguration;
 import fi.oph.henkilotietomuutospalvelu.config.properties.ViestintaProperties;
 import fi.oph.henkilotietomuutospalvelu.dto.FlowdocMessagesApiDto;
@@ -36,7 +37,7 @@ public class FlowdocClientImpl implements FlowdocClient {
 
     @PostConstruct
     public void setup() {
-        this.ophHttpClient = new OphHttpClient.Builder("HenkilotietomuutosPalvelu")
+        this.ophHttpClient = new OphHttpClient.Builder(ConfigEnums.CALLER_ID.value())
                 .build();
     }
 

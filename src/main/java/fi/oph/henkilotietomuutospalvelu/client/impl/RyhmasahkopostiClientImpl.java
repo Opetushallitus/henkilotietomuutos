@@ -3,6 +3,7 @@ package fi.oph.henkilotietomuutospalvelu.client.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fi.oph.henkilotietomuutospalvelu.client.RyhmasahkopostiClient;
+import fi.oph.henkilotietomuutospalvelu.config.ConfigEnums;
 import fi.oph.henkilotietomuutospalvelu.config.UrlConfiguration;
 import fi.oph.henkilotietomuutospalvelu.config.properties.CasProperties;
 import fi.oph.henkilotietomuutospalvelu.config.properties.ViestintaProperties;
@@ -42,7 +43,7 @@ public class RyhmasahkopostiClientImpl implements RyhmasahkopostiClient {
                 .casServiceUrl(urlConfiguration.url("ryhmasahkoposti-service.security-check"))
                 .build();
 
-        ophHttpClient = new OphHttpClient.Builder("HenkilotietomuutosPalvelu")
+        ophHttpClient = new OphHttpClient.Builder(ConfigEnums.CALLER_ID.value())
                 .authenticator(casAuthenticator)
                 .build();
     }

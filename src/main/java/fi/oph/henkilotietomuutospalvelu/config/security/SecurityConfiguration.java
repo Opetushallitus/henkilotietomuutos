@@ -1,5 +1,6 @@
 package fi.oph.henkilotietomuutospalvelu.config.security;
 
+import fi.oph.henkilotietomuutospalvelu.config.ConfigEnums;
 import fi.oph.henkilotietomuutospalvelu.config.properties.CasProperties;
 import fi.vm.sade.java_utils.security.OpintopolkuCasAuthenticationFilter;
 import fi.vm.sade.javautils.kayttooikeusclient.OphUserDetailsServiceImpl;
@@ -50,7 +51,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public CasAuthenticationProvider casAuthenticationProvider() {
         CasAuthenticationProvider casAuthenticationProvider = new CasAuthenticationProvider();
         String host = environment.getProperty("host.host-alb", "https://" + environment.getRequiredProperty("host.host-virkailija"));
-        casAuthenticationProvider.setUserDetailsService(new OphUserDetailsServiceImpl(host, "henkilotietomuutos"));
+        casAuthenticationProvider.setUserDetailsService(new OphUserDetailsServiceImpl(host, ConfigEnums.CALLER_ID.value()));
         casAuthenticationProvider.setServiceProperties(serviceProperties());
         casAuthenticationProvider.setTicketValidator(cas20ServiceTicketValidator());
         casAuthenticationProvider.setKey(casProperties.getKey());

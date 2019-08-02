@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.client.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fi.oph.henkilotietomuutospalvelu.client.VtjServiceClient;
+import fi.oph.henkilotietomuutospalvelu.config.ConfigEnums;
 import fi.oph.henkilotietomuutospalvelu.config.UrlConfiguration;
 import fi.oph.henkilotietomuutospalvelu.config.properties.CasProperties;
 import fi.oph.henkilotietomuutospalvelu.config.properties.OppijanumerorekisteriProperties;
@@ -42,7 +43,7 @@ public class VtjServiceClientImpl implements VtjServiceClient {
                 .casServiceUrl(urlConfiguration.url("vtj-service.security-check"))
                 .build();
 
-        ophHttpClient = new OphHttpClient.Builder("HenkilotietomuutosPalvelu")
+        ophHttpClient = new OphHttpClient.Builder(ConfigEnums.CALLER_ID.value())
                 .authenticator(casAuthenticator)
                 .build();
     }

@@ -11,7 +11,7 @@ public class HttpClientConfiguration {
 
     @Bean
     public OphHttpClient httpClient(OphProperties properties) {
-        return ApacheOphHttpClient.createDefaultOphClient("henkilotietomuutos", properties, 10000, 60);
+        return ApacheOphHttpClient.createDefaultOphClient(ConfigEnums.CALLER_ID.value(), properties, 10000, 60);
     }
 
 }
