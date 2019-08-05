@@ -24,7 +24,7 @@ public class VtjDataRepositoryImpl implements VtjDataRepositoryCustom {
                 .from(qVtjDataEvent)
                 .select(qVtjDataEvent)
                 .where(qVtjDataEvent.hetu.eq(hetu))
-                .orderBy(qVtjDataEvent.vtjdataTimestamp.desc().nullsLast(), qVtjDataEvent.id.desc())
+                .orderBy(qVtjDataEvent.vtjdataTimestamp.desc().nullsFirst(), qVtjDataEvent.id.desc())
                 .fetchFirst();
         return Optional.ofNullable(vtjDataEvent);
     }

@@ -83,4 +83,34 @@ public class HetuServiceTest {
         assertThat(hetuService.updateHetusToVtj()).isEmpty();
     }
 
+    @Test
+    public void updateHetusToDbNullsFirst() {
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
+
+        HetuDto hetuDto1 = new HetuDto();
+        hetuDto1.setAddedHetus(asList("hetu1"));
+
+        hetuService.updateHetusToDb(hetuDto1);
+
+        assertThat(vtjDataRepository.findAll())
+                .extracting(VtjDataEvent::getHetu, VtjDataEvent::getType)
+                .containsExactlyInAnyOrder(tuple("hetu1", VtjEventType.ADD));
+        assertThat(hetuService.updateHetusToVtj()).containsExactlyInAnyOrder("hetu1");
+
+        HetuDto hetuDto2 = new HetuDto();
+        hetuDto2.setRemovedHetus(asList("hetu1"));
+
+        hetuService.updateHetusToDb(hetuDto2);
+
+        assertThat(vtjDataRepository.findAll())
+                .extracting(VtjDataEvent::getHetu, VtjDataEvent::getType)
+                .containsExactlyInAnyOrder(tuple("hetu1", VtjEventType.ADD), tuple("hetu1", VtjEventType.REMOVE));
+
+        hetuService.updateHetusToDb(hetuDto2);
+
+        assertThat(vtjDataRepository.findAll())
+                .extracting(VtjDataEvent::getHetu, VtjDataEvent::getType)
+                .containsExactlyInAnyOrder(tuple("hetu1", VtjEventType.ADD), tuple("hetu1", VtjEventType.REMOVE));
+    }
+
 }
