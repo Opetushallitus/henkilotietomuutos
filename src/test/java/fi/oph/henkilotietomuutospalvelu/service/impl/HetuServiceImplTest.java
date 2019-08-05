@@ -10,7 +10,6 @@ import org.assertj.core.groups.Tuple;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -20,6 +19,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(SpringRunner.class)
@@ -33,9 +33,6 @@ public class HetuServiceImplTest {
     @Mock
     private VtjDataRepository vtjDataRepository;
 
-    @Captor
-    private ArgumentCaptor<List<VtjDataEvent>> listArgumentCaptor;
-
     @Test
     public void allUpdatedHetusAreSaved() {
         HetuDto hetuDto = new HetuDto();
@@ -46,8 +43,9 @@ public class HetuServiceImplTest {
 
         this.hetuService.updateHetusToDb(hetuDto);
 
-        verify(this.vtjDataRepository).saveAll(this.listArgumentCaptor.capture());
-        List<VtjDataEvent> savedData = this.listArgumentCaptor.getValue();
+        ArgumentCaptor<VtjDataEvent> vtjDataEventArgumentCaptor = ArgumentCaptor.forClass(VtjDataEvent.class);
+        verify(this.vtjDataRepository, times(3)).save(vtjDataEventArgumentCaptor.capture());
+        List<VtjDataEvent> savedData = vtjDataEventArgumentCaptor.getAllValues();
         assertThat(savedData)
                 .extracting(VtjDataEvent::getHetu, VtjDataEvent::getType)
                 .containsExactlyInAnyOrder(Tuple.tuple("hetu1", VtjEventType.ADD),
