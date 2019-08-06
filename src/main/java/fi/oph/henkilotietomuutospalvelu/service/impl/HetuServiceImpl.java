@@ -1,13 +1,13 @@
 package fi.oph.henkilotietomuutospalvelu.service.impl;
 
 import fi.oph.henkilotietomuutospalvelu.annotations.NotifyOnError;
+import fi.oph.henkilotietomuutospalvelu.dto.HetuDto;
 import fi.oph.henkilotietomuutospalvelu.model.VtjDataEvent;
 import fi.oph.henkilotietomuutospalvelu.model.type.VtjEventType;
 import fi.oph.henkilotietomuutospalvelu.repository.VtjDataRepository;
 import fi.oph.henkilotietomuutospalvelu.service.FileService;
 import fi.oph.henkilotietomuutospalvelu.service.HetuService;
 import lombok.RequiredArgsConstructor;
-import fi.oph.henkilotietomuutospalvelu.dto.HetuDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
@@ -17,9 +17,11 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -58,12 +60,20 @@ public class HetuServiceImpl implements HetuService {
     @Override
     @Transactional
     public void updateHetusToDb(HetuDto hetuDto) {
-        List<VtjDataEvent> vtjDataList = Stream.concat(hetuDto.getAddedHetus().stream()
-                        .map(hetu -> this.mapHetuToVtjData(hetu, VtjEventType.ADD)),
-                hetuDto.getRemovedHetus().stream()
-                        .map(hetu -> this.mapHetuToVtjData(hetu, VtjEventType.REMOVE)))
-                .collect(Collectors.toList());
-        this.vtjDataRepository.saveAll(vtjDataList);
+        hetuDto.getAddedHetus().stream()
+                .filter(hetu -> isNewEvent(hetu, VtjEventType.ADD))
+                .map(hetu -> mapHetuToVtjData(hetu, VtjEventType.ADD))
+                .forEach(vtjDataRepository::save);
+        hetuDto.getRemovedHetus().stream()
+                .filter(hetu -> isNewEvent(hetu, VtjEventType.REMOVE))
+                .map(hetu -> mapHetuToVtjData(hetu, VtjEventType.REMOVE))
+                .forEach(vtjDataRepository::save);
+    }
+
+    private boolean isNewEvent(String hetu, VtjEventType vtjEventType) {
+        return vtjDataRepository.findLatestByHetu(hetu)
+                .map(vtjDataEvent -> !vtjEventType.equals(vtjDataEvent.getType()))
+                .orElse(true);
     }
 
     private VtjDataEvent mapHetuToVtjData(String hetu, VtjEventType vtjEventType) {

@@ -11,6 +11,6 @@ import java.util.List;
 
 @Transactional(propagation = Propagation.MANDATORY)
 @Repository
-public interface VtjDataRepository extends CrudRepository<VtjDataEvent, Long> {
+public interface VtjDataRepository extends CrudRepository<VtjDataEvent, Long>, VtjDataRepositoryCustom {
     List<VtjDataEvent> findByVtjdataTimestampIsNull();
 }
