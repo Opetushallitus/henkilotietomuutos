@@ -1,7 +1,7 @@
 package fi.oph.henkilotietomuutospalvelu.config;
 
 public enum ConfigEnums {
-    SUBSYSTEMCODE("henkilotietomuutos-service"),
+    CALLER_ID("1.2.246.562.10.00000000001.henkilotietomuutos-service"),
     SERVICENAME("henkilotietomuutos");
 
     private final String value;
