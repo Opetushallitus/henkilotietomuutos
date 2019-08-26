@@ -22,8 +22,8 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://{{host_postgresql_henkilotietomuutos}}:{{host_postgresql_henkilotietomuutos_port}}/henkilotietomuutos?ApplicationName=henkilotietomuutos-service
-    username: {{host_postgresql_henkilotietomuutos_user}}
-    password: {{host_postgresql_henkilotietomuutos_password}}
+    username: {{postgres_app_user}}
+    password: {{host_postgresql_henkilotietomuutos_app_password}}
     hikari:
       maximum-pool-size: 20
       connection-timeout: 10000
