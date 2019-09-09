@@ -108,7 +108,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
                 updateHenkilo.setTurvakielto(false);
             }
             updateHenkilo.setYhteystiedotRyhma(currentHenkilo.getYhteystiedotRyhma());
-            updateHenkilo.setHuoltajat(new HashSet<>());
+            updateHenkilo.setHuoltajat(currentHenkilo.getHuoltajat());
 
             if (!currentHenkilo.isPassivoitu()) {
                 TietoryhmaContextImpl tietoryhmaContext = new TietoryhmaContextImpl(currentHenkilo, this.koodistoService, this.timeService);
