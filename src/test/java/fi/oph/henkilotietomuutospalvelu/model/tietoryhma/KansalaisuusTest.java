@@ -2,7 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import com.google.common.collect.Sets;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.KansalaisuusDto;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class KansalaisuusTest {
                 .valid(true)
                 .muutostapa(Muutostapa.LISATTY)
                 .build();
-        kansalaisuus.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloDto()), updateDto);
+        kansalaisuus.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloForceReadDto()), updateDto);
         assertThat(updateDto.getKansalaisuus())
                 .flatExtracting(KansalaisuusDto::getKansalaisuusKoodi)
                 .containsExactly("246");
@@ -40,7 +40,7 @@ public class KansalaisuusTest {
                 .valid(false)
                 .muutostapa(Muutostapa.LISATTY)
                 .build();
-        kansalaisuus.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloDto()), updateDto);
+        kansalaisuus.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloForceReadDto()), updateDto);
         assertThat(updateDto.getKansalaisuus()).isNull();
     }
 
@@ -53,7 +53,7 @@ public class KansalaisuusTest {
                 .valid(true)
                 .muutostapa(Muutostapa.LISATTY)
                 .build();
-        kansalaisuus.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloDto()), updateDto);
+        kansalaisuus.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloForceReadDto()), updateDto);
         assertThat(updateDto.getKansalaisuus()).isNull();
     }
 
@@ -61,7 +61,7 @@ public class KansalaisuusTest {
     public void newKansalaisuusIsAddedToOldList() {
         KansalaisuusDto kansalaisuusDto = new KansalaisuusDto();
         kansalaisuusDto.setKansalaisuusKoodi("100");
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .kansalaisuus(Sets.newHashSet(kansalaisuusDto))
                 .build();
         HenkiloForceUpdateDto updateDto =  new HenkiloForceUpdateDto();
@@ -81,7 +81,7 @@ public class KansalaisuusTest {
     public void invalidKansalaisuusPreservsOldList() {
         KansalaisuusDto kansalaisuusDto = new KansalaisuusDto();
         kansalaisuusDto.setKansalaisuusKoodi("100");
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .kansalaisuus(Sets.newHashSet(kansalaisuusDto))
                 .build();
         HenkiloForceUpdateDto updateDto =  new HenkiloForceUpdateDto();
@@ -99,7 +99,7 @@ public class KansalaisuusTest {
     public void poistoLisaysToimii() {
         LocalDate now = LocalDate.of(2022, 1, 1);
 
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         readDto.setKansalaisuus(singleton(KansalaisuusDto.fromKansalaisuusKoodi("kansalaisuus1")));
 
         HenkiloForceUpdateDto updateDto = new HenkiloForceUpdateDto();
@@ -127,7 +127,7 @@ public class KansalaisuusTest {
     public void uudelleenkasittelyToimii() {
         LocalDate now = LocalDate.of(2022, 1, 1);
 
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         readDto.setKansalaisuus(Stream.of("kansalaisuus2", "kansalaisuus3").map(KansalaisuusDto::fromKansalaisuusKoodi).collect(toSet()));
 
         HenkiloForceUpdateDto updateDto = new HenkiloForceUpdateDto();

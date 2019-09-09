@@ -11,7 +11,7 @@ import fi.vm.sade.javautils.http.OphHttpClient;
 import fi.vm.sade.javautils.http.OphHttpEntity;
 import fi.vm.sade.javautils.http.OphHttpRequest;
 import fi.vm.sade.javautils.http.auth.CasAuthenticator;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -83,14 +83,14 @@ public class OnrServiceClientImpl implements OnrServiceClient {
     }
 
     @Override
-    public Optional<HenkiloDto> getHenkiloByHetu(String hetu) {
+    public Optional<HenkiloForceReadDto> getHenkiloByHetu(String hetu) {
         OphHttpRequest request = OphHttpRequest.Builder
                 .get(urlConfiguration.url("oppijanumerorekisteri-service.henkilo.hetu", hetu))
                 .build();
-        return ophHttpClient.<HenkiloDto>execute(request)
+        return ophHttpClient.<HenkiloForceReadDto>execute(request)
                 .expectedStatus(SC_OK).mapWith(text -> {
                     try {
-                        return this.objectMapper.readValue(text, HenkiloDto.class);
+                        return this.objectMapper.readValue(text, HenkiloForceReadDto.class);
                     } catch (IOException jpe) {
                         throw new RestClientException(jpe.getMessage());
                     }

@@ -3,7 +3,7 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.KoodistoYhteystietoAlkupera;
 import fi.oph.henkilotietomuutospalvelu.dto.type.KoodistoYhteystietoTyyppi;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.YhteystiedotRyhmaDto;
 import org.junit.Before;
@@ -15,10 +15,7 @@ import java.util.HashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class YhteystietoTietoryhmaTest {
 
@@ -32,7 +29,7 @@ public class YhteystietoTietoryhmaTest {
     @Test
     public void updateHenkiloLisays() {
         when(tietoryhma.getTyyppi()).thenReturn(KoodistoYhteystietoTyyppi.KOTIMAINEN);
-        HenkiloDto current = new HenkiloDto();
+        HenkiloForceReadDto current = new HenkiloForceReadDto();
         TestTietoryhmaContextImpl context = new TestTietoryhmaContextImpl(current);
         HenkiloForceUpdateDto updated = new HenkiloForceUpdateDto();
         updated.setYhteystiedotRyhma(new HashSet<>());
@@ -58,7 +55,7 @@ public class YhteystietoTietoryhmaTest {
     @Test
     public void updateHenkiloMuokkaus() {
         when(tietoryhma.getTyyppi()).thenReturn(KoodistoYhteystietoTyyppi.KOTIMAINEN);
-        HenkiloDto current = new HenkiloDto();
+        HenkiloForceReadDto current = new HenkiloForceReadDto();
         TestTietoryhmaContextImpl context = new TestTietoryhmaContextImpl(current);
         HenkiloForceUpdateDto updated = new HenkiloForceUpdateDto();
         updated.setYhteystiedotRyhma(new HashSet<>());
@@ -89,7 +86,7 @@ public class YhteystietoTietoryhmaTest {
     @Test
     public void updateHenkiloPoisto() {
         when(tietoryhma.getTyyppi()).thenReturn(KoodistoYhteystietoTyyppi.KOTIMAINEN);
-        HenkiloDto current = new HenkiloDto();
+        HenkiloForceReadDto current = new HenkiloForceReadDto();
         TestTietoryhmaContextImpl context = new TestTietoryhmaContextImpl(current);
         HenkiloForceUpdateDto updated = new HenkiloForceUpdateDto();
         updated.setYhteystiedotRyhma(new HashSet<>());

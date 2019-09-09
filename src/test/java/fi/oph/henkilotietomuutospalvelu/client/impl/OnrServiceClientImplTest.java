@@ -7,7 +7,7 @@ import fi.oph.henkilotietomuutospalvelu.config.properties.OppijanumerorekisteriP
 import fi.vm.sade.javautils.http.OphHttpClient;
 import fi.vm.sade.javautils.http.OphHttpResponseImpl;
 import fi.vm.sade.javautils.http.exceptions.UnhandledHttpStatusCodeException;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -67,9 +67,9 @@ public class OnrServiceClientImplTest {
     public void foundHenkiloIsReturned() {
         CloseableHttpResponse httpResponse = this.mockResponse("{\"hetu\":\"hetu1\"}", SC_OK, ContentType.APPLICATION_JSON.toString());
         given(this.ophHttpClient.execute(any())).willReturn(new OphHttpResponseImpl<>(httpResponse));
-        Optional<HenkiloDto> optionalHenkiloDto = this.onrServiceClient.getHenkiloByHetu("hetu1");
+        Optional<HenkiloForceReadDto> optionalHenkiloDto = this.onrServiceClient.getHenkiloByHetu("hetu1");
         assertThat(optionalHenkiloDto)
-                .map(HenkiloDto::getHetu)
+                .map(HenkiloForceReadDto::getHetu)
                 .contains("hetu1");
     }
 
@@ -77,7 +77,7 @@ public class OnrServiceClientImplTest {
     public void henkiloNotFound() {
         CloseableHttpResponse httpResponse = this.mockResponse("", SC_NOT_FOUND, ContentType.APPLICATION_JSON.toString());
         given(this.ophHttpClient.execute(any())).willReturn(new OphHttpResponseImpl<>(httpResponse));
-        Optional<HenkiloDto> optionalHenkiloDto = this.onrServiceClient.getHenkiloByHetu("hetu1");
+        Optional<HenkiloForceReadDto> optionalHenkiloDto = this.onrServiceClient.getHenkiloByHetu("hetu1");
         assertThat(optionalHenkiloDto).isEmpty();
     }
 

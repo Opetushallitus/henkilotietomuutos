@@ -1,7 +1,7 @@
 package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import org.junit.Test;
 
@@ -13,7 +13,7 @@ public class TurvakieltoTest {
 
     @Test
     public void lisatty() {
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         TestTietoryhmaContextImpl context = new TestTietoryhmaContextImpl(readDto, LocalDate.of(2019, 1, 25));
         Turvakielto turvakielto = new Turvakielto();
         turvakielto.setMuutostapa(Muutostapa.LISATTY);
@@ -27,7 +27,7 @@ public class TurvakieltoTest {
 
     @Test
     public void poistettu() {
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         TestTietoryhmaContextImpl context = new TestTietoryhmaContextImpl(readDto, LocalDate.of(2019, 1, 25));
         HenkiloForceUpdateDto updateDto = new HenkiloForceUpdateDto();
         Turvakielto turvakielto = new Turvakielto();
@@ -41,7 +41,7 @@ public class TurvakieltoTest {
 
     @Test
     public void uudelleenkasittely() {
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         readDto.setTurvakielto(false);
         TestTietoryhmaContextImpl context = new TestTietoryhmaContextImpl(readDto, LocalDate.of(2019, 1, 25));
         HenkiloForceUpdateDto updateDto = new HenkiloForceUpdateDto();

@@ -1,6 +1,6 @@
 package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HuoltajaCreateDto;
 import org.assertj.core.groups.Tuple;
@@ -20,12 +20,12 @@ public class HuoltajaTest {
                 .hetu("hetu1")
                 .voimassa(true)
                 .build();
-        huoltaja1.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloDto()), henkiloForceUpdateDto);
+        huoltaja1.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloForceReadDto()), henkiloForceUpdateDto);
         Huoltaja huoltaja2 = Huoltaja.builder()
                 .hetu("hetu2")
                 .voimassa(true)
                 .build();
-        huoltaja2.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloDto()), henkiloForceUpdateDto);
+        huoltaja2.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloForceReadDto()), henkiloForceUpdateDto);
         assertThat(henkiloForceUpdateDto.getHuoltajat())
                 .extracting(HuoltajaCreateDto::getHetu)
                 .containsExactlyInAnyOrder("hetu1", "hetu2");
@@ -42,7 +42,7 @@ public class HuoltajaTest {
                         .build())
                 .voimassa(true)
                 .build();
-        huoltaja1.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloDto()), henkiloForceUpdateDto);
+        huoltaja1.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloForceReadDto()), henkiloForceUpdateDto);
         Huoltaja huoltaja2 = Huoltaja.builder()
                 .henkilotunnuksetonHenkilo(HenkilotunnuksetonHenkilo.builder()
                         .firstNames("Etunimet2")
@@ -50,7 +50,7 @@ public class HuoltajaTest {
                         .build())
                 .voimassa(true)
                 .build();
-        huoltaja2.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloDto()), henkiloForceUpdateDto);
+        huoltaja2.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloForceReadDto()), henkiloForceUpdateDto);
         assertThat(henkiloForceUpdateDto.getHuoltajat())
                 .extracting(HuoltajaCreateDto::getEtunimet, HuoltajaCreateDto::getSukunimi)
                 .containsExactlyInAnyOrder(Tuple.tuple("Etunimet1", "Sukunimi1"), Tuple.tuple("Etunimet2", "Sukunimi2"));
@@ -64,7 +64,7 @@ public class HuoltajaTest {
                 .hetu("hetu")
                 .voimassa(true)
                 .build();
-        huoltaja1.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloDto()), henkiloForceUpdateDto);
+        huoltaja1.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloForceReadDto()), henkiloForceUpdateDto);
         assertThat(henkiloForceUpdateDto.getHuoltajat())
                 .extracting(HuoltajaCreateDto::getHetu)
                 .containsExactly("hetu");
@@ -72,7 +72,7 @@ public class HuoltajaTest {
                 .hetu("hetu")
                 .voimassa(true)
                 .build();
-        huoltaja2.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloDto()), henkiloForceUpdateDto);
+        huoltaja2.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloForceReadDto()), henkiloForceUpdateDto);
         assertThat(henkiloForceUpdateDto.getHuoltajat())
                 .extracting(HuoltajaCreateDto::getHetu)
                 .containsExactly("hetu");
@@ -90,7 +90,7 @@ public class HuoltajaTest {
                         .build())
                 .voimassa(true)
                 .build();
-        huoltaja1.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloDto()), henkiloForceUpdateDto);
+        huoltaja1.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloForceReadDto()), henkiloForceUpdateDto);
         assertThat(henkiloForceUpdateDto.getHuoltajat())
                 .extracting(HuoltajaCreateDto::getEtunimet, HuoltajaCreateDto::getSukunimi)
                 .containsExactly(Tuple.tuple("Etunimet", "Sukunimi"));
@@ -102,7 +102,7 @@ public class HuoltajaTest {
                         .build())
                 .voimassa(true)
                 .build();
-        huoltaja2.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloDto()), henkiloForceUpdateDto);
+        huoltaja2.updateHenkilo(new TestTietoryhmaContextImpl(new HenkiloForceReadDto()), henkiloForceUpdateDto);
         assertThat(henkiloForceUpdateDto.getHuoltajat())
                 .extracting(HuoltajaCreateDto::getEtunimet, HuoltajaCreateDto::getSukunimi, HuoltajaCreateDto::getKansalaisuusKoodi)
                 .containsExactly(Tuple.tuple("Etunimet", "Sukunimi", Collections.singleton("01")));

@@ -1,6 +1,6 @@
 package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,7 @@ public class KutsumanimiTest {
 
     @Test
     public void kutsumanimiIsSet() {
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .etunimet("etu nimi")
                 .kutsumanimi("etu")
                 .build();
@@ -36,7 +36,7 @@ public class KutsumanimiTest {
 
     @Test
     public void oldKutsumanimiIsNotSet() {
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .etunimet("etu nimi")
                 .kutsumanimi("etu")
                 .build();
@@ -52,7 +52,7 @@ public class KutsumanimiTest {
 
     @Test
     public void dualPartkutsumanimiIsSet() {
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .etunimet("etu-toka nimi")
                 .kutsumanimi("nimi")
                 .build();

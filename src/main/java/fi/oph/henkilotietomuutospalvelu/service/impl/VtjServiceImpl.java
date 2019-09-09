@@ -4,7 +4,7 @@ import fi.oph.henkilotietomuutospalvelu.client.OnrServiceClient;
 import fi.oph.henkilotietomuutospalvelu.client.VtjServiceClient;
 import fi.oph.henkilotietomuutospalvelu.config.OrikaConfiguration;
 import fi.oph.henkilotietomuutospalvelu.service.VtjService;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HuoltajaCreateDto;
 import fi.vm.sade.rajapinnat.vtj.api.YksiloityHenkilo;
@@ -41,7 +41,7 @@ public class VtjServiceImpl implements VtjService {
                 .map(huoltajaCreateDto -> onrServiceClient.getHenkiloByHetu(huoltajaCreateDto.getHetu()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .filter(HenkiloDto::isYksiloityVTJ)
+                .filter(HenkiloForceReadDto::isYksiloityVTJ)
                 .flatMap(henkiloDto -> Stream.concat(Stream.of(henkiloDto.getHetu()), henkiloDto.getKaikkiHetut().stream()))
                 .collect(Collectors.toSet());
         Stream<HuoltajaCreateDto> hetullisetYksiloidytHuoltajat = henkiloForceUpdateDto.getHuoltajat().stream()

@@ -1,7 +1,7 @@
 package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import org.junit.Test;
 
@@ -11,7 +11,7 @@ public class HenkilotunnuskorjausTest {
     @Test
     public void hetuNotChanged() {
         HenkiloForceUpdateDto henkilo = new HenkiloForceUpdateDto();
-        HenkiloDto currentHenkilo = HenkiloDto.builder()
+        HenkiloForceReadDto currentHenkilo = HenkiloForceReadDto.builder()
                 .hetu("hetu1")
                 .build();
         Tietoryhma.Context context = new TestTietoryhmaContextImpl(currentHenkilo);
@@ -36,7 +36,7 @@ public class HenkilotunnuskorjausTest {
     @Test
     public void muutostietoNotActive() {
         HenkiloForceUpdateDto henkilo = new HenkiloForceUpdateDto();
-        HenkiloDto currentHenkilo = HenkiloDto.builder()
+        HenkiloForceReadDto currentHenkilo = HenkiloForceReadDto.builder()
                 .hetu("hetu1")
                 .build();
         Tietoryhma.Context context = new TestTietoryhmaContextImpl(currentHenkilo);
@@ -61,7 +61,7 @@ public class HenkilotunnuskorjausTest {
     @Test
     public void hetuLisattyVanhaMuutettuFalse() {
         HenkiloForceUpdateDto henkilo = new HenkiloForceUpdateDto();
-        HenkiloDto currentHenkilo = HenkiloDto.builder()
+        HenkiloForceReadDto currentHenkilo = HenkiloForceReadDto.builder()
                 .hetu("hetu1")
                 .build();
         Tietoryhma.Context context = new TestTietoryhmaContextImpl(currentHenkilo);
@@ -86,7 +86,7 @@ public class HenkilotunnuskorjausTest {
     @Test
     public void uusiAktiivinenHetuLisattyJaVanhaMuutettuEpaAktiiviseksi() {
         HenkiloForceUpdateDto henkilo = new HenkiloForceUpdateDto();
-        HenkiloDto currentHenkilo = HenkiloDto.builder()
+        HenkiloForceReadDto currentHenkilo = HenkiloForceReadDto.builder()
                 .hetu("hetu1")
                 .build();
         Tietoryhma.Context context = new TestTietoryhmaContextImpl(currentHenkilo);
@@ -111,7 +111,7 @@ public class HenkilotunnuskorjausTest {
     @Test
     public void vanhaHetuEiVastaaLisatiedonAktiivista() {
         HenkiloForceUpdateDto henkilo = new HenkiloForceUpdateDto();
-        HenkiloDto currentHenkilo = HenkiloDto.builder()
+        HenkiloForceReadDto currentHenkilo = HenkiloForceReadDto.builder()
                 .hetu("hetu1")
                 .build();
         Tietoryhma.Context context = new TestTietoryhmaContextImpl(currentHenkilo);
@@ -136,7 +136,7 @@ public class HenkilotunnuskorjausTest {
     @Test
     public void hetuEiPaivityJosValmiiksiAktiivisenaLisatiodossa() {
         HenkiloForceUpdateDto henkilo = new HenkiloForceUpdateDto();
-        HenkiloDto currentHenkilo = HenkiloDto.builder()
+        HenkiloForceReadDto currentHenkilo = HenkiloForceReadDto.builder()
                 .hetu("hetu1")
                 .build();
         Tietoryhma.Context context = new TestTietoryhmaContextImpl(currentHenkilo);
@@ -161,7 +161,7 @@ public class HenkilotunnuskorjausTest {
     @Test
     public void hetuMuutettuJaLisatietonaVanhaEpaAktiivinen() {
         HenkiloForceUpdateDto henkilo = new HenkiloForceUpdateDto();
-        HenkiloDto currentHenkilo = HenkiloDto.builder()
+        HenkiloForceReadDto currentHenkilo = HenkiloForceReadDto.builder()
                 .hetu("hetu1")
                 .build();
         Tietoryhma.Context context = new TestTietoryhmaContextImpl(currentHenkilo);
@@ -186,7 +186,7 @@ public class HenkilotunnuskorjausTest {
     @Test
     public void lisatietonaVanhaEpaAktiivinenJaHetuMuutettu() {
         HenkiloForceUpdateDto henkilo = new HenkiloForceUpdateDto();
-        HenkiloDto currentHenkilo = HenkiloDto.builder()
+        HenkiloForceReadDto currentHenkilo = HenkiloForceReadDto.builder()
                 .hetu("hetu1")
                 .build();
         Tietoryhma.Context context = new TestTietoryhmaContextImpl(currentHenkilo);
