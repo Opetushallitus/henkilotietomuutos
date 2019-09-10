@@ -6,7 +6,7 @@ import fi.oph.henkilotietomuutospalvelu.config.OrikaConfiguration;
 import fi.oph.henkilotietomuutospalvelu.config.OrikaMapperFactory;
 import fi.oph.henkilotietomuutospalvelu.mappers.OsoitetietoToYhteystiedotRyhmaConverter;
 import fi.oph.henkilotietomuutospalvelu.service.VtjService;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HuoltajaCreateDto;
 import fi.vm.sade.rajapinnat.vtj.api.YksiloityHenkilo;
@@ -61,7 +61,7 @@ public class VtjServiceImplTest {
     @Test
     public void hetullinenYksiloityShouldNotBeAggregatedWithNewInfo() {
         given(this.onrServiceClient.getHenkiloByHetu("hetu"))
-                .willReturn(Optional.of(HenkiloDto.builder()
+                .willReturn(Optional.of(HenkiloForceReadDto.builder()
                         .hetu("hetu")
                         .yksiloityVTJ(true)
                         .etunimet("etunimi")
@@ -83,7 +83,7 @@ public class VtjServiceImplTest {
     @Test
     public void hetullinenYksiloimatonShouldBeAggregatedWithNewInfo() {
         given(this.onrServiceClient.getHenkiloByHetu("hetu"))
-                .willReturn(Optional.of(HenkiloDto.builder()
+                .willReturn(Optional.of(HenkiloForceReadDto.builder()
                         .hetu("hetu")
                         .yksiloityVTJ(false)
                         .etunimet("etunimi")
@@ -132,14 +132,14 @@ public class VtjServiceImplTest {
     @Test
     public void allCasesShouldWorkTogether() {
         given(this.onrServiceClient.getHenkiloByHetu("hetuyksiloimaton"))
-                .willReturn(Optional.of(HenkiloDto.builder()
+                .willReturn(Optional.of(HenkiloForceReadDto.builder()
                         .hetu("hetuyksiloimaton")
                         .yksiloityVTJ(false)
                         .etunimet("etunimi")
                         .kaikkiHetut(new HashSet<>())
                         .build()));
         given(this.onrServiceClient.getHenkiloByHetu("hetuyksiloity"))
-                .willReturn(Optional.of(HenkiloDto.builder()
+                .willReturn(Optional.of(HenkiloForceReadDto.builder()
                         .hetu("hetuyksiloity")
                         .yksiloityVTJ(true)
                         .etunimet("etunimi")
@@ -174,7 +174,7 @@ public class VtjServiceImplTest {
     @Test
     public void hetullinenYksiloityShouldWorkWithDifferentHetuReturned() {
         given(this.onrServiceClient.getHenkiloByHetu("hetu"))
-                .willReturn(Optional.of(HenkiloDto.builder()
+                .willReturn(Optional.of(HenkiloForceReadDto.builder()
                         .hetu("erihetu")
                         .yksiloityVTJ(true)
                         .etunimet("etunimi")
@@ -196,7 +196,7 @@ public class VtjServiceImplTest {
     @Test
     public void passivoituVtjHenkiloShouldBeIgnored() {
         given(this.onrServiceClient.getHenkiloByHetu("hetu"))
-                .willReturn(Optional.of(HenkiloDto.builder()
+                .willReturn(Optional.of(HenkiloForceReadDto.builder()
                         .hetu("hetu")
                         .yksiloityVTJ(false)
                         .etunimet("etunimi")
@@ -222,7 +222,7 @@ public class VtjServiceImplTest {
     @Test
     public void henkiloNotFoundOnVtjShouldBeIgnored() {
         given(this.onrServiceClient.getHenkiloByHetu("hetu"))
-                .willReturn(Optional.of(HenkiloDto.builder()
+                .willReturn(Optional.of(HenkiloForceReadDto.builder()
                         .hetu("hetu")
                         .yksiloityVTJ(false)
                         .etunimet("etunimi")

@@ -188,7 +188,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRiviOtherHetu.setQueryHetu("hetu1");
         henkiloMuutostietoRiviOtherHetu.addTietoryhma(henkilotunnuskorjaus);
 
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .hetu("hetu2")
                 .oidHenkilo("oid1")
                 .etunimet("etunimi kutsumanimi")
@@ -227,7 +227,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.addTietoryhma(tietoryhma);
         when(henkiloMuutostietoRepository.findByQueryHetuInAndProcessTimestampIsNull(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .hetu("hetu1")
                 .oidHenkilo("oid1")
                 .etunimet("etunimi kutsumanimi")
@@ -276,7 +276,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.addTietoryhma(osoiteKorjattu, osoiteKorjattavaa, osoiteLisatieto, osoitePoistettu);
         when(henkiloMuutostietoRepository.findByQueryHetuInAndProcessTimestampIsNull(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .yhteystiedotRyhma(new HashSet<>())
                 .build();
         when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
@@ -307,7 +307,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.addTietoryhma(osoitePoistettu);
         when(henkiloMuutostietoRepository.findByQueryHetuInAndProcessTimestampIsNull(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .yhteystiedotRyhma(Stream.of(
                         YhteystiedotRyhmaDto.builder()
                                 .ryhmaAlkuperaTieto("alkupera1")
@@ -370,7 +370,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.addTietoryhma(osoiteLisatty, osoiteMuutettu, osoiteLisatieto);
         when(henkiloMuutostietoRepository.findByQueryHetuInAndProcessTimestampIsNull(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .yhteystiedotRyhma(new HashSet<>())
                 .build();
         when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
@@ -405,7 +405,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.addTietoryhma(etunimi, kutsumanimi);
         when(henkiloMuutostietoRepository.findByQueryHetuInAndProcessTimestampIsNull(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
-        HenkiloDto henkiloDto = HenkiloDto.builder().build();
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder().build();
         when(onrServiceClient.getHenkiloByHetu(eq("hetu1"))).thenReturn(Optional.of(henkiloDto));
 
         muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
@@ -430,7 +430,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.addTietoryhma(henkiloName);
         when(henkiloMuutostietoRepository.findByQueryHetuInAndProcessTimestampIsNull(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .etunimet("vanhanimi toinennimi")
                 .kutsumanimi("toinennimi")
                 .build();
@@ -458,7 +458,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.addTietoryhma(henkiloName);
         when(henkiloMuutostietoRepository.findByQueryHetuInAndProcessTimestampIsNull(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .etunimet("vanhanimi toinennimi")
                 .kutsumanimi("vanhanimi")
                 .build();
@@ -485,7 +485,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.addTietoryhma(henkiloName);
         when(henkiloMuutostietoRepository.findByQueryHetuInAndProcessTimestampIsNull(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .etunimet("vanhanimi toinennimi")
                 .kutsumanimi("vanhanimi")
                 .build();
@@ -512,7 +512,7 @@ public class MuutostietoHandleServiceImplTest {
         henkiloMuutostietoRivi.addTietoryhma(henkiloName);
         when(henkiloMuutostietoRepository.findByQueryHetuInAndProcessTimestampIsNull(any())).thenReturn(singletonList(henkiloMuutostietoRivi));
 
-        HenkiloDto henkiloDto = HenkiloDto.builder()
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .etunimet("vanhanimi toinennimi")
                 .kutsumanimi("vanhanimi")
                 .build();

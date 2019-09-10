@@ -126,7 +126,7 @@ public class MuutostietoServiceITest {
         yksiloityHenkilo.setHetu("140434-0665");
         given(this.vtjServiceClient.getHenkiloByHetu("140434-0665")).willReturn(Optional.of(yksiloityHenkilo));
 
-        HenkiloDto henkilo = new HenkiloDto();
+        HenkiloForceReadDto henkilo = new HenkiloForceReadDto();
         henkilo.setOidHenkilo("1.2.246.562.24.41327169638");
         henkilo.setHetu("100271-008M");
         henkilo.setPassivoitu(false);
@@ -166,7 +166,7 @@ public class MuutostietoServiceITest {
     public void whenPersonHasNimenmuutosWithExpirationDate_thenIgnoreNimenmuutos() throws Exception {
         mockFiles("test_data/nimi_test.PTT", "test_data/nimi_test.PTT_001.PART");
 
-        HenkiloDto henkilo = new HenkiloDto();
+        HenkiloForceReadDto henkilo = new HenkiloForceReadDto();
         henkilo.setOidHenkilo("1.2.246.562.24.41327169638");
         henkilo.setHetu("030552-085W");
         henkilo.setPassivoitu(false);
@@ -198,7 +198,7 @@ public class MuutostietoServiceITest {
                 .hetu(hetu)
                 .tietoryhmat(emptyList())
                 .build());
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         readDto.setHetu(hetu);
         when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
 
@@ -218,7 +218,7 @@ public class MuutostietoServiceITest {
                 .hetu(hetu)
                 .tietoryhmat(emptyList())
                 .build());
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         readDto.setHetu(hetu);
         when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
 
@@ -236,7 +236,7 @@ public class MuutostietoServiceITest {
         given(this.koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("512"))).willReturn(true);
         given(this.koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("246"))).willReturn(true);
 
-        HenkiloDto henkilo = new HenkiloDto();
+        HenkiloForceReadDto henkilo = new HenkiloForceReadDto();
         henkilo.setOidHenkilo("1.2.246.562.24.41327169638");
         henkilo.setHetu("030552-085W");
         henkilo.setPassivoitu(false);
@@ -272,7 +272,7 @@ public class MuutostietoServiceITest {
     public void henkiloHetuAndSukupuoliAndNimiChanges() throws Exception {
         mockFiles("test_data/hetu_changes.MTT_001.PART", "test_data/hetu_changes.MTT_001.PART");
 
-        HenkiloDto henkilo = new HenkiloDto();
+        HenkiloForceReadDto henkilo = new HenkiloForceReadDto();
         henkilo.setOidHenkilo("1.2.246.562.24.41327169638");
         henkilo.setPassivoitu(false);
         henkilo.setHetu("250198-9606");
@@ -320,7 +320,7 @@ public class MuutostietoServiceITest {
                 .tiedostoNimi(tiedostonimi2)
                 .build());
 
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         readDto.setHetu(hetu);
         readDto.setKansalaisuus(singleton(KansalaisuusDto.fromKansalaisuusKoodi("kansalaisuus1")));
         when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
@@ -361,11 +361,11 @@ public class MuutostietoServiceITest {
                         .tiedostoNimi(tiedostonimi1)
                         .build()));
 
-        HenkiloDto readDto1 = new HenkiloDto();
+        HenkiloForceReadDto readDto1 = new HenkiloForceReadDto();
         readDto1.setOidHenkilo("oid1");
         readDto1.setHetu(hetu1);
         when(onrServiceClient.getHenkiloByHetu(eq(hetu1))).thenReturn(Optional.of(readDto1));
-        HenkiloDto readDto2 = new HenkiloDto();
+        HenkiloForceReadDto readDto2 = new HenkiloForceReadDto();
         readDto2.setOidHenkilo("oid2");
         readDto2.setHetu(hetu2);
         when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.of(readDto2));
@@ -399,7 +399,7 @@ public class MuutostietoServiceITest {
                 .tiedostoNimi(tiedostonimi3)
                 .build());
 
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         readDto.setHetu(hetu1);
         when(onrServiceClient.getHenkiloByHetu(eq(hetu1))).thenReturn(Optional.of(readDto));
         when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.empty());
@@ -464,7 +464,7 @@ public class MuutostietoServiceITest {
                 .tiedostoNimi(tiedostonimi2)
                 .build());
 
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         readDto.setHetu(hetu3);
         when(onrServiceClient.getHenkiloByHetu(eq(hetu1))).thenReturn(Optional.empty());
         when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.empty());
@@ -505,7 +505,7 @@ public class MuutostietoServiceITest {
                 .tiedostoNimi(tiedostonimi2)
                 .build());
 
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         readDto.setHetu(hetu3);
         when(onrServiceClient.getHenkiloByHetu(eq(hetu1))).thenReturn(Optional.of(readDto));
         when(onrServiceClient.getHenkiloByHetu(eq(hetu2))).thenReturn(Optional.of(readDto));
@@ -549,7 +549,7 @@ public class MuutostietoServiceITest {
                 .tiedostoNimi(tiedostonimi3)
                 .build());
 
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         readDto.setHetu(hetu);
         when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
 
@@ -605,7 +605,7 @@ public class MuutostietoServiceITest {
                 ))
                 .build());
 
-        HenkiloDto readDto = new HenkiloDto();
+        HenkiloForceReadDto readDto = new HenkiloForceReadDto();
         readDto.setHetu(hetu);
         when(onrServiceClient.getHenkiloByHetu(eq(hetu))).thenReturn(Optional.of(readDto));
 

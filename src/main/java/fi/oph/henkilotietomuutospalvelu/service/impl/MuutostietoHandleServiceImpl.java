@@ -22,7 +22,7 @@ import fi.oph.henkilotietomuutospalvelu.utils.CustomOrderComparator;
 import fi.oph.henkilotietomuutospalvelu.utils.HenkiloMuutostietoRiviComparator;
 import fi.oph.henkilotietomuutospalvelu.utils.HenkiloUtils;
 import fi.oph.henkilotietomuutospalvelu.utils.TiedostoComparator;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -91,7 +91,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void handleMuutostieto(HenkiloMuutostietoRivi henkiloMuutostietoRivi) {
-        Optional<HenkiloDto> currentHenkiloOptional = this.getCurrentHenkilo(henkiloMuutostietoRivi.getQueryHetu());
+        Optional<HenkiloForceReadDto> currentHenkiloOptional = this.getCurrentHenkilo(henkiloMuutostietoRivi.getQueryHetu());
         currentHenkiloOptional.ifPresent(currentHenkilo -> {
             Set<String> kaikkiHetut = getKaikkiHetut(currentHenkilo.getHetu());
             Map<Tiedosto, List<HenkiloMuutostietoRivi>> kaikkiMuutostietoRivit = henkiloMuutostietoRepository
@@ -108,7 +108,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
                 updateHenkilo.setTurvakielto(false);
             }
             updateHenkilo.setYhteystiedotRyhma(currentHenkilo.getYhteystiedotRyhma());
-            updateHenkilo.setHuoltajat(new HashSet<>());
+            updateHenkilo.setHuoltajat(currentHenkilo.getHuoltajat());
 
             if (!currentHenkilo.isPassivoitu()) {
                 TietoryhmaContextImpl tietoryhmaContext = new TietoryhmaContextImpl(currentHenkilo, this.koodistoService, this.timeService);
@@ -185,7 +185,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
     @RequiredArgsConstructor
     private static class TietoryhmaContextImpl implements Tietoryhma.Context {
 
-        private final HenkiloDto currentHenkilo;
+        private final HenkiloForceReadDto currentHenkilo;
         private final KoodistoService koodistoService;
         private final TimeService timeService;
 
@@ -216,8 +216,8 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
     }
 
     @NotNull
-    private Optional<HenkiloDto> getCurrentHenkilo(String queryHetu) {
-        Optional<HenkiloDto> optionalHenkiloDto = this.onrServiceClient.getHenkiloByHetu(queryHetu);
+    private Optional<HenkiloForceReadDto> getCurrentHenkilo(String queryHetu) {
+        Optional<HenkiloForceReadDto> optionalHenkiloDto = this.onrServiceClient.getHenkiloByHetu(queryHetu);
         if (!optionalHenkiloDto.isPresent()) {
             // Trying to find henkilo with changed hetus.
             List<HenkiloMuutostietoRivi> allCurrentHenkiloRivis = this.henkiloMuutostietoRepository

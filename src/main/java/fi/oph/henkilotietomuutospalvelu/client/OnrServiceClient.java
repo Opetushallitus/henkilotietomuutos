@@ -1,6 +1,6 @@
 package fi.oph.henkilotietomuutospalvelu.client;
 
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 
 import java.util.Optional;
@@ -14,6 +14,6 @@ public interface OnrServiceClient {
      */
     void updateHenkilo(HenkiloForceUpdateDto updateDto, boolean retry);
 
-    Optional<HenkiloDto> getHenkiloByHetu(String hetu);
+    Optional<HenkiloForceReadDto> getHenkiloByHetu(String hetu);
 
 }

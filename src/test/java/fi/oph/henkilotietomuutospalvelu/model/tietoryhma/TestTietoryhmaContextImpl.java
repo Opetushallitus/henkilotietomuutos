@@ -3,7 +3,7 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.KoodiMetadataDto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
-import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import lombok.AllArgsConstructor;
 import org.springframework.util.StringUtils;
 
@@ -13,24 +13,24 @@ import java.util.Optional;
 @AllArgsConstructor
 class TestTietoryhmaContextImpl implements Tietoryhma.Context {
 
-    private final HenkiloDto henkiloDto;
+    private final HenkiloForceReadDto henkiloDto;
     private Optional<KoodistoService> koodistoService = Optional.empty();
     private LocalDate now;
 
-    public TestTietoryhmaContextImpl(HenkiloDto henkiloDto) {
+    public TestTietoryhmaContextImpl(HenkiloForceReadDto henkiloDto) {
         this(henkiloDto, LocalDate.now());
     }
 
-    public TestTietoryhmaContextImpl(HenkiloDto henkiloDto, KoodistoService koodistoService) {
+    public TestTietoryhmaContextImpl(HenkiloForceReadDto henkiloDto, KoodistoService koodistoService) {
         this(henkiloDto, Optional.of(koodistoService), LocalDate.now());
     }
 
-    public TestTietoryhmaContextImpl(HenkiloDto henkiloDto, LocalDate now) {
+    public TestTietoryhmaContextImpl(HenkiloForceReadDto henkiloDto, LocalDate now) {
         this(henkiloDto, Optional.empty(), now);
     }
 
     @Override
-    public HenkiloDto getCurrentHenkilo() {
+    public HenkiloForceReadDto getCurrentHenkilo() {
         return henkiloDto;
     }
 
