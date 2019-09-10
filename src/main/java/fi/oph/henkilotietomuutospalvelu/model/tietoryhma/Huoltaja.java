@@ -15,7 +15,9 @@ import org.springframework.util.StringUtils;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Entity
@@ -68,9 +70,15 @@ public class Huoltaja extends Tietoryhma {
     }
 
     @Override
+    protected Set<Muutostapa> getRedundantChanges() {
+        return EnumSet.of(Muutostapa.LISATIETO, Muutostapa.KORJATTAVAA);
+    }
+
+    @Override
     protected void updateHenkiloInternal(Context context, HenkiloForceUpdateDto henkilo) {
         if (Boolean.TRUE.equals(this.voimassa)
-                && HenkiloUpdateUtil.localdateIsBetween(this.startDate, this.endDate)) {
+                && HenkiloUpdateUtil.localdateIsBetween(this.startDate, this.endDate, context.getLocalDateNow())
+                && !Muutostapa.POISTETTU.equals(getMuutostapa())) {
             // Samaan huoltajaan voi olla useita tietoryhmiä samalla rivillä
             HuoltajaCreateDto huoltajaCreateDto = Optional.ofNullable(henkilo.getHuoltajat())
                     .filter(huoltajat -> !huoltajat.isEmpty())
@@ -91,7 +99,7 @@ public class Huoltaja extends Tietoryhma {
             henkilo.getHuoltajat().add(huoltajaCreateDto);
         }
         else {
-            log.warn("Huoltajuus ei voimassa. Ei käsitellä.");
+            henkilo.getHuoltajat().removeIf(this::isHuoltajaAlreadyUpdated);
         }
     }
 

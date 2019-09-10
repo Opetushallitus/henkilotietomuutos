@@ -52,11 +52,12 @@ public class HenkiloUpdateUtil {
      * Hyväksyttävät päivämäärät ovat joko voimassa tai niitä ei ole annettu.
      * @param start alkupvm
      * @param end loppupvm
+     * @param date päivämäärä
      * @return Onko aikaväli validi
      */
-    public static boolean localdateIsBetween(LocalDate start, LocalDate end) {
-        return (start == null || LocalDate.now().isAfter(start))
-                && (end == null || LocalDate.now().isBefore(end));
+    public static boolean localdateIsBetween(LocalDate start, LocalDate end, LocalDate date) {
+        return (start == null || date.isAfter(start))
+                && (end == null || date.isBefore(end));
     }
 
     /**
