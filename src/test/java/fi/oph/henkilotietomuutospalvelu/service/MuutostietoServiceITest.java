@@ -384,10 +384,9 @@ public class MuutostietoServiceITest {
         String hetu2 = "281198-9540";
 
         String tiedostonimi1 = "test_001.PTT";
-        tallennaTiedosto(tiedostonimi1, MuutostietoDto.builder()
-                .hetu(hetu1)
-                .tiedostoNimi(tiedostonimi1)
-                .build());
+        tallennaTiedosto(tiedostonimi1, asList(
+                MuutostietoDto.builder().hetu(hetu1).tiedostoNimi(tiedostonimi1).build(),
+                MuutostietoDto.builder().hetu(hetu1).tiedostoNimi(tiedostonimi1).build()));
         String tiedostonimi2 = "test_001.MTT";
         tallennaTiedosto(tiedostonimi2, MuutostietoDto.builder()
                 .hetu(hetu1)
@@ -411,7 +410,9 @@ public class MuutostietoServiceITest {
 
         assertThat(henkiloMuutostietoRepository.findAll())
                 .extracting(HenkiloMuutostietoRivi::getQueryHetu, HenkiloMuutostietoRivi::getProcessTimestamp)
-                .containsExactlyInAnyOrder(tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu2, null));
+                .containsExactlyInAnyOrder(tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu2, null));
+        verify(onrServiceClient).getHenkiloByHetu(eq(hetu1));
+        verify(onrServiceClient).updateHenkilo(any(HenkiloForceUpdateDto.class), eq(true));
 
         LocalDateTime time2 = LocalDateTime.of(2019, 4, 3, 23, 12, 59);
         when(timeService.getLocalDateTime()).thenReturn(time2);
@@ -420,7 +421,9 @@ public class MuutostietoServiceITest {
 
         assertThat(henkiloMuutostietoRepository.findAll())
                 .extracting(HenkiloMuutostietoRivi::getQueryHetu, HenkiloMuutostietoRivi::getProcessTimestamp)
-                .containsExactlyInAnyOrder(tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu2, time2));
+                .containsExactlyInAnyOrder(tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu2, time2));
+        verify(onrServiceClient).getHenkiloByHetu(eq(hetu2));
+        verify(onrServiceClient).updateHenkilo(any(HenkiloForceUpdateDto.class), eq(true));
 
         String tiedostonimi4 = "test_002.MTT";
         tallennaTiedosto(tiedostonimi4, MuutostietoDto.builder()
@@ -435,7 +438,9 @@ public class MuutostietoServiceITest {
 
         assertThat(henkiloMuutostietoRepository.findAll())
                 .extracting(HenkiloMuutostietoRivi::getQueryHetu, HenkiloMuutostietoRivi::getProcessTimestamp)
-                .containsExactlyInAnyOrder(tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu2, time2), tuple(hetu1, time3));
+                .containsExactlyInAnyOrder(tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu1, time1), tuple(hetu2, time2), tuple(hetu1, time3));
+        verify(onrServiceClient, times(2)).getHenkiloByHetu(eq(hetu1));
+        verify(onrServiceClient, times(2)).updateHenkilo(any(HenkiloForceUpdateDto.class), eq(true));
     }
 
     @Test

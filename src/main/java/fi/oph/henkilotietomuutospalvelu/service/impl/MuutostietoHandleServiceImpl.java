@@ -91,6 +91,9 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void handleMuutostieto(HenkiloMuutostietoRivi henkiloMuutostietoRivi) {
+        if (henkiloMuutostietoRivi.getProcessTimestamp() != null) {
+            return;
+        }
         Optional<HenkiloForceReadDto> currentHenkiloOptional = this.getCurrentHenkilo(henkiloMuutostietoRivi.getQueryHetu());
         currentHenkiloOptional.ifPresent(currentHenkilo -> {
             Set<String> kaikkiHetut = getKaikkiHetut(currentHenkilo.getHetu());
