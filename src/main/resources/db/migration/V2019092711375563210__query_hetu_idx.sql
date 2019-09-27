@@ -1,0 +1,1 @@
+create index concurrently henkilo_muutostieto_query_hetu_idx on henkilo_muutostieto_rivi (query_hetu);
