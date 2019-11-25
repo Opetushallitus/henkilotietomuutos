@@ -34,7 +34,7 @@ public class OrikaMappingTest {
         YksiloityHenkilo yksiloityHenkilo = new YksiloityHenkilo();
         yksiloityHenkilo.setEtunimi("etunimi");
         yksiloityHenkilo.setSukunimi("sukunimi");
-        yksiloityHenkilo.setKutsumanimi(null);
+        yksiloityHenkilo.setKutsumanimi("etunimi");
         yksiloityHenkilo.setHetu("hetu");
         yksiloityHenkilo.setPassivoitu(false);
         yksiloityHenkilo.setSukupuoli("sukupuoli");

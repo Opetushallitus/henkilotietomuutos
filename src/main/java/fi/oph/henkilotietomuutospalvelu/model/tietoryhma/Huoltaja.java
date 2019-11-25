@@ -91,6 +91,7 @@ public class Huoltaja extends Tietoryhma {
             huoltajaCreateDto.setHuoltajuustyyppiKoodi(this.laji);
             if (StringUtils.isEmpty(this.hetu)) {
                 huoltajaCreateDto.setEtunimet(this.henkilotunnuksetonHenkilo.getFirstNames());
+                huoltajaCreateDto.setKutsumanimi(this.henkilotunnuksetonHenkilo.getFirstNames());
                 huoltajaCreateDto.setSukunimi(this.henkilotunnuksetonHenkilo.getLastname());
                 huoltajaCreateDto.setKansalaisuusKoodi(Collections.singleton(this.henkilotunnuksetonHenkilo.getNationality()));
                 huoltajaCreateDto.setSyntymaaika(this.henkilotunnuksetonHenkilo.getDateOfBirth());
