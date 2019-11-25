@@ -4,6 +4,7 @@ import fi.oph.henkilotietomuutospalvelu.client.OnrServiceClient;
 import fi.oph.henkilotietomuutospalvelu.client.VtjServiceClient;
 import fi.oph.henkilotietomuutospalvelu.config.OrikaConfiguration;
 import fi.oph.henkilotietomuutospalvelu.service.VtjService;
+import fi.oph.henkilotietomuutospalvelu.service.build.HenkiloUpdateUtil;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HuoltajaCreateDto;
@@ -55,6 +56,7 @@ public class VtjServiceImpl implements VtjService {
                 .map(Optional::get)
                 .filter(this::filterPassivoitu)
                 .map(yksiloityHenkilo -> this.orikaConfiguration.map(yksiloityHenkilo, HuoltajaCreateDto.class))
+                .map(this::setKutsumanimi)
                 .map(huoltajaCreateDto -> this.setHuoltajuusTyyppikoodit(huoltajaCreateDto, henkiloForceUpdateDto.getHuoltajat()));
         // Hetuttomat (ei tehdä muutoksia)
         Stream<HuoltajaCreateDto> hetuttomatHuoltajat = henkiloForceUpdateDto.getHuoltajat().stream()
@@ -64,6 +66,14 @@ public class VtjServiceImpl implements VtjService {
                 .flatMap(streamOfStreams -> streamOfStreams)
                 .collect(Collectors.toSet());
         henkiloForceUpdateDto.setHuoltajat(huoltajaCreateDtos);
+    }
+
+    private HuoltajaCreateDto setKutsumanimi(HuoltajaCreateDto huoltajaCreateDto) {
+        if (huoltajaCreateDto.getKutsumanimi() == null || !HenkiloUpdateUtil.isValidKutsumanimi(
+                huoltajaCreateDto.getEtunimet(), huoltajaCreateDto.getKutsumanimi())) {
+            huoltajaCreateDto.setKutsumanimi(huoltajaCreateDto.getEtunimet());
+        }
+        return huoltajaCreateDto;
     }
 
     private HuoltajaCreateDto setHuoltajuusTyyppikoodit(HuoltajaCreateDto huoltajaCreateDto, Collection<HuoltajaCreateDto> kaikkiHuoltajat) {
