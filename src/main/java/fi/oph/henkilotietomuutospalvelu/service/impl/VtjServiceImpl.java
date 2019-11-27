@@ -14,13 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static fi.oph.henkilotietomuutospalvelu.service.validators.UnknownKoodi.HUOLTAJUUSTYYPPI_TUNTEMATON;
 
 @Slf4j
 @Service
@@ -56,8 +53,7 @@ public class VtjServiceImpl implements VtjService {
                 .map(Optional::get)
                 .filter(this::filterPassivoitu)
                 .map(yksiloityHenkilo -> this.orikaConfiguration.map(yksiloityHenkilo, HuoltajaCreateDto.class))
-                .map(this::setKutsumanimi)
-                .map(huoltajaCreateDto -> this.setHuoltajuusTyyppikoodit(huoltajaCreateDto, henkiloForceUpdateDto.getHuoltajat()));
+                .map(this::setKutsumanimi);
         // Hetuttomat (ei tehdä muutoksia)
         Stream<HuoltajaCreateDto> hetuttomatHuoltajat = henkiloForceUpdateDto.getHuoltajat().stream()
                 .filter(huoltajaCreateDto -> StringUtils.isEmpty(huoltajaCreateDto.getHetu()));
@@ -73,17 +69,6 @@ public class VtjServiceImpl implements VtjService {
                 huoltajaCreateDto.getEtunimet(), huoltajaCreateDto.getKutsumanimi())) {
             huoltajaCreateDto.setKutsumanimi(huoltajaCreateDto.getEtunimet());
         }
-        return huoltajaCreateDto;
-    }
-
-    private HuoltajaCreateDto setHuoltajuusTyyppikoodit(HuoltajaCreateDto huoltajaCreateDto, Collection<HuoltajaCreateDto> kaikkiHuoltajat) {
-        String huoltajuustyyppikoodi = kaikkiHuoltajat.stream()
-                .filter(huoltaja -> StringUtils.hasLength(huoltaja.getHetu()))
-                .filter(huoltaja -> huoltaja.getHetu().equals(huoltajaCreateDto.getHetu()))
-                .map(HuoltajaCreateDto::getHuoltajuustyyppiKoodi)
-                .findFirst()
-                .orElse(HUOLTAJUUSTYYPPI_TUNTEMATON.getKoodi());
-        huoltajaCreateDto.setHuoltajuustyyppiKoodi(huoltajuustyyppikoodi);
         return huoltajaCreateDto;
     }
 

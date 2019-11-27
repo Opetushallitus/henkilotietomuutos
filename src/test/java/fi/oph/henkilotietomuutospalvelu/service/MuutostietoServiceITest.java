@@ -120,7 +120,6 @@ public class MuutostietoServiceITest {
 
         given(this.koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("246"))).willReturn(true);
         given(this.koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("512"))).willReturn(true);
-        given(this.koodistoService.isKoodiValid(eq(Koodisto.HUOLTAJUUSTYYPPI), eq("03"))).willReturn(true);
 
         YksiloityHenkilo yksiloityHenkilo = new YksiloityHenkilo();
         yksiloityHenkilo.setHetu("140434-0665");
@@ -153,12 +152,10 @@ public class MuutostietoServiceITest {
                 .extracting(HuoltajaCreateDto::getEtunimet,
                         HuoltajaCreateDto::getSukunimi,
                         HuoltajaCreateDto::getKansalaisuusKoodi,
-                        HuoltajaCreateDto::getHuoltajuustyyppiKoodi,
                         HuoltajaCreateDto::getSyntymaaika)
                 .containsExactly(Tuple.tuple("Testi Test",
                         "Testinen",
                         Collections.singleton("246"),
-                        "03",
                         null));
     }
 

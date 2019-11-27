@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 
-import static fi.oph.henkilotietomuutospalvelu.service.validators.UnknownKoodi.HUOLTAJUUSTYYPPI_TUNTEMATON;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -96,7 +95,6 @@ public class VtjServiceImplTest {
                 .willReturn(Optional.of(yksiloityHenkilo));
         HuoltajaCreateDto huoltajaCreateDto = HuoltajaCreateDto.builder()
                 .hetu("hetu")
-                .huoltajuustyyppiKoodi(HUOLTAJUUSTYYPPI_TUNTEMATON.getKoodi())
                 .build();
         HenkiloForceUpdateDto henkiloForceUpdateDto = new HenkiloForceUpdateDto();
         henkiloForceUpdateDto.setHuoltajat(Collections.singleton(huoltajaCreateDto));
@@ -113,7 +111,6 @@ public class VtjServiceImplTest {
                 .willReturn(Optional.empty());
         HuoltajaCreateDto huoltajaCreateDto = HuoltajaCreateDto.builder()
                 .hetu("hetu")
-                .huoltajuustyyppiKoodi(HUOLTAJUUSTYYPPI_TUNTEMATON.getKoodi())
                 .build();
         YksiloityHenkilo yksiloityHenkilo = new YksiloityHenkilo();
         yksiloityHenkilo.setHetu("hetu");
@@ -152,15 +149,12 @@ public class VtjServiceImplTest {
                 .willReturn(Optional.of(yksiloityHenkilo));
         HuoltajaCreateDto hetullinenYksiloimatonHuoltaja = HuoltajaCreateDto.builder()
                 .hetu("hetuyksiloimaton")
-                .huoltajuustyyppiKoodi(HUOLTAJUUSTYYPPI_TUNTEMATON.getKoodi())
                 .build();
         HuoltajaCreateDto hetutonHuoltaja = HuoltajaCreateDto.builder()
                 .etunimet("hetuton")
-                .huoltajuustyyppiKoodi(HUOLTAJUUSTYYPPI_TUNTEMATON.getKoodi())
                 .build();
         HuoltajaCreateDto hetullinenYksiloityHuoltaja = HuoltajaCreateDto.builder()
                 .hetu("hetuyksiloity")
-                .huoltajuustyyppiKoodi(HUOLTAJUUSTYYPPI_TUNTEMATON.getKoodi())
                 .build();
         HenkiloForceUpdateDto henkiloForceUpdateDto = new HenkiloForceUpdateDto();
         henkiloForceUpdateDto.setHuoltajat(new HashSet<>(Arrays.asList(hetullinenYksiloimatonHuoltaja, hetutonHuoltaja, hetullinenYksiloityHuoltaja)));
@@ -210,7 +204,6 @@ public class VtjServiceImplTest {
                 .willReturn(Optional.of(yksiloityHenkilo));
         HuoltajaCreateDto huoltajaCreateDto = HuoltajaCreateDto.builder()
                 .hetu("hetu")
-                .huoltajuustyyppiKoodi(HUOLTAJUUSTYYPPI_TUNTEMATON.getKoodi())
                 .build();
         HenkiloForceUpdateDto henkiloForceUpdateDto = new HenkiloForceUpdateDto();
         henkiloForceUpdateDto.setHuoltajat(Collections.singleton(huoltajaCreateDto));
@@ -232,7 +225,6 @@ public class VtjServiceImplTest {
                 .willReturn(Optional.empty());
         HuoltajaCreateDto huoltajaCreateDto = HuoltajaCreateDto.builder()
                 .hetu("hetu")
-                .huoltajuustyyppiKoodi(HUOLTAJUUSTYYPPI_TUNTEMATON.getKoodi())
                 .build();
         HenkiloForceUpdateDto henkiloForceUpdateDto = new HenkiloForceUpdateDto();
         henkiloForceUpdateDto.setHuoltajat(Collections.singleton(huoltajaCreateDto));

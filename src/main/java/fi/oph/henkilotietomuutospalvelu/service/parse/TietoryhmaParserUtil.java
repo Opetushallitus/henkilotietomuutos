@@ -1,13 +1,12 @@
 package fi.oph.henkilotietomuutospalvelu.service.parse;
 
-import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.dto.type.*;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.service.exception.TietoryhmaParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
-
 import java.util.Arrays;
 
 @Slf4j
@@ -363,16 +362,32 @@ public class TietoryhmaParserUtil {
         if (hetutonHenkilo != null && "451".equals(parseRyhmatunnus(hetutonHenkilo))) {
             henkilotunnuksetonHenkilo = parseHenkilotunnuksetonHenkilo(hetutonHenkilo, selvakielinenTieto);
         }
+        if (value.length() == 43) {
+            // formaatti ennen 2019-12-01
+            return Huoltaja.builder()
+                    .ryhmatunnus(Ryhmatunnus.HUOLTAJA)
+                    .muutostapa(parseMuutosTapa(value))
+                    .hetu(parseString(value,4, 11))
+                    //.laji(parseString(value, 15, 2)) tiedon sisältö muuttunut uudessa versiossa
+                    //.huollonjako(Huollonjako.getEnum(parseCharacter(value, 17))) tietoa ei enää uudessa formaatissa
+                    //.voimassa(parseCharacter(value, 18).equals("1")) tietoa ei enää uudessa formaatissa
+                    .startDate(parseDate(value, 19))
+                    .endDate(parseDate(value, 27))
+                    //.resolutionDate(parseDate(value, 35)) // tietoa ei enää uudessa formaatissa
+                    .henkilotunnuksetonHenkilo(henkilotunnuksetonHenkilo)
+                    .build();
+        }
         return Huoltaja.builder()
                 .ryhmatunnus(Ryhmatunnus.HUOLTAJA)
                 .muutostapa(parseMuutosTapa(value))
-                .hetu(parseString(value,4, 11))
-                .laji(parseString(value, 15, 2))
-                .huollonjako(Huollonjako.getEnum(parseCharacter(value, 17)))
-                .voimassa(parseCharacter(value, 18).equals("1"))
-                .startDate(parseDate(value, 19))
-                .endDate(parseDate(value, 27))
-                .resolutionDate(parseDate(value, 35))
+                .hetu(parseString(value, 4, 11))
+                .laji(parseString(value, 15, 1))
+                .rooli(parseString(value, 16, 1))
+                .startDate(parseDate(value, 17))
+                .endDate(parseDate(value, 25))
+                .asuminen(parseString(value, 33, 1))
+                .asuminenAlkupvm(parseDate(value, 34))
+                .asuminenLoppupvm(parseDate(value, 42))
                 .henkilotunnuksetonHenkilo(henkilotunnuksetonHenkilo)
                 .build();
     }
