@@ -12,16 +12,7 @@ import java.util.Arrays;
 @Slf4j
 public class TietoryhmaParserUtil {
 
-    public static Tietoryhma deserializeTietoryhma(String tietoryhma) {
-        return deserializeTietoryhma(tietoryhma, null);
-    }
-
-    public static Tietoryhma deserializeTietoryhma(String tietoryhma, String additionalInformation) {
-        return deserializeTietoryhma(tietoryhma, additionalInformation, null);
-    }
-
-
-    public static Tietoryhma deserializeTietoryhma(String tietoryhma, String additionalInformation, String additionalInformation2) {
+    public static Tietoryhma deserializeTietoryhma(String tietoryhma, String... tarkentavatTietoryhmat) {
         if (tietoryhma.length() < 4) {
             throw new TietoryhmaParseException("Tietoryhmä has a length less than 4 and is not valid!");
         }
@@ -35,7 +26,7 @@ public class TietoryhmaParserUtil {
             case("001"):
                 return parseHenkilotunnuskorjaus(tietoryhma);
             case("002"):
-                return parseAidinkieli(tietoryhma, additionalInformation);
+                return parseAidinkieli(tietoryhma, tarkentavatTietoryhmat);
             case("003"):
                 return parseSukupuoli(tietoryhma);
             case("004"):
@@ -43,11 +34,11 @@ public class TietoryhmaParserUtil {
             case("005"):
                 return parseHenkiloNameChange(tietoryhma);
             case("007"):
-                return parseKansalaisuus(tietoryhma, additionalInformation);
+                return parseKansalaisuus(tietoryhma, tarkentavatTietoryhmat);
             case("008"):
                 return parseSyntymaKotikunta(tietoryhma);
             case("009"):
-                return parseUlkomainenSyntymapaikka(tietoryhma, additionalInformation);
+                return parseUlkomainenSyntymapaikka(tietoryhma, tarkentavatTietoryhmat);
             case("013"):
                 return parseKuolinpaiva(tietoryhma);
             case("015"):
@@ -59,21 +50,21 @@ public class TietoryhmaParserUtil {
             case("103"):
                 return parsePostiosoite(tietoryhma);
             case("104"):
-                return parseUlkomainenOsoite(tietoryhma, additionalInformation);
+                return parseUlkomainenOsoite(tietoryhma, tarkentavatTietoryhmat);
             case("105"):
-                return parseTilapainenUlkomainenOsoite(tietoryhma, additionalInformation);
+                return parseTilapainenUlkomainenOsoite(tietoryhma, tarkentavatTietoryhmat);
             case("204"):
                 return parseKotikunta(tietoryhma);
             case("305"):
-                return parseHuoltaja(tietoryhma, additionalInformation, additionalInformation2);
+                return parseHuoltaja(tietoryhma, tarkentavatTietoryhmat);
             case("306"):
                 return parseEdunvalvonta(tietoryhma);
             case("307"):
-                return parseEdunvalvoja(tietoryhma, additionalInformation, additionalInformation2);
+                return parseEdunvalvoja(tietoryhma, tarkentavatTietoryhmat);
             case("316"):
                 return parseEdunvalvontaValtuutus(tietoryhma);
             case("317"):
-                return parseEdunvalvontaValtuutettu(tietoryhma, additionalInformation, additionalInformation2);
+                return parseEdunvalvontaValtuutettu(tietoryhma, tarkentavatTietoryhmat);
             case("401"):
                 return parseAmmatti(tietoryhma);
             case("421"):
@@ -137,7 +128,7 @@ public class TietoryhmaParserUtil {
     }
 
     @NotNull
-    private static String parseRyhmatunnus(String tietoryhma) {
+    public static String parseRyhmatunnus(String tietoryhma) {
         return parseString(tietoryhma, 0, 3);
     }
 
@@ -224,10 +215,10 @@ public class TietoryhmaParserUtil {
                 .build();
     }
 
-    private static Kansalaisuus parseKansalaisuus(String value, String additionalInformation) {
+    private static Kansalaisuus parseKansalaisuus(String value, String... tarkentavatTietoryhmat) {
         String code = parseString(value, 4, 3);
         if (code.equals("998")) {
-            code = parseAdditionalInformation(additionalInformation);
+            code = parseAdditionalInformation(tarkentavatTietoryhmat[0]);
         }
 
         return Kansalaisuus.builder()
@@ -304,11 +295,7 @@ public class TietoryhmaParserUtil {
                 .build();
     }
 
-    private static Edunvalvoja parseEdunvalvoja(String value, String hetutonHenkilo, String selvakielinenTieto) {
-        HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo = null;
-        if (hetutonHenkilo != null && "451".equals(parseRyhmatunnus(hetutonHenkilo))) {
-            henkilotunnuksetonHenkilo = parseHenkilotunnuksetonHenkilo(hetutonHenkilo, selvakielinenTieto);
-        }
+    private static Edunvalvoja parseEdunvalvoja(String value, String... tarkentavatTietoryhmat) {
         return Edunvalvoja.builder()
                 .ryhmatunnus(Ryhmatunnus.EDUNVALVOJA)
                 .muutostapa(parseMuutosTapa(value))
@@ -318,7 +305,7 @@ public class TietoryhmaParserUtil {
                 .oikeusaputoimistoKoodi(parseString(value, 27, 6))
                 .startDate(parseDate(value, 33))
                 .endDate(parseDate(value, 41))
-                .henkilotunnuksetonHenkilo(henkilotunnuksetonHenkilo)
+                .henkilotunnuksetonHenkilo(parseHenkilotunnuksetonHenkilo(tarkentavatTietoryhmat))
                 .build();
     }
 
@@ -333,18 +320,14 @@ public class TietoryhmaParserUtil {
                 .build();
     }
 
-    private static EdunvalvontaValtuutettu parseEdunvalvontaValtuutettu(String value, String hetutonHenkilo, String selvakielinenTieto) {
-        HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo = null;
-        if (hetutonHenkilo != null && "451".equals(parseRyhmatunnus(hetutonHenkilo))) {
-            henkilotunnuksetonHenkilo = parseHenkilotunnuksetonHenkilo(hetutonHenkilo, selvakielinenTieto);
-        }
+    private static EdunvalvontaValtuutettu parseEdunvalvontaValtuutettu(String value, String... tarkentavatTietoryhmat) {
         return EdunvalvontaValtuutettu.builder()
                 .ryhmatunnus(Ryhmatunnus.EDUNVALVONTAVALTUUTETTU)
                 .muutostapa(parseMuutosTapa(value))
                 .hetu(parseString(value, 4, 11))
                 .startDate(parseDate(value, 15))
                 .endDate(parseDate(value, 23))
-                .henkilotunnuksetonHenkilo(henkilotunnuksetonHenkilo)
+                .henkilotunnuksetonHenkilo(parseHenkilotunnuksetonHenkilo(tarkentavatTietoryhmat))
                 .build();
     }
 
@@ -357,11 +340,7 @@ public class TietoryhmaParserUtil {
                 .build();
     }
 
-    private static Huoltaja parseHuoltaja(String value, String hetutonHenkilo, String selvakielinenTieto) {
-        HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo = null;
-        if (hetutonHenkilo != null && "451".equals(parseRyhmatunnus(hetutonHenkilo))) {
-            henkilotunnuksetonHenkilo = parseHenkilotunnuksetonHenkilo(hetutonHenkilo, selvakielinenTieto);
-        }
+    private static Huoltaja parseHuoltaja(String value, String... tarkentavatTietoryhmat) {
         if (value.length() == 43) {
             // formaatti ennen 2019-12-01
             return Huoltaja.builder()
@@ -374,7 +353,7 @@ public class TietoryhmaParserUtil {
                     .startDate(parseDate(value, 19))
                     .endDate(parseDate(value, 27))
                     //.resolutionDate(parseDate(value, 35)) // tietoa ei enää uudessa formaatissa
-                    .henkilotunnuksetonHenkilo(henkilotunnuksetonHenkilo)
+                    .henkilotunnuksetonHenkilo(parseHenkilotunnuksetonHenkilo(tarkentavatTietoryhmat))
                     .build();
         }
         return Huoltaja.builder()
@@ -388,7 +367,7 @@ public class TietoryhmaParserUtil {
                 .asuminen(parseString(value, 33, 1))
                 .asuminenAlkupvm(parseDate(value, 34))
                 .asuminenLoppupvm(parseDate(value, 42))
-                .henkilotunnuksetonHenkilo(henkilotunnuksetonHenkilo)
+                .henkilotunnuksetonHenkilo(parseHenkilotunnuksetonHenkilo(tarkentavatTietoryhmat))
                 .build();
     }
 
@@ -430,7 +409,7 @@ public class TietoryhmaParserUtil {
                 .build();
     }
 
-    private static UlkomainenSyntymapaikka parseUlkomainenSyntymapaikka(String value, String additionalInformation) {
+    private static UlkomainenSyntymapaikka parseUlkomainenSyntymapaikka(String value, String... tarkentavatTietoryhmat) {
         String countryCode = parseString(value, 4, 3);
 
         UlkomainenSyntymapaikka syntymapaikka = UlkomainenSyntymapaikka.builder()
@@ -441,7 +420,7 @@ public class TietoryhmaParserUtil {
                 .build();
 
         if (countryCode.equals("998")) {
-            syntymapaikka.setAdditionalInformation(parseAdditionalInformation(additionalInformation));
+            syntymapaikka.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
         }
 
         return syntymapaikka;
@@ -463,7 +442,7 @@ public class TietoryhmaParserUtil {
                 .build();
     }
 
-    private static UlkomainenOsoite parseUlkomainenOsoite(String value, String additionalInformation) {
+    private static UlkomainenOsoite parseUlkomainenOsoite(String value, String... tarkentavatTietoryhmat) {
         String countryCode = parseString(value, 164, 3);
 
         UlkomainenOsoite osoite = UlkomainenOsoite.builder()
@@ -477,13 +456,13 @@ public class TietoryhmaParserUtil {
                 .build();
 
         if (countryCode.equals("998")) {
-            osoite.setAdditionalInformation(parseAdditionalInformation(additionalInformation));
+            osoite.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
         }
 
         return osoite;
     }
 
-    private static TilapainenUlkomainenOsoite parseTilapainenUlkomainenOsoite(String value, String additionalInformation) {
+    private static TilapainenUlkomainenOsoite parseTilapainenUlkomainenOsoite(String value, String... tarkentavatTietoryhmat) {
         String countryCode = parseString(value, 164, 3);
 
         TilapainenUlkomainenOsoite osoite =  TilapainenUlkomainenOsoite.builder()
@@ -497,7 +476,7 @@ public class TietoryhmaParserUtil {
                 .build();
 
         if (countryCode.equals("998")) {
-            osoite.setAdditionalInformation(parseAdditionalInformation(additionalInformation));
+            osoite.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
         }
 
         return osoite;
@@ -511,27 +490,37 @@ public class TietoryhmaParserUtil {
                 .build();
     }
 
-    private static HenkilotunnuksetonHenkilo parseHenkilotunnuksetonHenkilo(String value, String additionalInformation) {
-        String nationality = parseString(value, 213, 3);
+    private static HenkilotunnuksetonHenkilo parseHenkilotunnuksetonHenkilo(String... tietoryhmat) {
+        HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo = null;
+        for (String tietoryhma : tietoryhmat) {
+            String ryhmatunnus = parseRyhmatunnus(tietoryhma);
+            switch (ryhmatunnus) {
+                case "451":
+                    henkilotunnuksetonHenkilo = parseHenkilotunnuksetonHenkilo(tietoryhma);
+                    break;
+                case "452":
+                    if (henkilotunnuksetonHenkilo != null && "998".equals(henkilotunnuksetonHenkilo.getNationality())) {
+                        henkilotunnuksetonHenkilo.setAdditionalInformation(parseAdditionalInformation(tietoryhma));
+                    }
+                    break;
+            }
+        }
+        return henkilotunnuksetonHenkilo;
+    }
 
-        HenkilotunnuksetonHenkilo henkilo = HenkilotunnuksetonHenkilo.builder()
+    private static HenkilotunnuksetonHenkilo parseHenkilotunnuksetonHenkilo(String value) {
+        return HenkilotunnuksetonHenkilo.builder()
                 .ryhmatunnus(Ryhmatunnus.HENKILOTUNNUKSETON_HENKILO)
                 .muutostapa(parseMuutosTapa(value))
                 .dateOfBirth(parseDate(value, 4))
                 .gender(Gender.getEnum(parseCharacter(value, 12)))
                 .lastname(parseString(value, 13, 100))
                 .firstNames(parseString(value, 113, 100))
-                .nationality(nationality)
+                .nationality(parseString(value, 213, 3))
                 .build();
-
-        if (additionalInformation != null && nationality.equals("998")) {
-            henkilo.setAdditionalInformation(parseAdditionalInformation(additionalInformation));
-        }
-
-        return henkilo;
     }
 
-    private static Aidinkieli parseAidinkieli(String value, String additionalInformation) {
+    private static Aidinkieli parseAidinkieli(String value, String... tarkentavatTietoryhmat) {
         String languageCode = parseString(value, 4,2);
 
         Aidinkieli aidinkieli = Aidinkieli.builder()
@@ -540,7 +529,7 @@ public class TietoryhmaParserUtil {
                 .languageCode(languageCode).build();
 
         if (languageCode.equals("98")) {
-            aidinkieli.setAdditionalInformation(parseAdditionalInformation(additionalInformation));
+            aidinkieli.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
         }
 
         return aidinkieli;
