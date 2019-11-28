@@ -13,10 +13,7 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Entity
@@ -91,11 +88,18 @@ public class Huoltaja extends Tietoryhma {
     @JoinColumn(name = "hetuton_henkilo")
     private HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(name = "huoltaja_oikeudet",
+            uniqueConstraints = @UniqueConstraint(name = "huoltaja_oikeudet_oikeudet_id_uk", columnNames = "oikeudet_id"),
+            foreignKey = @ForeignKey(name = "huoltaja_oikeudet_huoltaja_id_fk"),
+            inverseForeignKey = @ForeignKey(name = "huoltaja_oikeudet_oikeudet_id_fk"))
+    private Set<Oikeus> oikeudet = new HashSet<>();
+
     @Builder
     public Huoltaja(Ryhmatunnus ryhmatunnus, Muutostapa muutostapa, String hetu, String laji,
                     String rooli, LocalDate startDate, LocalDate endDate,
                     String asuminen, LocalDate asuminenAlkupvm, LocalDate asuminenLoppupvm,
-                    HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo) {
+                    HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo, Set<Oikeus> oikeudet) {
         super(ryhmatunnus, muutostapa);
         this.hetu = hetu;
         this.laji = laji;
@@ -106,6 +110,7 @@ public class Huoltaja extends Tietoryhma {
         this.asuminenAlkupvm = asuminenAlkupvm;
         this.asuminenLoppupvm = asuminenLoppupvm;
         this.henkilotunnuksetonHenkilo = henkilotunnuksetonHenkilo;
+        this.oikeudet = oikeudet;
     }
 
     @Override

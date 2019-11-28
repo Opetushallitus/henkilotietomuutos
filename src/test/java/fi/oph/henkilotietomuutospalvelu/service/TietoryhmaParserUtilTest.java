@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 public class TietoryhmaParserUtilTest {
 
@@ -127,8 +128,10 @@ public class TietoryhmaParserUtilTest {
     @Test
     public void parseHuoltajaV20191201() {
         String huoltajaStr = "3051081184-175B212017022020330501\t0000000000000000";
+        String oikeudetStr1 = "3201P5012018031220180414";
+        String oikeudetStr2 = "3204T3012019010120321231";
 
-        Tietoryhma tietoryhma = TietoryhmaParserUtil.deserializeTietoryhma(huoltajaStr);
+        Tietoryhma tietoryhma = TietoryhmaParserUtil.deserializeTietoryhma(huoltajaStr, oikeudetStr1, oikeudetStr2);
 
         assertThat(tietoryhma).isInstanceOf(Huoltaja.class);
         Huoltaja huoltaja = (Huoltaja) tietoryhma;
@@ -142,6 +145,10 @@ public class TietoryhmaParserUtilTest {
                 .returns("", Huoltaja::getAsuminen)
                 .returns(null, Huoltaja::getAsuminenAlkupvm)
                 .returns(null, Huoltaja::getAsuminenLoppupvm);
+        assertThat(huoltaja.getOikeudet()).extracting(Oikeus::getMuutostapa, Oikeus::getKoodi, Oikeus::getAlkupvm, Oikeus::getLoppupvm)
+                .containsExactlyInAnyOrder(
+                        tuple(Muutostapa.LISATTY, "P501", LocalDate.of(2018, 3, 12), LocalDate.of(2018, 4, 14)),
+                        tuple(Muutostapa.POISTETTU, "T301", LocalDate.of(2019, 1, 1), LocalDate.of(2032, 12, 31)));
     }
 
     @Test

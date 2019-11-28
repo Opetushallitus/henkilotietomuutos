@@ -14,6 +14,7 @@ import fi.oph.henkilotietomuutospalvelu.model.HenkiloMuutostietoRivi;
 import fi.oph.henkilotietomuutospalvelu.model.Tiedosto;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
+import fi.oph.henkilotietomuutospalvelu.repository.HuoltajaRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.vm.sade.oppijanumerorekisteri.dto.*;
 import fi.vm.sade.rajapinnat.vtj.api.YksiloityHenkilo;
@@ -58,7 +59,7 @@ import static org.mockito.Mockito.*;
 // that doesn't sit well with @Transactional (TiedostoRepository doesn't return anything in new transaction)
 @SqlGroup({
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "/sql/muutostietoServiceData.sql"),
-        @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = {"DELETE tietoryhma;", "DELETE henkilo_muutostieto_rivi;", "DELETE tiedosto;"})
+        @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, statements = {"DELETE huoltaja_oikeudet;", "DELETE tietoryhma;", "DELETE henkilo_muutostieto_rivi;", "DELETE tiedosto;"})
 })
 public class MuutostietoServiceITest {
 
@@ -70,6 +71,12 @@ public class MuutostietoServiceITest {
 
     @Autowired
     private TiedostoRepository tiedostoRepository;
+
+    @Autowired
+    private HuoltajaRepository huoltajaRepository;
+
+    @Autowired
+    private DatabaseService databaseService;
 
     @SpyBean
     private FileService fileService;
@@ -302,6 +309,42 @@ public class MuutostietoServiceITest {
         assertThat(updatedHenkilo.getEtunimet()).isNull();
         assertThat(updatedHenkilo.getSukunimi()).isNull();
         assertThat(updatedHenkilo.getHuoltajat()).isEmpty();
+    }
+
+    @Test
+    public void importMuutostiedotHuoltaja() throws IOException, URISyntaxException {
+        mockFiles("test_data/huoltaja_test.PTT", "test_data/huoltaja_test.PTT_001.PART");
+
+        muutostietoService.importMuutostiedot(0);
+
+        databaseService.runInTransaction(() -> {
+            assertThat(henkiloMuutostietoRepository.findAll()).hasSize(1);
+            assertThat(huoltajaRepository.findByHetu("281199-9493")).isNotPresent();
+            assertThat(huoltajaRepository.findByHetu("281179-903E")).hasValueSatisfying(huoltaja -> {
+                assertThat(huoltaja)
+                        .returns(Muutostapa.LISATTY, Huoltaja::getMuutostapa)
+                        .returns("1", Huoltaja::getLaji)
+                        .returns("1", Huoltaja::getRooli)
+                        .returns(null, Huoltaja::getStartDate)
+                        .returns(null, Huoltaja::getEndDate);
+                assertThat(huoltaja.getOikeudet())
+                        .extracting(Oikeus::getMuutostapa, Oikeus::getKoodi, Oikeus::getAlkupvm, Oikeus::getLoppupvm)
+                        .containsExactlyInAnyOrder(
+                                tuple(Muutostapa.LISATTY, "T301", null, null),
+                                tuple(Muutostapa.LISATTY, "T302", null, null));
+            });
+            assertThat(huoltajaRepository.findByHetu("281179-972N")).hasValueSatisfying(huoltaja -> {
+                assertThat(huoltaja)
+                        .returns(Muutostapa.LISATTY, Huoltaja::getMuutostapa)
+                        .returns("1", Huoltaja::getLaji)
+                        .returns("2", Huoltaja::getRooli)
+                        .returns(null, Huoltaja::getStartDate)
+                        .returns(null, Huoltaja::getEndDate);
+                assertThat(huoltaja.getOikeudet())
+                        .extracting(Oikeus::getMuutostapa, Oikeus::getKoodi, Oikeus::getAlkupvm, Oikeus::getLoppupvm)
+                        .containsExactly(tuple(Muutostapa.LISATTY, "P501", LocalDate.of(1999, 11, 28), null));
+            });
+        });
     }
 
     @Test

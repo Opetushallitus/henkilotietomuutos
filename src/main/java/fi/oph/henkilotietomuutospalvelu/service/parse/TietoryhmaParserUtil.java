@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class TietoryhmaParserUtil {
@@ -368,6 +370,24 @@ public class TietoryhmaParserUtil {
                 .asuminenAlkupvm(parseDate(value, 34))
                 .asuminenLoppupvm(parseDate(value, 42))
                 .henkilotunnuksetonHenkilo(parseHenkilotunnuksetonHenkilo(tarkentavatTietoryhmat))
+                .oikeudet(parseOikeudet(tarkentavatTietoryhmat))
+                .build();
+    }
+
+    private static Set<Oikeus> parseOikeudet(String... tietoryhmat) {
+        return Arrays.stream(tietoryhmat)
+                .filter(tietoryhma -> "320".equals(parseRyhmatunnus(tietoryhma)))
+                .map(TietoryhmaParserUtil::parseOikeus)
+                .collect(Collectors.toSet());
+    }
+
+    private static Oikeus parseOikeus(String tietoryhmaStr) {
+        return Oikeus.builder()
+                .ryhmatunnus(Ryhmatunnus.OIKEUS)
+                .muutostapa(parseMuutosTapa(tietoryhmaStr))
+                .koodi(parseString(tietoryhmaStr, 4, 4))
+                .alkupvm(parseDate(tietoryhmaStr, 8))
+                .loppupvm(parseDate(tietoryhmaStr, 16))
                 .build();
     }
 
