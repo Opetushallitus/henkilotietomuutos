@@ -328,10 +328,10 @@ public class MuutostietoServiceITest {
                         .returns(null, Huoltaja::getStartDate)
                         .returns(null, Huoltaja::getEndDate);
                 assertThat(huoltaja.getOikeudet())
-                        .extracting(Oikeus::getMuutostapa, Oikeus::getKoodi, Oikeus::getAlkupvm, Oikeus::getLoppupvm)
+                        .extracting(Oikeus::getMuutostapa, Oikeus::getKoodi, Oikeus::getAlkupvm, Oikeus::getLoppupvm, Oikeus::getHenkiloMuutostietoRivi)
                         .containsExactlyInAnyOrder(
-                                tuple(Muutostapa.LISATTY, "T301", null, null),
-                                tuple(Muutostapa.LISATTY, "T302", null, null));
+                                tuple(Muutostapa.LISATTY, "T301", null, LocalDate.of(2019, 11, 28), null),
+                                tuple(Muutostapa.LISATTY, "T302", LocalDate.of(2000, 2, 2), LocalDate.of(2005, 5, 5), null));
             });
             assertThat(huoltajaRepository.findByHetu("281179-972N")).hasValueSatisfying(huoltaja -> {
                 assertThat(huoltaja)
@@ -341,8 +341,8 @@ public class MuutostietoServiceITest {
                         .returns(null, Huoltaja::getStartDate)
                         .returns(null, Huoltaja::getEndDate);
                 assertThat(huoltaja.getOikeudet())
-                        .extracting(Oikeus::getMuutostapa, Oikeus::getKoodi, Oikeus::getAlkupvm, Oikeus::getLoppupvm)
-                        .containsExactly(tuple(Muutostapa.LISATTY, "P501", LocalDate.of(1999, 11, 28), null));
+                        .extracting(Oikeus::getMuutostapa, Oikeus::getKoodi, Oikeus::getAlkupvm, Oikeus::getLoppupvm, Oikeus::getHenkiloMuutostietoRivi)
+                        .containsExactly(tuple(Muutostapa.LISATTY, "P501", LocalDate.of(1999, 11, 28), null, null));
             });
         });
     }
