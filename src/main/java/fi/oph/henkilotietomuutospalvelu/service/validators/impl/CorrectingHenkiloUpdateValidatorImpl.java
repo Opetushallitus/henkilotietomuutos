@@ -62,13 +62,7 @@ public class CorrectingHenkiloUpdateValidatorImpl implements CorrectingHenkiloUp
                                         (koodi) -> this.koodistoService.isKoodiValid(Koodisto.MAAT_JA_VALTIOT_2, koodi),
                                         updateDto::setKansalaisuusKoodi,
                                         updateDto.getKansalaisuusKoodi(),
-                                        KANSALAISUUSKOODI_TUNTEMATON))),
-                (updateDto) -> Optional.ofNullable(updateDto.getHuoltajuustyyppiKoodi())
-                        .ifPresent(huoltajuustyyppi -> this.replaceIfInvalid(
-                                this.koodistoService.isKoodiValid(Koodisto.HUOLTAJUUSTYYPPI, huoltajuustyyppi),
-                                updateDto::setHuoltajuustyyppiKoodi,
-                                huoltajuustyyppi,
-                                HUOLTAJUUSTYYPPI_TUNTEMATON))
+                                        KANSALAISUUSKOODI_TUNTEMATON)))
         ).forEachOrdered(consumer -> consumer.accept(huoltajaCreateDto));
     }
 

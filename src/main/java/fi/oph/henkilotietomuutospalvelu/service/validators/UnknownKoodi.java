@@ -6,7 +6,6 @@ public enum UnknownKoodi {
     KIELIKOODI_TUNTEMATON("99"),
     KUNTAKOODI_TUNTEMATON("999"),
     KANSALAISUUSKOODI_TUNTEMATON("998"),
-    HUOLTAJUUSTYYPPI_TUNTEMATON("06"), // Muu huoltaja
     ;
 
     @Getter

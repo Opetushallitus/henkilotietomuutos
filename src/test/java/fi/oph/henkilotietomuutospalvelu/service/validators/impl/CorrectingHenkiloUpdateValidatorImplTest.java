@@ -1,11 +1,9 @@
 package fi.oph.henkilotietomuutospalvelu.service.validators.impl;
 
-import fi.oph.henkilotietomuutospalvelu.dto.KoodiDto;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
 import fi.oph.henkilotietomuutospalvelu.service.validators.UnknownKoodi;
 import fi.vm.sade.oppijanumerorekisteri.dto.*;
-import org.assertj.core.groups.Tuple;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -41,8 +39,8 @@ public class CorrectingHenkiloUpdateValidatorImplTest {
         henkiloForceUpdateDto.setHuoltajat(Collections.singleton(new HuoltajaCreateDto()));
         this.validator.validateAndCorrectErrors(henkiloForceUpdateDto);
         assertThat(henkiloForceUpdateDto.getHuoltajat())
-                .extracting(HuoltajaCreateDto::getHuoltajuustyyppiKoodi, HuoltajaCreateDto::getKansalaisuusKoodi)
-                .containsExactly(Tuple.tuple(null, null));
+                .extracting(HuoltajaCreateDto::getKansalaisuusKoodi)
+                .containsNull();
     }
 
     @Test
@@ -56,7 +54,6 @@ public class CorrectingHenkiloUpdateValidatorImplTest {
         invalidKielisyys.setKieliKoodi("invalid");
         henkiloForceUpdateDto.setAidinkieli(invalidKielisyys);
         HuoltajaCreateDto huoltajaCreateDto = new HuoltajaCreateDto();
-        huoltajaCreateDto.setHuoltajuustyyppiKoodi("invalid");
         huoltajaCreateDto.setKansalaisuusKoodi(Collections.singleton("invalid"));
         henkiloForceUpdateDto.setHuoltajat(Collections.singleton(huoltajaCreateDto));
 
@@ -69,16 +66,12 @@ public class CorrectingHenkiloUpdateValidatorImplTest {
                 .extracting(KansalaisuusDto::getKansalaisuusKoodi)
                 .containsExactly(UnknownKoodi.KANSALAISUUSKOODI_TUNTEMATON.getKoodi());
         assertThat(henkiloForceUpdateDto.getHuoltajat())
-                .extracting(HuoltajaCreateDto::getHuoltajuustyyppiKoodi,
-                        HuoltajaCreateDto::getKansalaisuusKoodi)
-                .containsExactly(Tuple.tuple(UnknownKoodi.HUOLTAJUUSTYYPPI_TUNTEMATON.getKoodi(),
-                        Collections.singleton(UnknownKoodi.KANSALAISUUSKOODI_TUNTEMATON.getKoodi())));
+                .extracting(HuoltajaCreateDto::getKansalaisuusKoodi)
+                .containsExactly(Collections.singleton(UnknownKoodi.KANSALAISUUSKOODI_TUNTEMATON.getKoodi()));
     }
 
     @Test
     public void testAllValuesValid() {
-        given(this.koodistoService.isKoodiValid(eq(Koodisto.HUOLTAJUUSTYYPPI), eq("validHuoltajuustyyppi")))
-                .willReturn(true);
         given(this.koodistoService.isKoodiValid(eq(Koodisto.KUNTA), eq("validKunta")))
                 .willReturn(true);
         given(this.koodistoService.isKoodiValid(eq(Koodisto.MAAT_JA_VALTIOT_2), eq("validMaa")))
@@ -94,7 +87,6 @@ public class CorrectingHenkiloUpdateValidatorImplTest {
         invalidKielisyys.setKieliKoodi("validKieli");
         henkiloForceUpdateDto.setAidinkieli(invalidKielisyys);
         HuoltajaCreateDto huoltajaCreateDto = new HuoltajaCreateDto();
-        huoltajaCreateDto.setHuoltajuustyyppiKoodi("validHuoltajuustyyppi");
         huoltajaCreateDto.setKansalaisuusKoodi(Collections.singleton("validMaa"));
         henkiloForceUpdateDto.setHuoltajat(Collections.singleton(huoltajaCreateDto));
 
@@ -107,8 +99,8 @@ public class CorrectingHenkiloUpdateValidatorImplTest {
                 .extracting(KansalaisuusDto::getKansalaisuusKoodi)
                 .containsExactly("validMaa");
         assertThat(henkiloForceUpdateDto.getHuoltajat())
-                .extracting(HuoltajaCreateDto::getHuoltajuustyyppiKoodi, HuoltajaCreateDto::getKansalaisuusKoodi)
-                .containsExactly(Tuple.tuple("validHuoltajuustyyppi", Collections.singleton("validMaa")));
+                .extracting(HuoltajaCreateDto::getKansalaisuusKoodi)
+                .containsExactly(Collections.singleton("validMaa"));
     }
 
 }

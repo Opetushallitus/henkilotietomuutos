@@ -1,9 +1,10 @@
 package fi.oph.henkilotietomuutospalvelu.service.impl;
 
 import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
+import fi.oph.henkilotietomuutospalvelu.dto.type.MuutosType;
+import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Huoltaja;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
-import fi.oph.henkilotietomuutospalvelu.dto.type.MuutosType;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoParseService;
 import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil;
 import fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseRyhmatunnus;
 
 @Service
 public class MuutostietoParseServiceImpl implements MuutostietoParseService {
@@ -36,24 +39,34 @@ public class MuutostietoParseServiceImpl implements MuutostietoParseService {
     private static List<Tietoryhma> deserializeTietoryhmat(String[] tietoryhmat) {
         List<Tietoryhma> ryhmat = new ArrayList<>();
         for (int i = 1; i <= tietoryhmat.length - 1; i++) {
-            Tietoryhma ryhma;
-            if (i < tietoryhmat.length - 2) {
-                ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmat[i], tietoryhmat[i+1], tietoryhmat[i+2]);
-            }
-            else if (i < tietoryhmat.length - 1) {
-                ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmat[i], tietoryhmat[i+1]);
-            }
-            else {
-                ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmat[i]);
+            List<String> tarkentavatTietoryhmat = etsiTarkentavatTietoryhmat(tietoryhmat, i);
+            Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmat[i],
+                    tarkentavatTietoryhmat.toArray(new String[tarkentavatTietoryhmat.size()]));
+
+            ryhmat.add(ryhma);
+            if (ryhma instanceof Huoltaja && ((Huoltaja)ryhma).getHenkilotunnuksetonHenkilo() != null) {
+                ryhmat.add(((Huoltaja)ryhma).getHenkilotunnuksetonHenkilo());
             }
 
-            if (ryhma != null) {
-                ryhmat.add(ryhma);
-                if (ryhma instanceof Huoltaja && ((Huoltaja)ryhma).getHenkilotunnuksetonHenkilo() != null) {
-                    ryhmat.add(((Huoltaja)ryhma).getHenkilotunnuksetonHenkilo());
-                }
-            }
+            i += tarkentavatTietoryhmat.size(); // tarkentavat tietoryhmät ohitetaan koska ne on jo käsitelty
         }
         return ryhmat;
+    }
+
+    private static List<String> etsiTarkentavatTietoryhmat(String[] tietoryhmat, int tietoryhmaIndex) {
+        List<String> tarkentavatTietoryhmat = new ArrayList<>();
+        for (int index = tietoryhmaIndex + 1; index <= tietoryhmat.length - 1; index++) {
+            String tarkentavaTietoryhma = tietoryhmat[index];
+            if (isTarkentavaTietoryhma(tarkentavaTietoryhma)) {
+                tarkentavatTietoryhmat.add(tarkentavaTietoryhma);
+            } else break;
+        }
+        return tarkentavatTietoryhmat;
+    }
+
+    private static boolean isTarkentavaTietoryhma(String tietoryhmaStr) {
+        String ryhmatunnusStr = parseRyhmatunnus(tietoryhmaStr);
+        Ryhmatunnus ryhmatunnus = Ryhmatunnus.getEnum(ryhmatunnusStr);
+        return ryhmatunnus.isTarkentava();
     }
 }

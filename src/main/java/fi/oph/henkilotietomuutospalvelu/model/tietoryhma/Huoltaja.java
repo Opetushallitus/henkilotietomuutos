@@ -1,6 +1,5 @@
 package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
-import fi.oph.henkilotietomuutospalvelu.dto.type.Huollonjako;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.service.build.HenkiloUpdateUtil;
@@ -14,10 +13,7 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Entity
@@ -30,43 +26,91 @@ public class Huoltaja extends Tietoryhma {
     private String hetu;
 
     /**
-     * Henkilösuhteen lajia kuvaava koodi.
-     * 03 = vanhempi huoltajana
-     * 36 = vanhempi määräyksenvaraisena huoltajana
-     * 06 = muu huoltaja
+     * Huoltajan laji.
+     * 1 = vanhempi,
+     * 2 = päätetty/oheis/muu huoltaja,
+     * 3 = tiedonsaantioikeutettu (eli ei ole virallinen huoltaja, esim. isä jolta on huolto päättynyt tai muu huoltaja)
      */
+    @Column(name = "laji")
     private String laji;
-    // 0, 1, 2,... in DB
-    private Huollonjako huollonjako;
-    private Boolean voimassa;
 
+    /**
+     * Huoltajan rooli.
+     * arvot null, 1 – 4, 6
+     * null = muu huoltaja/tiedonsaanti- tai päätösoikeutettu, joka ei ole varsinainen huoltaja
+     * 1 = isä
+     * 2 = äiti
+     * 3 = adoptioisä
+     * 4 = adoptioäiti
+     * 6 = vahvistettu äiti
+     */
+    private String rooli;
+
+    /**
+     * Huoltosuhteen alkamispäivä.
+     */
     @Column(name = "start_date")
     private LocalDate startDate;
 
+    /**
+     * Huoltosuhteen päättymispäivä.
+     */
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "resolution_date")
-    private LocalDate resolutionDate;
+    /**
+     * Huollettavan asuminen.
+     * tyhjä = kentän arvo on tyhjää, jos vuoroasumisesta ei ole tehty päätöstä
+     * 1 = lapsi asuu vanhempiensa luona (isä ja äiti / äiti ja äiti / isä ja isä / adoptioisä ja adoptioäiti / isä ja adoptiovanhempi / äiti ja adoptiovanhempi)
+     * 2 = äidin luona, oikeuden päätös tai yhteisesti sovittu
+     * 3 = isän luona, oikeuden päätös tai yhteisesti sovittu
+     * 4 = vuoroasuminen, asuu vuorotellen vanhempiensa luona, oikeuden päätös tai yhteisesti sovittu
+     * 5 = vuoroasuminen äidin ja oheishuoltajan kanssa, oikeuden päätös tai yhteisesti sovittu
+     * 6 = vuoroasuminen isän ja oheishuoltajan kanssa, oikeuden päätös tai yhteisesti sovittu
+     * 7 = vuoroasuminen vanhempien ja oheishuoltajan kanssa, oikeuden päätös tai yhteisesti sovittu
+     * 8 = oheishuoltajan/oheishuoltajien kanssa, oikeuden päätös
+     */
+    private String asuminen;
+
+    /**
+     * Asumispäätökseen liittyvä asumisen alkupäivä, esim. vuoroasuminen.
+     */
+    @Column(name = "asuminen_alkupvm")
+    private LocalDate asuminenAlkupvm;
+
+    /**
+     * Asumispäätökseen liittyvä asumisen päättymispäivä, esim. vuoroasuminen.
+     */
+    @Column(name = "asuminen_loppupvm")
+    private LocalDate asuminenLoppupvm;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "hetuton_henkilo")
     private HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(name = "huoltaja_oikeudet",
+            uniqueConstraints = @UniqueConstraint(name = "huoltaja_oikeudet_oikeudet_id_uk", columnNames = "oikeudet_id"),
+            foreignKey = @ForeignKey(name = "huoltaja_oikeudet_huoltaja_id_fk"),
+            inverseForeignKey = @ForeignKey(name = "huoltaja_oikeudet_oikeudet_id_fk"))
+    private Set<Oikeus> oikeudet = new HashSet<>();
+
     @Builder
     public Huoltaja(Ryhmatunnus ryhmatunnus, Muutostapa muutostapa, String hetu, String laji,
-                    Huollonjako huollonjako, Boolean voimassa, LocalDate startDate, LocalDate endDate, LocalDate resolutionDate,
-                    HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo) {
+                    String rooli, LocalDate startDate, LocalDate endDate,
+                    String asuminen, LocalDate asuminenAlkupvm, LocalDate asuminenLoppupvm,
+                    HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo, Set<Oikeus> oikeudet) {
         super(ryhmatunnus, muutostapa);
         this.hetu = hetu;
-        // Huoltajuustyyppi koodisto
         this.laji = laji;
-        this.huollonjako = huollonjako;
-        this.voimassa = voimassa;
+        this.rooli = rooli;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.resolutionDate = resolutionDate;
+        this.asuminen = asuminen;
+        this.asuminenAlkupvm = asuminenAlkupvm;
+        this.asuminenLoppupvm = asuminenLoppupvm;
         this.henkilotunnuksetonHenkilo = henkilotunnuksetonHenkilo;
+        this.oikeudet = oikeudet;
     }
 
     @Override
@@ -76,8 +120,7 @@ public class Huoltaja extends Tietoryhma {
 
     @Override
     protected void updateHenkiloInternal(Context context, HenkiloForceUpdateDto henkilo) {
-        if (Boolean.TRUE.equals(this.voimassa)
-                && HenkiloUpdateUtil.localdateIsBetween(this.startDate, this.endDate, context.getLocalDateNow())
+        if (HenkiloUpdateUtil.localdateIsBetween(this.startDate, this.endDate, context.getLocalDateNow())
                 && !Muutostapa.POISTETTU.equals(getMuutostapa())) {
             // Samaan huoltajaan voi olla useita tietoryhmiä samalla rivillä
             HuoltajaCreateDto huoltajaCreateDto = Optional.ofNullable(henkilo.getHuoltajat())
@@ -88,7 +131,6 @@ public class Huoltaja extends Tietoryhma {
                     .orElseGet(HuoltajaCreateDto::new);
 
             huoltajaCreateDto.setHetu(this.hetu);
-            huoltajaCreateDto.setHuoltajuustyyppiKoodi(this.laji);
             if (StringUtils.isEmpty(this.hetu)) {
                 huoltajaCreateDto.setEtunimet(this.henkilotunnuksetonHenkilo.getFirstNames());
                 huoltajaCreateDto.setKutsumanimi(this.henkilotunnuksetonHenkilo.getFirstNames());

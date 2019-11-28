@@ -1,11 +1,18 @@
 package fi.oph.henkilotietomuutospalvelu.service;
 
+import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
+import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
+import fi.oph.henkilotietomuutospalvelu.dto.type.NameType;
+import fi.oph.henkilotietomuutospalvelu.dto.type.Toimintakelpoisuus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
-import fi.oph.henkilotietomuutospalvelu.dto.type.*;
 import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil;
-import java.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 public class TietoryhmaParserUtilTest {
 
@@ -115,10 +122,33 @@ public class TietoryhmaParserUtilTest {
         Assert.assertEquals(Muutostapa.LISATTY, huoltaja.getMuutostapa());
         Assert.assertEquals("111177-094V", huoltaja.getHetu());
         Assert.assertEquals(LocalDate.of(2017, 2,14), huoltaja.getStartDate());
-        Assert.assertEquals(LocalDate.of(2017, 2, 20), huoltaja.getResolutionDate());
         Assert.assertNull(huoltaja.getEndDate());
-        Assert.assertEquals(true, huoltaja.getVoimassa());
-        Assert.assertEquals(Huollonjako.SUORITTAMATTA, huoltaja.getHuollonjako());
+    }
+
+    @Test
+    public void parseHuoltajaV20191201() {
+        String huoltajaStr = "3051081184-175B212017022020330501\t0000000000000000";
+        String oikeudetStr1 = "3201P5012018031220180414";
+        String oikeudetStr2 = "3204T3012019010120321231";
+
+        Tietoryhma tietoryhma = TietoryhmaParserUtil.deserializeTietoryhma(huoltajaStr, oikeudetStr1, oikeudetStr2);
+
+        assertThat(tietoryhma).isInstanceOf(Huoltaja.class);
+        Huoltaja huoltaja = (Huoltaja) tietoryhma;
+        assertThat(huoltaja)
+                .returns(Muutostapa.LISATTY, Huoltaja::getMuutostapa)
+                .returns("081184-175B", Huoltaja::getHetu)
+                .returns("2", Huoltaja::getLaji)
+                .returns("1", Huoltaja::getRooli)
+                .returns(LocalDate.of(2017, 2,20), Huoltaja::getStartDate)
+                .returns(LocalDate.of(2033, 5, 1), Huoltaja::getEndDate)
+                .returns("", Huoltaja::getAsuminen)
+                .returns(null, Huoltaja::getAsuminenAlkupvm)
+                .returns(null, Huoltaja::getAsuminenLoppupvm);
+        assertThat(huoltaja.getOikeudet()).extracting(Oikeus::getMuutostapa, Oikeus::getKoodi, Oikeus::getAlkupvm, Oikeus::getLoppupvm)
+                .containsExactlyInAnyOrder(
+                        tuple(Muutostapa.LISATTY, "P501", LocalDate.of(2018, 3, 12), LocalDate.of(2018, 4, 14)),
+                        tuple(Muutostapa.POISTETTU, "T301", LocalDate.of(2019, 1, 1), LocalDate.of(2032, 12, 31)));
     }
 
     @Test
@@ -236,6 +266,37 @@ public class TietoryhmaParserUtilTest {
         Assert.assertEquals("Waltman", henkilo.getLastname());
         Assert.assertEquals(Gender.FEMALE, henkilo.getGender());
         Assert.assertEquals("752", henkilo.getNationality());
+    }
+
+    @Test
+    public void parseHetutonHenkiloWithValidCountryCodeV20191201() {
+        String huoltajaStr = "3051           212017022020330501\t0000000000000000";
+        String henkilotunnuksetonHenkiloStr = "4510197002222Waltman                                                                    "
+                + "                         Vanessa                                                                  "
+                + "                           752";
+
+        Tietoryhma tietoryhma = TietoryhmaParserUtil.deserializeTietoryhma(huoltajaStr, henkilotunnuksetonHenkiloStr);
+
+        assertThat(tietoryhma).isInstanceOf(Huoltaja.class);
+        Huoltaja huoltaja = (Huoltaja) tietoryhma;
+        assertThat(huoltaja)
+                .returns(Muutostapa.LISATTY, Huoltaja::getMuutostapa)
+                .returns("", Huoltaja::getHetu)
+                .returns("2", Huoltaja::getLaji)
+                .returns("1", Huoltaja::getRooli)
+                .returns(LocalDate.of(2017, 2,20), Huoltaja::getStartDate)
+                .returns(LocalDate.of(2033, 5, 1), Huoltaja::getEndDate)
+                .returns("", Huoltaja::getAsuminen)
+                .returns(null, Huoltaja::getAsuminenAlkupvm)
+                .returns(null, Huoltaja::getAsuminenLoppupvm);
+        HenkilotunnuksetonHenkilo henkilo = huoltaja.getHenkilotunnuksetonHenkilo();
+        assertThat(henkilo)
+                .returns(Muutostapa.LISATIETO, HenkilotunnuksetonHenkilo::getMuutostapa)
+                .returns(LocalDate.of(1970, 2, 22), HenkilotunnuksetonHenkilo::getDateOfBirth)
+                .returns("Vanessa", HenkilotunnuksetonHenkilo::getFirstNames)
+                .returns("Waltman", HenkilotunnuksetonHenkilo::getLastname)
+                .returns(Gender.FEMALE, HenkilotunnuksetonHenkilo::getGender)
+                .returns("752", HenkilotunnuksetonHenkilo::getNationality);
     }
 
     // This cannot exist alone
