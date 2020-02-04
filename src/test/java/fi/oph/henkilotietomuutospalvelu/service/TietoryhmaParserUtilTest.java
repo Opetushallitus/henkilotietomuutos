@@ -40,6 +40,17 @@ public class TietoryhmaParserUtilTest {
     }
 
     @Test
+    public void parseAidinkieliSkipsMissingAdditionalInformation() {
+        String tietoryhmaStr = "002198";
+
+        Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmaStr);
+        Assert.assertTrue(ryhma instanceof Aidinkieli);
+
+        Aidinkieli aidinkieli = (Aidinkieli) ryhma;
+        Assert.assertEquals("98", aidinkieli.getLanguageCode());
+    }
+
+    @Test
     public void parseAmmatti() {
         String tietoryhma = "4013    luottoneuvottelija                 ";
 

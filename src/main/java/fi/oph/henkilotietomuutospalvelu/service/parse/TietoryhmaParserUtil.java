@@ -549,7 +549,11 @@ public class TietoryhmaParserUtil {
                 .languageCode(languageCode).build();
 
         if (languageCode.equals("98")) {
-            aidinkieli.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
+            if (tarkentavatTietoryhmat.length > 0) {
+                aidinkieli.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
+            } else {
+                log.warn("Missing additional language information.");
+            }
         }
 
         return aidinkieli;
