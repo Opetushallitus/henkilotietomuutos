@@ -73,7 +73,10 @@ public class OnrServiceClientImpl implements OnrServiceClient {
                             .build())
                     .build();
             ophHttpClient.execute(request)
-                    .handleErrorStatus(400).with(returnString -> {throw new RestClientException(returnString);})
+                    .handleErrorStatus(400).with(returnString -> {
+                        throw new RestClientException(
+                                "Update failed for OID " + updateDto.getOidHenkilo()  + ": " + returnString);
+                    })
                     .expectedStatus(SC_OK)
                     .ignoreResponse();
         }
