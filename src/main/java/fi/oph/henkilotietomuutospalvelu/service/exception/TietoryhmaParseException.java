@@ -10,4 +10,8 @@ public class TietoryhmaParseException extends RuntimeException {
         super(message);
     }
 
+    public TietoryhmaParseException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

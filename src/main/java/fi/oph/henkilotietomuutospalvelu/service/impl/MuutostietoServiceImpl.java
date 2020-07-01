@@ -19,12 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -64,19 +62,22 @@ public class MuutostietoServiceImpl implements MuutostietoService {
             lineNumberCounter = new AtomicInteger(0);
         }
 
-        List<MuutostietoDto> muutostiedot = this.fileService.readFile(path).stream()
-                .filter(line -> !line.startsWith("'''")) // Ignore metadata
-                .map(muutostietoParseService::deserializeMuutostietoLine)
-                .collect(Collectors.toList());
-        muutostiedot = squashMultipartMuutostiedot(muutostiedot);
-        muutostiedot.stream()
+        List<MuutostietoDto> muutostiedot = new ArrayList<>();
+        AtomicInteger sourceLineNumber = new AtomicInteger(0);
+        try (Stream<MuutostietoLine> muutostietoLines = this.fileService.processFile(path, line ->
+                        new MuutostietoLine(sourceLineNumber.incrementAndGet(), line))) {
+            muutostiedot = muutostietoLines
+                    .filter(line -> !line.content.startsWith("'''")) // Ignore metadata
+                    .map(muutostietoParseService::deserializeMuutostietoLine)
+                    .collect(Collectors.toList());
+        }
+        squashMultipartMuutostiedot(muutostiedot).stream()
                 .filter(muutostieto -> MuutosType.UUSI.equals(muutostieto.getMuutosType())
                         || MuutosType.VANHA.equals(muutostieto.getMuutosType()))
                 .forEach(muutostieto -> {
                     muutostieto.setTiedostoNimi(fileName);
                     muutostieto.setRivi(lineNumberCounter.incrementAndGet());
                 });
-
         this.muutostietoHandleService.importUnprocessedMuutostiedotToDb(muutostiedot, fileName);
 
         try {
@@ -139,4 +140,6 @@ public class MuutostietoServiceImpl implements MuutostietoService {
     public List<String> downloadFiles() throws IOException {
         return fileService.downloadBixFiles();
     }
+
+
 }

@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public interface FileService {
@@ -26,13 +26,14 @@ public interface FileService {
     List<String> readFile(Path path);
 
     /**
-     * Consume file content as a stream of strings. <b>Note:</b> at processing time, exceptions raised by the
+     * Process file content as a stream of strings. <b>Note:</b> at processing time, exceptions raised by the
      * underlying IO are wrapped in <code>UncheckedIOException</code>!
      *
      * @param path file path
-     * @param processor consumer processing the content
+     * @param processor function processing the content lines
+     * @return result stream
      */
-    void processFile(Path path, Consumer<String> processor);
+    <T> Stream<T> processFile(Path path, Function<String, T> processor);
 
     void deleteImportFile(Path path) throws IOException;
 
