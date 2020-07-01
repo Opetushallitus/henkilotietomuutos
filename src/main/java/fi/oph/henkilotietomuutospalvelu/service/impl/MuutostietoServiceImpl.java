@@ -10,6 +10,8 @@ import fi.oph.henkilotietomuutospalvelu.service.FileService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoHandleService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoParseService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoService;
+import fi.oph.henkilotietomuutospalvelu.service.exception.MuutostietoFileException;
+import fi.oph.henkilotietomuutospalvelu.service.exception.MuutostietoLineParseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -39,7 +41,8 @@ public class MuutostietoServiceImpl implements MuutostietoService {
     @NotifyOnError(NotifyOnError.NotifyType.IMPORT)
     @Transactional(readOnly = true)
     @Override
-    public List<MuutostietoDto> importMuutostiedot(int lastHandledLineNumber) throws IOException {
+    public List<MuutostietoDto> importMuutostiedot(int lastHandledLineNumber)
+            throws IOException, MuutostietoFileException {
         Optional<String> optional = this.fileService.findNextFile();
         if (optional.isPresent()) {
             return handleFile(optional.get(), lastHandledLineNumber);
@@ -48,7 +51,8 @@ public class MuutostietoServiceImpl implements MuutostietoService {
     }
 
     // Give each line a number (multi lines are considered as one),  and import to db
-    private List<MuutostietoDto> handleFile(String filePath, int lastHandledLineNumber) throws IOException {
+    private List<MuutostietoDto> handleFile(String filePath, int lastHandledLineNumber)
+            throws MuutostietoFileException {
         Path path = Paths.get(filePath);
         AtomicInteger lineNumberCounter;
         String fileName;
@@ -58,7 +62,11 @@ public class MuutostietoServiceImpl implements MuutostietoService {
         }
         else {
             fileName = FilenameUtils.getName(path.toString());
-            path = this.fileService.splitFile(path);
+            try {
+                path = this.fileService.splitFile(path);
+            } catch (IOException e) {
+                throw new MuutostietoFileException(filePath, e);
+            }
             lineNumberCounter = new AtomicInteger(0);
         }
 
@@ -70,6 +78,8 @@ public class MuutostietoServiceImpl implements MuutostietoService {
                     .filter(line -> !line.content.startsWith("'''")) // Ignore metadata
                     .map(muutostietoParseService::deserializeMuutostietoLine)
                     .collect(Collectors.toList());
+        } catch (MuutostietoLineParseException e) {
+            throw new MuutostietoFileException(filePath, e);
         }
         squashMultipartMuutostiedot(muutostiedot).stream()
                 .filter(muutostieto -> MuutosType.UUSI.equals(muutostieto.getMuutosType())

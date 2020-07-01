@@ -2,10 +2,10 @@ package fi.oph.henkilotietomuutospalvelu.config.scheduling;
 
 import fi.oph.henkilotietomuutospalvelu.config.properties.SchedulingProperties;
 import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
-import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.service.HetuService;
 import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoService;
+import fi.oph.henkilotietomuutospalvelu.service.exception.MuutostietoFileException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -87,7 +87,7 @@ public class ScheduledTasks {
             List<MuutostietoDto> muutostiedot = this.muutostietoService.importMuutostiedot(lastHandledLineNumber);
             log.info("Imported {} muutostietoa to db.", muutostiedot.size());
             return muutostiedot;
-        } catch (IOException e) {
+        } catch (IOException | MuutostietoFileException e) {
             log.error("Failed to import changes.", e);
             return Collections.emptyList();
         }

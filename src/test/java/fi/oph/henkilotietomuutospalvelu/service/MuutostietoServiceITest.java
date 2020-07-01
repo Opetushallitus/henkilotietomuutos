@@ -16,6 +16,7 @@ import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.HuoltajaRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
+import fi.oph.henkilotietomuutospalvelu.service.exception.MuutostietoFileException;
 import fi.vm.sade.oppijanumerorekisteri.dto.*;
 import fi.vm.sade.rajapinnat.vtj.api.YksiloityHenkilo;
 import org.assertj.core.groups.Tuple;
@@ -312,7 +313,7 @@ public class MuutostietoServiceITest {
     }
 
     @Test
-    public void importMuutostiedotHuoltaja() throws IOException, URISyntaxException {
+    public void importMuutostiedotHuoltaja() throws IOException, URISyntaxException, MuutostietoFileException {
         mockFiles("test_data/huoltaja_test.PTT", "test_data/huoltaja_test.PTT_001.PART");
 
         muutostietoService.importMuutostiedot(0);

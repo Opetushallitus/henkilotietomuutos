@@ -1,6 +1,7 @@
 package fi.oph.henkilotietomuutospalvelu.service;
 
 import fi.oph.henkilotietomuutospalvelu.dto.MuutostietoDto;
+import fi.oph.henkilotietomuutospalvelu.service.exception.MuutostietoFileException;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,7 +13,7 @@ public interface MuutostietoService {
      * @throws IOException anything related to file handling
      * @param lastHandledLineNumber Last line number of the last handled muutostieto. Will be set to 0 if new file.
      */
-    List<MuutostietoDto> importMuutostiedot(int lastHandledLineNumber) throws IOException;
+    List<MuutostietoDto> importMuutostiedot(int lastHandledLineNumber) throws IOException, MuutostietoFileException;
 
     /**
      * Update unhandled muutostiedot from database to oppijanumerorekisteri-service.
