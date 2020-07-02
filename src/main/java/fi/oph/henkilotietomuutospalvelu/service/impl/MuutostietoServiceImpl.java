@@ -70,10 +70,9 @@ public class MuutostietoServiceImpl implements MuutostietoService {
             lineNumberCounter = new AtomicInteger(0);
         }
 
-        List<MuutostietoDto> muutostiedot = new ArrayList<>();
-        AtomicInteger sourceLineNumber = new AtomicInteger(0);
-        try (Stream<MuutostietoLine> muutostietoLines = this.fileService.processFile(path, line ->
-                        new MuutostietoLine(sourceLineNumber.incrementAndGet(), line))) {
+        List<MuutostietoDto> muutostiedot;
+        try (Stream<MuutostietoLine> muutostietoLines = this.fileService.processFile(path, (line, lineNumber) ->
+                        new MuutostietoLine(lineNumber, line))) {
             muutostiedot = muutostietoLines
                     .filter(line -> !line.content.startsWith("'''")) // Ignore metadata
                     .map(muutostietoParseService::deserializeMuutostietoLine)

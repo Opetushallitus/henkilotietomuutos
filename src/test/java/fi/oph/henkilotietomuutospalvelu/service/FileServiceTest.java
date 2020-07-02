@@ -7,15 +7,20 @@ import fi.oph.henkilotietomuutospalvelu.model.type.VtjEventType;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
 import fi.oph.henkilotietomuutospalvelu.service.impl.FileServiceImpl;
 import fi.oph.henkilotietomuutospalvelu.service.impl.HetuServiceImpl;
+import fi.oph.henkilotietomuutospalvelu.service.impl.MuutostietoLine;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -28,6 +33,10 @@ import static org.assertj.core.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 public class FileServiceTest {
+
+    @Rule
+    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @InjectMocks
     private FileServiceImpl fileService;
 
@@ -118,6 +127,17 @@ public class FileServiceTest {
         assertThat(hetuFile.getName()).isEqualTo("38950_20171116.HTT").as("Filenames are not equal!");
         assertThat(hetuFile).hasSameContentAs(expectedFile).as("File contents are not equal!");
 
+    }
+
+    @Test
+    public void processFileNumbersLines() throws IOException {
+        File inputFile = temporaryFolder.newFile();
+        Files.write(inputFile.toPath(), "Rivi1\nRivi2".getBytes());
+        List<MuutostietoLine> results = fileService.processFile(inputFile.toPath(), (line, lineNumber)
+                -> new MuutostietoLine(lineNumber, line)).collect(Collectors.toList());
+        assertThat(results.size()).isEqualTo(2);
+        assertThat(results.get(0).lineNumber).isEqualTo(1);
+        assertThat(results.get(1).lineNumber).isEqualTo(2);
     }
 
 }

@@ -27,7 +27,7 @@ public class MuutostietoParseServiceImpl implements MuutostietoParseService {
             muutostietoDto.setTietoryhmat(deserializeTietoryhmat(parts));
             return muutostietoDto;
         } catch (RuntimeException e) {
-            throw new MuutostietoLineParseException(line.lineNumber, e);
+            throw new MuutostietoLineParseException(line, e);
         }
     }
 
