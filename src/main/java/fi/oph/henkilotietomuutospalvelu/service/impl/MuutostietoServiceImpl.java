@@ -10,6 +10,8 @@ import fi.oph.henkilotietomuutospalvelu.service.FileService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoHandleService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoParseService;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoService;
+import fi.oph.henkilotietomuutospalvelu.service.exception.MuutostietoFileException;
+import fi.oph.henkilotietomuutospalvelu.service.exception.MuutostietoLineParseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -19,12 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -41,7 +41,8 @@ public class MuutostietoServiceImpl implements MuutostietoService {
     @NotifyOnError(NotifyOnError.NotifyType.IMPORT)
     @Transactional(readOnly = true)
     @Override
-    public List<MuutostietoDto> importMuutostiedot(int lastHandledLineNumber) throws IOException {
+    public List<MuutostietoDto> importMuutostiedot(int lastHandledLineNumber)
+            throws IOException, MuutostietoFileException {
         Optional<String> optional = this.fileService.findNextFile();
         if (optional.isPresent()) {
             return handleFile(optional.get(), lastHandledLineNumber);
@@ -50,7 +51,8 @@ public class MuutostietoServiceImpl implements MuutostietoService {
     }
 
     // Give each line a number (multi lines are considered as one),  and import to db
-    private List<MuutostietoDto> handleFile(String filePath, int lastHandledLineNumber) throws IOException {
+    private List<MuutostietoDto> handleFile(String filePath, int lastHandledLineNumber)
+            throws MuutostietoFileException {
         Path path = Paths.get(filePath);
         AtomicInteger lineNumberCounter;
         String fileName;
@@ -60,23 +62,31 @@ public class MuutostietoServiceImpl implements MuutostietoService {
         }
         else {
             fileName = FilenameUtils.getName(path.toString());
-            path = this.fileService.splitFile(path);
+            try {
+                path = this.fileService.splitFile(path);
+            } catch (IOException e) {
+                throw new MuutostietoFileException(filePath, e);
+            }
             lineNumberCounter = new AtomicInteger(0);
         }
 
-        List<MuutostietoDto> muutostiedot = this.fileService.readFile(path).stream()
-                .filter(line -> !line.startsWith("'''")) // Ignore metadata
-                .map(muutostietoParseService::deserializeMuutostietoLine)
-                .collect(Collectors.toList());
-        muutostiedot = squashMultipartMuutostiedot(muutostiedot);
-        muutostiedot.stream()
+        List<MuutostietoDto> muutostiedot;
+        try (Stream<MuutostietoLine> muutostietoLines = this.fileService.processFile(path, (line, lineNumber) ->
+                        new MuutostietoLine(lineNumber, line))) {
+            muutostiedot = muutostietoLines
+                    .filter(line -> !line.content.startsWith("'''")) // Ignore metadata
+                    .map(muutostietoParseService::deserializeMuutostietoLine)
+                    .collect(Collectors.toList());
+        } catch (MuutostietoLineParseException e) {
+            throw new MuutostietoFileException(filePath, e);
+        }
+        squashMultipartMuutostiedot(muutostiedot).stream()
                 .filter(muutostieto -> MuutosType.UUSI.equals(muutostieto.getMuutosType())
                         || MuutosType.VANHA.equals(muutostieto.getMuutosType()))
                 .forEach(muutostieto -> {
                     muutostieto.setTiedostoNimi(fileName);
                     muutostieto.setRivi(lineNumberCounter.incrementAndGet());
                 });
-
         this.muutostietoHandleService.importUnprocessedMuutostiedotToDb(muutostiedot, fileName);
 
         try {
@@ -139,4 +149,6 @@ public class MuutostietoServiceImpl implements MuutostietoService {
     public List<String> downloadFiles() throws IOException {
         return fileService.downloadBixFiles();
     }
+
+
 }

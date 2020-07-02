@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,12 +87,21 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<String> readFile(Path path) {
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile()), StandardCharsets.UTF_8))) {
+        return processFile(path, (line, lineNumber) -> line).collect(Collectors.toList());
+    }
+
+    @Override
+    public <T> Stream<T> processFile(Path path, BiFunction<String, Integer, T> processor) {
+        try {
+            final BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile()), StandardCharsets.UTF_8));
             log.debug("Reading file from path: {}", path);
-            return br.lines().collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Failed to read file from path: {}", path);
-            return new ArrayList<>();
+            final int[] lineNumberHolder = {0};
+            return br.lines().onClose(() -> { // auto-close tässä sulkisi readerin etuajassa!
+                try { br.close(); } catch (IOException ignored) {}
+            }).map(line -> processor.apply(line, ++lineNumberHolder[0]));
+        } catch (IOException e) {
+            log.error("Failed to read file from path: {}", path, e);
+            return Stream.empty();
         }
     }
 

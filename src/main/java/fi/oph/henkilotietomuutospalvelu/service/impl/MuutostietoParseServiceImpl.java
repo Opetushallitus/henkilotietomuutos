@@ -6,6 +6,7 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Huoltaja;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoParseService;
+import fi.oph.henkilotietomuutospalvelu.service.exception.MuutostietoLineParseException;
 import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil;
 import fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,15 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 public class MuutostietoParseServiceImpl implements MuutostietoParseService {
 
     @Override
-    public MuutostietoDto deserializeMuutostietoLine(String line) {
-        String[] parts = line.split("\\|");
-        MuutostietoDto muutostietoDto = parseTunnisteosa(parts[0]);
-        muutostietoDto.setTietoryhmat(deserializeTietoryhmat(parts));
-        return muutostietoDto;
+    public MuutostietoDto deserializeMuutostietoLine(MuutostietoLine line) throws MuutostietoLineParseException {
+        String[] parts = line.content.split("\\|");
+        try {
+            MuutostietoDto muutostietoDto = parseTunnisteosa(parts[0]);
+            muutostietoDto.setTietoryhmat(deserializeTietoryhmat(parts));
+            return muutostietoDto;
+        } catch (RuntimeException e) {
+            throw new MuutostietoLineParseException(line, e);
+        }
     }
 
     private static MuutostietoDto parseTunnisteosa(String tunnisteosa) {

@@ -6,6 +6,7 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.MuutosType;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.repository.HenkiloMuutostietoRepository;
 import fi.oph.henkilotietomuutospalvelu.repository.TiedostoRepository;
+import fi.oph.henkilotietomuutospalvelu.service.impl.MuutostietoLine;
 import fi.oph.henkilotietomuutospalvelu.service.impl.MuutostietoServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,10 +21,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -54,13 +55,15 @@ public class MuutostietoServiceImplTest {
     @Test
     public void handleFileLineNumberingIfNextPart() throws Exception {
         String fileName = "12345_20180120OPHREK_011.MTT";
+        String line = "1";
+        MuutostietoLine muutostietoLine = new MuutostietoLine(1, line);
         given(this.tiedostoRepository.findByFileName(eq(fileName))).willReturn(Optional.empty());
 
         MuutostietoDto muutostietoDto = MuutostietoDto.builder()
                 .muutosType(MuutosType.UUSI)
                 .build();
-        given( this.fileService.readFile(any())).willReturn(Lists.newArrayList("1"));
-        given(this.muutostietoParseService.deserializeMuutostietoLine(eq("1"))).willReturn(muutostietoDto);
+        given(this.fileService.processFile(any(), any())).willReturn(Stream.of(muutostietoLine));
+        given(this.muutostietoParseService.deserializeMuutostietoLine(eq(muutostietoLine))).willReturn(muutostietoDto);
 
         int lastLineNumber = 100;
         ReflectionTestUtils.invokeMethod(muutostietoService, "handleFile", "C:\\Users\\user\\henkilotietomuutos\\import\\12345_20180120OPHREK_011.MTT_001.PART", lastLineNumber);
