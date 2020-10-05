@@ -24,9 +24,8 @@ import org.mockito.*;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -526,6 +525,63 @@ public class MuutostietoHandleServiceImplTest {
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
         assertThat(updateDto.getEtunimet()).isNull();
         assertThat(updateDto.getKutsumanimi()).isEqualTo("vanhanimi toinennimi");
+    }
+
+    @Test
+    public void handleUusiHuoltajaTieto() {
+        Tietoryhma huoltajatieto = Huoltaja.builder()
+                .hetu("huoltajanhetu")
+                .startDate(LocalDate.now().minus(1L, ChronoUnit.YEARS))
+                .endDate(LocalDate.now().plus(17L, ChronoUnit.YEARS))
+                .muutostapa(Muutostapa.LISATTY)
+                .build();
+        HenkiloMuutostietoRivi muutosRivi = new HenkiloMuutostietoRivi();
+        muutosRivi.addTietoryhma(huoltajatieto);
+        muutosRivi.setQueryHetu("huollettavanhetu");
+        muutosRivi.setTiedosto(new Tiedosto());
+        when(henkiloMuutostietoRepository.findByQueryHetuInAndProcessTimestampIsNull(any()))
+                .thenReturn(singletonList(muutosRivi));
+
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
+                .hetu("huollettavanhetu")
+                .huoltajat(new HashSet<>())
+                .build();
+        when(onrServiceClient.getHenkiloByHetu(eq(henkiloDto.getHetu()))).thenReturn(Optional.of(henkiloDto));
+
+        muutostietoHandleService.handleMuutostieto(muutosRivi);
+
+        verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
+        assertThat(updateDto.getHuoltajat()).isNotEmpty();
+    }
+
+    @Test
+    public void handlePoistettuHuoltajaTieto() {
+        Tietoryhma huoltajatieto = Huoltaja.builder()
+                .hetu("huoltajanhetu")
+                .startDate(LocalDate.now().minus(18L, ChronoUnit.YEARS))
+                .endDate(LocalDate.now().minus(1L, ChronoUnit.DAYS))
+                .muutostapa(Muutostapa.POISTETTU)
+                .build();
+        HenkiloMuutostietoRivi muutosRivi = new HenkiloMuutostietoRivi();
+        muutosRivi.addTietoryhma(huoltajatieto);
+        muutosRivi.setQueryHetu("huollettavanhetu");
+        muutosRivi.setTiedosto(new Tiedosto());
+        when(henkiloMuutostietoRepository.findByQueryHetuInAndProcessTimestampIsNull(any()))
+                .thenReturn(singletonList(muutosRivi));
+
+        HashSet<HuoltajaCreateDto> huoltajat = new HashSet<>(
+                Arrays.asList(HuoltajaCreateDto.builder().hetu("huoltajanhetu").build()));
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
+                .hetu("huollettavanhetu")
+                .huoltajat(huoltajat).build();
+        when(onrServiceClient.getHenkiloByHetu(eq(henkiloDto.getHetu()))).thenReturn(Optional.of(henkiloDto));
+
+        muutostietoHandleService.handleMuutostieto(muutosRivi);
+
+        verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
+        assertThat(updateDto.getHuoltajat()).isEmpty();
     }
 
 }
