@@ -584,4 +584,40 @@ public class MuutostietoHandleServiceImplTest {
         assertThat(updateDto.getHuoltajat()).isEmpty();
     }
 
+    @Test
+    public void handleMuuttunutHuoltajaTieto() {
+        Tietoryhma uusiHuoltajatieto = Huoltaja.builder()
+                .hetu("huoltajanhetu")
+                .startDate(LocalDate.now().minus(1L, ChronoUnit.DAYS))
+                .endDate(LocalDate.now().plus(8L, ChronoUnit.YEARS))
+                .muutostapa(Muutostapa.LISATTY)
+                .build();
+        Tietoryhma vanhaHuoltajatieto = Huoltaja.builder()
+                .hetu("huoltajanhetu")
+                .startDate(LocalDate.now().minus(10L, ChronoUnit.YEARS))
+                .endDate(LocalDate.now().minus(2L, ChronoUnit.DAYS))
+                .muutostapa(Muutostapa.MUUTETTU)
+                .build();
+        HenkiloMuutostietoRivi muutosRivi = new HenkiloMuutostietoRivi();
+        muutosRivi.addTietoryhma(uusiHuoltajatieto);
+        muutosRivi.addTietoryhma(vanhaHuoltajatieto);
+        muutosRivi.setQueryHetu("huollettavanhetu");
+        muutosRivi.setTiedosto(new Tiedosto());
+        when(henkiloMuutostietoRepository.findByQueryHetuInAndProcessTimestampIsNull(any()))
+                .thenReturn(singletonList(muutosRivi));
+
+        HashSet<HuoltajaCreateDto> huoltajat = new HashSet<>(
+                Arrays.asList(HuoltajaCreateDto.builder().hetu("huoltajanhetu").build()));
+        HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
+                .hetu("huollettavanhetu")
+                .huoltajat(huoltajat).build();
+        when(onrServiceClient.getHenkiloByHetu(eq(henkiloDto.getHetu()))).thenReturn(Optional.of(henkiloDto));
+
+        muutostietoHandleService.handleMuutostieto(muutosRivi);
+
+        verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
+        HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
+        assertThat(updateDto.getHuoltajat()).isNotEmpty();
+    }
+
 }
