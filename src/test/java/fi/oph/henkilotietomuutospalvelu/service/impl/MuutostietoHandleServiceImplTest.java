@@ -550,7 +550,7 @@ public class MuutostietoHandleServiceImplTest {
 
         verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
-        assertThat(updateDto.getHuoltajat()).isNotEmpty();
+        assertThat(updateDto.getHuoltajat().size()).isEqualTo(1);
     }
 
     @Test
@@ -569,7 +569,7 @@ public class MuutostietoHandleServiceImplTest {
                 .thenReturn(singletonList(muutosRivi));
 
         HashSet<HuoltajaCreateDto> huoltajat = new HashSet<>(
-                Arrays.asList(HuoltajaCreateDto.builder().hetu("huoltajanhetu").build()));
+                singletonList(HuoltajaCreateDto.builder().hetu("huoltajanhetu").build()));
         HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .hetu("huollettavanhetu")
                 .huoltajat(huoltajat).build();
@@ -605,7 +605,7 @@ public class MuutostietoHandleServiceImplTest {
                 .thenReturn(singletonList(muutosRivi));
 
         HashSet<HuoltajaCreateDto> huoltajat = new HashSet<>(
-                Arrays.asList(HuoltajaCreateDto.builder().hetu("huoltajanhetu").build()));
+                singletonList(HuoltajaCreateDto.builder().hetu("huoltajanhetu").build()));
         HenkiloForceReadDto henkiloDto = HenkiloForceReadDto.builder()
                 .hetu("huollettavanhetu")
                 .huoltajat(huoltajat).build();
@@ -615,7 +615,7 @@ public class MuutostietoHandleServiceImplTest {
 
         verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
-        assertThat(updateDto.getHuoltajat()).isNotEmpty();
+        assertThat(updateDto.getHuoltajat().size()).isEqualTo(1);
     }
 
 }

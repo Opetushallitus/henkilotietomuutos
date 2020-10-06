@@ -120,12 +120,13 @@ public class Huoltaja extends Tietoryhma {
 
     @Override
     protected void updateHenkiloInternal(Context context, HenkiloForceUpdateDto henkilo) {
-        if (HenkiloUpdateUtil.localdateIsBetween(this.startDate, this.endDate, context.getLocalDateNow())
-                && !Muutostapa.POISTETTU.equals(getMuutostapa())) {
+        if (Muutostapa.POISTETTU == getMuutostapa()) {
+            henkilo.getHuoltajat().removeIf(this::huoltajaMatches);
+        } else if (HenkiloUpdateUtil.localdateIsBetween(this.startDate, this.endDate, context.getLocalDateNow())) {
             // Samaan huoltajaan voi olla useita tietoryhmiä samalla rivillä
             HuoltajaCreateDto huoltajaCreateDto = Optional.ofNullable(henkilo.getHuoltajat())
                     .filter(huoltajat -> !huoltajat.isEmpty())
-                    .map(huoltajat -> huoltajat.stream().filter(this::isHuoltajaAlreadyUpdated).findFirst())
+                    .map(huoltajat -> huoltajat.stream().filter(this::huoltajaMatches).findFirst())
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .orElseGet(HuoltajaCreateDto::new);
@@ -141,12 +142,9 @@ public class Huoltaja extends Tietoryhma {
             }
             henkilo.getHuoltajat().add(huoltajaCreateDto);
         }
-        else {
-            henkilo.getHuoltajat().removeIf(this::isHuoltajaAlreadyUpdated);
-        }
     }
 
-    private boolean isHuoltajaAlreadyUpdated(HuoltajaCreateDto huoltajaCreateDto) {
+    private boolean huoltajaMatches(HuoltajaCreateDto huoltajaCreateDto) {
         return Optional.ofNullable(this.hetu)
                 .filter(StringUtils::hasLength)
                 .map(hetu -> hetu.equals(huoltajaCreateDto.getHetu()))
