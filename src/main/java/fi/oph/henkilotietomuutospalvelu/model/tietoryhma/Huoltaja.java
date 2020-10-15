@@ -2,7 +2,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.oph.henkilotietomuutospalvelu.service.build.HenkiloUpdateUtil;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HuoltajaCreateDto;
 import lombok.Builder;
@@ -119,19 +118,29 @@ public class Huoltaja extends Tietoryhma {
     }
 
     @Override
+    public boolean isVoimassa(Context context) {
+        return (this.startDate == null || context.getLocalDateNow().isAfter(this.startDate))
+                && (this.endDate == null || context.getLocalDateNow().isBefore(this.endDate));
+    }
+
+    @Override
     protected void updateHenkiloInternal(Context context, HenkiloForceUpdateDto henkilo) {
-        if (Muutostapa.POISTETTU == getMuutostapa()) {
+        if (Muutostapa.POISTETTU == getMuutostapa() || Muutostapa.KORJATTAVAA == getMuutostapa()) {
+            // poistettu poistuu, korjattavaa korvataan erillisellä korjattu-tietoryhmällä
             henkilo.getHuoltajat().removeIf(this::huoltajaMatches);
-        } else if (HenkiloUpdateUtil.localdateIsBetween(this.startDate, this.endDate, context.getLocalDateNow())) {
-            // Samaan huoltajaan voi olla useita tietoryhmiä samalla rivillä
+        } else {
+            // samaan huoltajaan voi olla useita tietoryhmiä samalla rivillä
+            // muutos tulee kahdella ryhmällä: muutettu ja lisätty
             HuoltajaCreateDto huoltajaCreateDto = Optional.ofNullable(henkilo.getHuoltajat())
-                    .filter(huoltajat -> !huoltajat.isEmpty())
-                    .map(huoltajat -> huoltajat.stream().filter(this::huoltajaMatches).findFirst())
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .orElseGet(HuoltajaCreateDto::new);
+                    .orElse(Collections.emptySet())
+                    .stream()
+                    .filter(this::huoltajaMatches)
+                    .findFirst()
+                    .orElse(new HuoltajaCreateDto());
 
             huoltajaCreateDto.setHetu(this.hetu);
+            huoltajaCreateDto.setHuoltajuusAlku(this.getStartDate());
+            huoltajaCreateDto.setHuoltajuusLoppu(this.getEndDate());
             if (StringUtils.isEmpty(this.hetu)) {
                 huoltajaCreateDto.setEtunimet(this.henkilotunnuksetonHenkilo.getFirstNames());
                 huoltajaCreateDto.setKutsumanimi(this.henkilotunnuksetonHenkilo.getFirstNames());

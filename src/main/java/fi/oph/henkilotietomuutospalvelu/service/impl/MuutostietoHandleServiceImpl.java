@@ -130,7 +130,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
                                             .comparing(Tietoryhma::getMuutostapa, new CustomOrderComparator<>(Muutostapa.POISTETTU))
                                             // käsitellään voimassaolevat viimeiseksi koska samassa tiedostossa voi olla
                                             // sekä muokkauksia (esim. passivointi) että lisäyksiä samoihin yhteystietoihin
-                                            .thenComparing(Tietoryhma::isVoimassa))
+                                            .thenComparing(tietoryhma -> tietoryhma.isVoimassa(tietoryhmaContext)))
                                     .forEach(tietoryhma -> tietoryhma.updateHenkilo(tietoryhmaContext, updateHenkilo));
                             if (Boolean.TRUE.equals(updateHenkilo.getTurvakielto()) && !Boolean.TRUE.equals(turvakielto)) {
                                 // turvakielto meni päälle tässä tiedostossa -> poistetaan muutostietopalvelun alaiset yhteystiedot
@@ -174,7 +174,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
         return henkilotunnuskorjausRepository.findQueryHetuByHenkilotunnuskorjausHetu(kaikkiHetut)
                 .entrySet()
                 .stream()
-                .filter(entry -> entry.getValue().stream().allMatch(kaikkiHetut::contains))
+                .filter(entry -> kaikkiHetut.containsAll(entry.getValue()))
                 .map(Map.Entry::getKey)
                 .collect(collectingAndThen(toSet(), Collections::unmodifiableSet));
     }

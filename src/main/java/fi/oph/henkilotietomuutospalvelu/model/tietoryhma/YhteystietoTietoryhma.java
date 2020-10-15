@@ -27,10 +27,10 @@ public abstract class YhteystietoTietoryhma extends Tietoryhma {
     }
 
     @Override
-    public boolean isVoimassa() {
+    public boolean isVoimassa(Context context) {
         LocalDate startDate = getStartDate();
         LocalDate endDate = getEndDate();
-        LocalDate now = LocalDate.now();
+        LocalDate now = context.getLocalDateNow();
         boolean startOk = startDate == null || now.isAfter(startDate) || now.isEqual(startDate);
         boolean endOk = endDate == null || now.isBefore(endDate) || now.isEqual(endDate);
         return startOk && endOk;
@@ -47,7 +47,7 @@ public abstract class YhteystietoTietoryhma extends Tietoryhma {
         KoodistoYhteystietoTyyppi tyyppi = getTyyppi();
 
         removeYhteystietoryhma(henkilo.getYhteystiedotRyhma(), alkupera, tyyppi);
-        if (!Muutostapa.POISTETTU.equals(getMuutostapa()) && isVoimassa()) {
+        if (!Muutostapa.POISTETTU.equals(getMuutostapa()) && isVoimassa(context)) {
             YhteystiedotRyhmaDto yhteystietoryhma = new YhteystiedotRyhmaDto();
             yhteystietoryhma.setReadOnly(true);
             yhteystietoryhma.setRyhmaAlkuperaTieto(alkupera.getKoodi());
