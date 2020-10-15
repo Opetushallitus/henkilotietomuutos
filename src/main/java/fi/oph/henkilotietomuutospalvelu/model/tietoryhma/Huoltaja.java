@@ -119,6 +119,12 @@ public class Huoltaja extends Tietoryhma {
     }
 
     @Override
+    public boolean isVoimassa(Context context) {
+        return (this.startDate == null || context.getLocalDateNow().isAfter(this.startDate))
+                && (this.endDate == null || context.getLocalDateNow().isBefore(this.endDate));
+    }
+
+    @Override
     protected void updateHenkiloInternal(Context context, HenkiloForceUpdateDto henkilo) {
         if (HenkiloUpdateUtil.localdateIsBetween(this.startDate, this.endDate, context.getLocalDateNow())
                 && !Muutostapa.POISTETTU.equals(getMuutostapa())) {
@@ -129,8 +135,9 @@ public class Huoltaja extends Tietoryhma {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .orElseGet(HuoltajaCreateDto::new);
-
             huoltajaCreateDto.setHetu(this.hetu);
+            huoltajaCreateDto.setHuoltajuusAlku(this.getStartDate());
+            huoltajaCreateDto.setHuoltajuusLoppu(this.getEndDate());
             if (StringUtils.isEmpty(this.hetu)) {
                 huoltajaCreateDto.setEtunimet(this.henkilotunnuksetonHenkilo.getFirstNames());
                 huoltajaCreateDto.setKutsumanimi(this.henkilotunnuksetonHenkilo.getFirstNames());
