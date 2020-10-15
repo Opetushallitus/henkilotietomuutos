@@ -527,10 +527,12 @@ public class MuutostietoHandleServiceImplTest {
 
     @Test
     public void handleUusiHuoltajaTieto() {
+        LocalDate alku = LocalDate.now().minus(1L, ChronoUnit.YEARS);
+        LocalDate loppu = LocalDate.now().plus(17L, ChronoUnit.YEARS);
         Tietoryhma huoltajatieto = Huoltaja.builder()
                 .hetu("huoltajanhetu")
-                .startDate(LocalDate.now().minus(1L, ChronoUnit.YEARS))
-                .endDate(LocalDate.now().plus(17L, ChronoUnit.YEARS))
+                .startDate(alku)
+                .endDate(loppu)
                 .muutostapa(Muutostapa.LISATTY)
                 .build();
         HenkiloMuutostietoRivi muutosRivi = new HenkiloMuutostietoRivi();
@@ -551,6 +553,9 @@ public class MuutostietoHandleServiceImplTest {
         verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
         assertThat(updateDto.getHuoltajat().size()).isEqualTo(1);
+        HuoltajaCreateDto huoltaja = updateDto.getHuoltajat().stream().findFirst().orElse(new HuoltajaCreateDto());
+        assertThat(huoltaja.getHuoltajuusAlku()).isEqualTo(alku);
+        assertThat(huoltaja.getHuoltajuusLoppu()).isEqualTo(loppu);
     }
 
     @Test
@@ -584,10 +589,12 @@ public class MuutostietoHandleServiceImplTest {
 
     @Test
     public void handleMuuttunutHuoltajaTieto() {
+        LocalDate alku = LocalDate.now().minus(1L, ChronoUnit.DAYS);
+        LocalDate loppu = LocalDate.now().plus(8L, ChronoUnit.YEARS);
         Tietoryhma uusiHuoltajatieto = Huoltaja.builder()
                 .hetu("huoltajanhetu")
-                .startDate(LocalDate.now().minus(1L, ChronoUnit.DAYS))
-                .endDate(LocalDate.now().plus(8L, ChronoUnit.YEARS))
+                .startDate(alku)
+                .endDate(loppu)
                 .muutostapa(Muutostapa.LISATTY)
                 .build();
         Tietoryhma vanhaHuoltajatieto = Huoltaja.builder()
@@ -616,6 +623,9 @@ public class MuutostietoHandleServiceImplTest {
         verify(onrServiceClient).updateHenkilo(henkiloForceUpdateDtoArgumentCaptor.capture(), eq(true));
         HenkiloForceUpdateDto updateDto = henkiloForceUpdateDtoArgumentCaptor.getValue();
         assertThat(updateDto.getHuoltajat().size()).isEqualTo(1);
+        HuoltajaCreateDto huoltaja = updateDto.getHuoltajat().stream().findFirst().orElse(new HuoltajaCreateDto());
+        assertThat(huoltaja.getHuoltajuusAlku()).isEqualTo(alku);
+        assertThat(huoltaja.getHuoltajuusLoppu()).isEqualTo(loppu);
     }
 
 }

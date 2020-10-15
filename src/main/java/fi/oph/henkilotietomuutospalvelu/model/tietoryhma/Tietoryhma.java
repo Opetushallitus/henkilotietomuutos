@@ -47,7 +47,7 @@ public abstract class Tietoryhma extends IdentifiableAndVersionedEntity {
         this.muutostapa = muutostapa;
     }
 
-    public boolean isVoimassa() {
+    public boolean isVoimassa(Context context) {
         return true;
     }
 
