@@ -1,4 +1,4 @@
-package fi.oph.henkilotietomuutospalvelu.service;
+package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.service.exception.TietoryhmaParseException;
 import fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil;
@@ -34,6 +34,19 @@ public class VRKParseUtilTest {
 
         LocalDate otherDate = VRKParseUtil.deserializeDate(otherDateString);
         Assert.assertEquals(LocalDate.of(1981, 1, 1), otherDate);
+    }
+
+    @Test
+    public void serializeNullLocalDate() {
+        Assert.assertEquals(VRKParseUtil.UNDEFINED_DATE, VRKParseUtil.serializeDate(null));
+    }
+
+    @Test
+    public void serializeValidLocalDate() {
+        String dateString = "20120524";
+        LocalDate date = VRKParseUtil.deserializeDate(dateString);
+        String serialized = VRKParseUtil.serializeDate(date);
+        Assert.assertEquals(dateString, serialized);
     }
 
     @Test
