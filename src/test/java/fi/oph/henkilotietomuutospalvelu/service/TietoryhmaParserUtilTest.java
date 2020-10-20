@@ -217,28 +217,6 @@ public class TietoryhmaParserUtilTest {
     }
 
     @Test
-    public void parseHenkilotunnuskorjaus() {
-        String uusiTunnus = "0011060622-451X1";
-        String vanhaTunnus = "0013030622-123D2";
-
-        Tietoryhma uusiRyhma = TietoryhmaParserUtil.deserializeTietoryhma(uusiTunnus);
-        Assert.assertTrue(uusiRyhma instanceof Henkilotunnuskorjaus);
-
-        Henkilotunnuskorjaus korjaus = (Henkilotunnuskorjaus) uusiRyhma;
-        Assert.assertEquals(Muutostapa.LISATTY, korjaus.getMuutostapa());
-        Assert.assertEquals("060622-451X", korjaus.getHetu());
-        Assert.assertEquals(true, korjaus.getActive());
-
-        Tietoryhma vanhaRyhma = TietoryhmaParserUtil.deserializeTietoryhma(vanhaTunnus);
-        Assert.assertTrue(vanhaRyhma instanceof Henkilotunnuskorjaus);
-
-        korjaus = (Henkilotunnuskorjaus) vanhaRyhma;
-        Assert.assertEquals(Muutostapa.MUUTETTU, korjaus.getMuutostapa());
-        Assert.assertEquals("030622-123D", korjaus.getHetu());
-        Assert.assertEquals(false, korjaus.getActive());
-    }
-
-    @Test
     public void parseSukupuoli() {
         String maleString = "00331";
         String femaleString = "00312";

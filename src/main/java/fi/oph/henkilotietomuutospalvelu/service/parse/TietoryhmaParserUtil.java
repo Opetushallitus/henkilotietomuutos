@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkilotunnuskorjausParser.parseHenkilotunnuskorjaus;
+
 @Slf4j
 public class TietoryhmaParserUtil {
 
@@ -140,14 +142,6 @@ public class TietoryhmaParserUtil {
     @NotNull
     public static String parseRyhmatunnus(String tietoryhma) {
         return parseString(tietoryhma, 0, 3);
-    }
-
-    private static Henkilotunnuskorjaus parseHenkilotunnuskorjaus(String value) {
-        return Henkilotunnuskorjaus.builder()
-                .ryhmatunnus(Ryhmatunnus.HENKILOTUNNUS_KORJAUS)
-                .muutostapa(parseMuutosTapa(value))
-                .hetu(parseString(value, 4, 11))
-                .active(parseCharacter(value, 15).equals("1")).build();
     }
 
     private static Sukupuoli parseSukupuoli(String value) {
@@ -578,16 +572,16 @@ public class TietoryhmaParserUtil {
         return value.substring(4).trim();
     }
 
-    private static Muutostapa parseMuutosTapa(String value) {
+    static Muutostapa parseMuutosTapa(String value) {
         Long number = Long.valueOf(value.substring(3, 4));
         return Muutostapa.get(number);
     }
 
-    private static String parseCharacter(String str, int startIndex) {
+    static String parseCharacter(String str, int startIndex) {
         return str.substring(startIndex, startIndex+1);
     }
 
-    private static String parseString(String str, int startIndex, int length) {
+    static String parseString(String str, int startIndex, int length) {
         try {
             int endIndex = startIndex + length;
             int strLength = str.length();
