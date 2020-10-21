@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static fi.oph.henkilotietomuutospalvelu.service.parse.AidinkieliParser.parseAidinkieli;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkilotunnuskorjausParser.parseHenkilotunnuskorjaus;
 
 @Slf4j
@@ -546,26 +547,7 @@ public class TietoryhmaParserUtil {
                 .build();
     }
 
-    private static Aidinkieli parseAidinkieli(String value, String... tarkentavatTietoryhmat) {
-        String languageCode = parseString(value, 4,2);
-
-        Aidinkieli aidinkieli = Aidinkieli.builder()
-                .ryhmatunnus(Ryhmatunnus.AIDINKIELI)
-                .muutostapa(parseMuutosTapa(value))
-                .languageCode(languageCode).build();
-
-        if (languageCode.equals("98")) {
-            if (tarkentavatTietoryhmat.length > 0) {
-                aidinkieli.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
-            } else {
-                log.warn("Missing additional language information.");
-            }
-        }
-
-        return aidinkieli;
-    }
-
-    private static String parseAdditionalInformation(String value) {
+    static String parseAdditionalInformation(String value) {
         if (value == null) {
             throw new TietoryhmaParseException("Additional information was null!");
         }
