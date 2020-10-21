@@ -40,6 +40,10 @@ public class VRKParseUtil {
         return localDate.format(DATE_FORMAT);
     }
 
+    public static String serializeString(String string, int length) {
+        return String.format("%1$-" + length + "s", string);
+    }
+
     public static LocalDate parseDateFromHetu(String hetu) throws TietoryhmaParseException {
         int day = Integer.parseInt(hetu.substring(0, 2));
         int month = Integer.parseInt(hetu.substring(2, 4));
