@@ -2,7 +2,6 @@ package fi.oph.henkilotietomuutospalvelu.service;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
-import fi.oph.henkilotietomuutospalvelu.dto.type.NameType;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Toimintakelpoisuus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil;
@@ -126,81 +125,6 @@ public class TietoryhmaParserUtilTest {
                 .containsExactlyInAnyOrder(
                         tuple(Muutostapa.LISATTY, "P501", LocalDate.of(2018, 3, 12), LocalDate.of(2018, 4, 14)),
                         tuple(Muutostapa.POISTETTU, "T301", LocalDate.of(2019, 1, 1), LocalDate.of(2032, 12, 31)));
-    }
-
-    @Test
-    public void parseHenkiloName() {
-        String firstTietoryhmaString = "0045Miehenä Tes                                                                                         Ukko Antto                                                                                          00000000 ";
-        String secondTietoryhmaString = "0046Miehenä Tes                                                                                         Ukko Anton                                                                                          00000000 ";
-
-        Tietoryhma firstTietoryhma = TietoryhmaParserUtil.deserializeTietoryhma(firstTietoryhmaString);
-        Tietoryhma secondTietoryhma = TietoryhmaParserUtil.deserializeTietoryhma(secondTietoryhmaString);
-
-        Assert.assertTrue(firstTietoryhma instanceof HenkiloName);
-        Assert.assertTrue(secondTietoryhma instanceof  HenkiloName);
-
-        HenkiloName oldName = (HenkiloName) firstTietoryhma;
-        HenkiloName newName = (HenkiloName) secondTietoryhma;
-
-        Assert.assertEquals(Muutostapa.KORJATTAVAA, oldName.getMuutostapa());
-        Assert.assertNull(newName.getLastUpdateDate());
-
-        Assert.assertEquals(Muutostapa.KORJATTU, newName.getMuutostapa());
-        Assert.assertNull(newName.getLastUpdateDate());
-
-        Assert.assertEquals("Ukko Anton", newName.getFirstNames());
-        Assert.assertEquals("Ukko Antto", oldName.getFirstNames());
-        Assert.assertEquals("Miehenä Tes", newName.getLastName());
-        Assert.assertEquals("Miehenä Tes", oldName.getLastName());
-    }
-
-    @Test
-    public void parseHenkiloNameChange() {
-        String firstTietoryhmaString = "0051Olli Santeri                                                                                        022017010100000000 ";
-        String secondTietoryhmaString = "0053Outi Susanna                                                                                        060000000020170101 ";
-
-        Tietoryhma firstTietoryhma = TietoryhmaParserUtil.deserializeTietoryhma(firstTietoryhmaString);
-        Tietoryhma secondTietoryhma = TietoryhmaParserUtil.deserializeTietoryhma(secondTietoryhmaString);
-
-        Assert.assertTrue(firstTietoryhma instanceof HenkiloNameChange);
-        Assert.assertTrue(secondTietoryhma instanceof  HenkiloNameChange);
-
-        HenkiloNameChange newName = (HenkiloNameChange) firstTietoryhma;
-        HenkiloNameChange oldName = (HenkiloNameChange) secondTietoryhma;
-
-        Assert.assertEquals(Muutostapa.LISATTY, newName.getMuutostapa());
-        Assert.assertEquals(LocalDate.of(2017, 1, 1), newName.getStartDate());
-        Assert.assertNull(newName.getEndDate());
-
-        Assert.assertEquals(Muutostapa.MUUTETTU, oldName.getMuutostapa());
-        Assert.assertNull(oldName.getStartDate());
-        Assert.assertEquals(LocalDate.of(2017, 1, 1), oldName.getEndDate());
-
-        Assert.assertEquals("Olli Santeri", newName.getName());
-        Assert.assertEquals("Outi Susanna", oldName.getName());
-        Assert.assertEquals(NameType.ETUNIMI, newName.getNameType());
-        Assert.assertEquals(NameType.ETUNIMI, oldName.getNameType());
-    }
-
-    @Test
-    public void parseSukupuoli() {
-        String maleString = "00331";
-        String femaleString = "00312";
-
-        Tietoryhma maleRyhma = TietoryhmaParserUtil.deserializeTietoryhma(maleString);
-        Tietoryhma femaleRyhma = TietoryhmaParserUtil.deserializeTietoryhma(femaleString);
-
-        Assert.assertTrue(maleRyhma instanceof Sukupuoli);
-        Assert.assertTrue(femaleRyhma instanceof Sukupuoli);
-
-        Sukupuoli male = (Sukupuoli) maleRyhma;
-        Sukupuoli female = (Sukupuoli) femaleRyhma;
-
-        Assert.assertEquals(Muutostapa.MUUTETTU, male.getMuutostapa());
-        Assert.assertEquals(Gender.MALE, male.getGender());
-
-        Assert.assertEquals(Muutostapa.LISATTY, female.getMuutostapa());
-        Assert.assertEquals(Gender.FEMALE, female.getGender());
     }
 
     @Test

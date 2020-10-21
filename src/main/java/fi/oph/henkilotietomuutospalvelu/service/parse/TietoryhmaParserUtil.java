@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.AidinkieliParser.parseAidinkieli;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkilotunnuskorjausParser.parseHenkilotunnuskorjaus;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.SukupuoliParser.parseSukupuoli;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameParser.parseHenkiloName;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameChangeParser.parseHenkiloNameChange;
 
 @Slf4j
 public class TietoryhmaParserUtil {
@@ -145,25 +148,6 @@ public class TietoryhmaParserUtil {
         return parseString(tietoryhma, 0, 3);
     }
 
-    private static Sukupuoli parseSukupuoli(String value) {
-        return Sukupuoli.builder()
-                .ryhmatunnus(Ryhmatunnus.SUKUPUOLI)
-                .muutostapa(parseMuutosTapa(value))
-                .gender(Gender.getEnum(parseCharacter(value, 4)))
-                .build();
-    }
-
-    private static HenkiloName parseHenkiloName(String value) {
-        return HenkiloName.builder()
-                .ryhmatunnus(Ryhmatunnus.HENKILO_NIMI)
-                .muutostapa(parseMuutosTapa(value))
-                .lastName(parseString(value, 4, 100))
-                .firstNames(parseString(value, 104, 100))
-                .lastUpdateDate(parseDate(value, 204))
-                .additionalInformation(parseCharacter(value, 212))
-                .build();
-    }
-
     private static Kutsumanimi parseKutsumanimi(String value) {
         return Kutsumanimi.builder()
                 .ryhmatunnus(Ryhmatunnus.KUTSUMANIMI)
@@ -173,50 +157,6 @@ public class TietoryhmaParserUtil {
                 .startDate(parseDate(value, 106))
                 .endDate(parseDate(value, 114))
                 .nonStandardCharacters(parseCharacter(value, 122).equals("1"))
-                .build();
-    }
-
-    private static HenkiloNameChange parseHenkiloNameChange(String value) {
-        /*
-         * Kuvaus: Henkilön nimen laji.
-         * 01 = nykyinen sukunimi
-         * 02 = nykyiset etunimet
-         * 03 = nykyinen välinimi
-         * 04 = kutsumanimi
-         * 05 = entinen sukunimi
-         * 06 = entiset etunimet
-         * 07 = viimeksi naimattomana ollessa ollut sukunimi
-         * 08 = entinen välinimi (ei oteta toistaiseksi käyttöön)
-         * 09 = entinen kutsumanimi (ei oteta toistaiseksi käyttöön)
-         * 10 = korjattu sukunimi
-         * 11 = korjatut etunimet
-         * 12 = korjattu välinimi
-         * 13 = korjattu kutsumanimi (ei oteta toistaiseksi käyttöön)
-         * 14 = patronyymi(ei oteta toistaiseksi käyttöön)
-         * 15 = juridisen henkilön nimi
-         */
-
-        String laji = parseString(value, 104, 2);
-
-        NameType type = NameType.TUNTEMATON;
-        if (Arrays.asList("01", "05", "07", "10").contains(laji)) {
-            type = NameType.SUKUNIMI;
-        } else if (Arrays.asList("02", "06", "11").contains(laji)) {
-            type = NameType.ETUNIMI;
-        } else if (Arrays.asList("03", "08", "12").contains(laji)) {
-            type = NameType.VALINIMI;
-        } else if (Arrays.asList("04", "09", "13").contains(laji)) {
-            type = NameType.KUTSUMANIMI;
-        }
-
-        return HenkiloNameChange.builder()
-                .ryhmatunnus(Ryhmatunnus.HENKILO_NIMENMUUTOS)
-                .muutostapa(parseMuutosTapa(value))
-                .name(parseString(value,4, 100))
-                .nameType(type)
-                .startDate(parseDate(value, 106))
-                .endDate(parseDate(value, 114))
-                .hasNonStandardCharacters(parseCharacter(value, 122).equals("1"))
                 .build();
     }
 
@@ -577,7 +517,7 @@ public class TietoryhmaParserUtil {
         }
     }
 
-    private static LocalDate parseDate(String str, int startIndex) {
+    static LocalDate parseDate(String str, int startIndex) {
         return VRKParseUtil.deserializeDate(parseString(str, startIndex, 8));
     }
 
