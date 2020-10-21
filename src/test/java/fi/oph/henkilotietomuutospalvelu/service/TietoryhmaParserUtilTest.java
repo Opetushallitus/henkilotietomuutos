@@ -17,40 +17,6 @@ import static org.assertj.core.api.Assertions.tuple;
 public class TietoryhmaParserUtilTest {
 
     @Test
-    public void parseAidinkieliWhenLanguageCodeIsValid() {
-        String tietoryhmaStr = "0021fi";
-        Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmaStr);
-        Assert.assertTrue(ryhma instanceof Aidinkieli);
-
-        Aidinkieli aidinkieli = (Aidinkieli) ryhma;
-        Assert.assertEquals("fi", aidinkieli.getLanguageCode());
-    }
-
-    @Test
-    public void parseAidinkieliWhenLanguageCodeContainsAdditionalInformation() {
-        String tietoryhmaStr = "002198";
-        String lisatiedot = "4520suomalainen viittomakieli     ";
-
-        Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmaStr, lisatiedot);
-        Assert.assertTrue(ryhma instanceof Aidinkieli);
-
-        Aidinkieli aidinkieli = (Aidinkieli) ryhma;
-        Assert.assertEquals("98", aidinkieli.getLanguageCode());
-        Assert.assertEquals("suomalainen viittomakieli", aidinkieli.getAdditionalInformation());
-    }
-
-    @Test
-    public void parseAidinkieliSkipsMissingAdditionalInformation() {
-        String tietoryhmaStr = "002198";
-
-        Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmaStr);
-        Assert.assertTrue(ryhma instanceof Aidinkieli);
-
-        Aidinkieli aidinkieli = (Aidinkieli) ryhma;
-        Assert.assertEquals("98", aidinkieli.getLanguageCode());
-    }
-
-    @Test
     public void parseAmmatti() {
         String tietoryhma = "4013    luottoneuvottelija                 ";
 
