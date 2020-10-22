@@ -1,6 +1,9 @@
 package fi.oph.henkilotietomuutospalvelu.service.parse;
 
-import fi.oph.henkilotietomuutospalvelu.dto.type.*;
+import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
+import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
+import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.dto.type.Toimintakelpoisuus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.service.exception.TietoryhmaParseException;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +15,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.AidinkieliParser.parseAidinkieli;
-import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkilotunnuskorjausParser.parseHenkilotunnuskorjaus;
-import static fi.oph.henkilotietomuutospalvelu.service.parse.SukupuoliParser.parseSukupuoli;
-import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameParser.parseHenkiloName;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameChangeParser.parseHenkiloNameChange;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameParser.parseHenkiloName;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkilotunnuskorjausParser.parseHenkilotunnuskorjaus;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.KansalaisuusParser.parseKansalaisuus;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.SukupuoliParser.parseSukupuoli;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.SyntymaKotikuntaParser.parseSyntymaKotikunta;
 
 @Slf4j
 public class TietoryhmaParserUtil {
@@ -157,30 +162,6 @@ public class TietoryhmaParserUtil {
                 .startDate(parseDate(value, 106))
                 .endDate(parseDate(value, 114))
                 .nonStandardCharacters(parseCharacter(value, 122).equals("1"))
-                .build();
-    }
-
-    private static Kansalaisuus parseKansalaisuus(String value, String... tarkentavatTietoryhmat) {
-        String code = parseString(value, 4, 3);
-        if (code.equals("998")) {
-            code = parseAdditionalInformation(tarkentavatTietoryhmat[0]);
-        }
-
-        return Kansalaisuus.builder()
-                .ryhmatunnus(Ryhmatunnus.KANSALAISUUS)
-                .muutostapa(parseMuutosTapa(value))
-                .code(code)
-                .valid(parseCharacter(value, 7).equals("1"))
-                .startDate(parseDate(value, 8))
-                .endDate(parseDate(value,16))
-                .build();
-    }
-
-    private static SyntymaKotikunta parseSyntymaKotikunta(String value) {
-        return SyntymaKotikunta.builder()
-                .ryhmatunnus(Ryhmatunnus.SYNTYMAKOTIKUNTA)
-                .muutostapa(parseMuutosTapa(value))
-                .kuntakoodi(parseString(value, 4, 3))
                 .build();
     }
 
