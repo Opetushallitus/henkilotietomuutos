@@ -189,14 +189,4 @@ public class TietoryhmaParserUtilTest {
         Assert.assertNull(ryhma);
     }
 
-    @Test
-    public void parseShortenedTietoryhma() {
-        String tietoryhma = "0091050Dhaka";
-        Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhma);
-        Assert.assertTrue(ryhma instanceof UlkomainenSyntymapaikka);
-
-        UlkomainenSyntymapaikka syntymapaikka = (UlkomainenSyntymapaikka) ryhma;
-        Assert.assertEquals("050", syntymapaikka.getCountryCode());
-        Assert.assertEquals("Dhaka", syntymapaikka.getLocation());
-    }
 }
