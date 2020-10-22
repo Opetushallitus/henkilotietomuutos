@@ -19,6 +19,7 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameChangePa
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameParser.parseHenkiloName;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkilotunnuskorjausParser.parseHenkilotunnuskorjaus;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.KansalaisuusParser.parseKansalaisuus;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.KuolinpaivaParser.parseKuolinpaiva;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.SukupuoliParser.parseSukupuoli;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.SyntymaKotikuntaParser.parseSyntymaKotikunta;
 
@@ -389,7 +390,7 @@ public class TietoryhmaParserUtil {
                 .endDate(endDate)
                 .build();
     }
-
+    
     private static UlkomainenOsoite parseUlkomainenOsoite(String value, String... tarkentavatTietoryhmat) {
         String countryCode = parseString(value, 164, 3);
 
@@ -428,14 +429,6 @@ public class TietoryhmaParserUtil {
         }
 
         return osoite;
-    }
-
-    private static Kuolinpaiva parseKuolinpaiva(String value) {
-        return Kuolinpaiva.builder()
-                .ryhmatunnus(Ryhmatunnus.KUOLINPAIVA)
-                .muutostapa(parseMuutosTapa(value))
-                .dateOfDeath(parseDate(value, 4))
-                .build();
     }
 
     private static HenkilotunnuksetonHenkilo parseHenkilotunnuksetonHenkilo(String... tietoryhmat) {

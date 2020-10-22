@@ -1,10 +1,16 @@
-package fi.oph.henkilotietomuutospalvelu.service;
+package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Toimintakelpoisuus;
-import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
-import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Ammatti;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Edunvalvoja;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Edunvalvonta;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.HenkilotunnuksetonHenkilo;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Huoltaja;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Oikeus;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.SahkopostiOsoite;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import org.junit.Assert;
 import org.junit.Test;
 
