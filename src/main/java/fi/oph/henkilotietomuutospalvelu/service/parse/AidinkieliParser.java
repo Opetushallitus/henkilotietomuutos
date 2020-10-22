@@ -1,6 +1,5 @@
 package fi.oph.henkilotietomuutospalvelu.service.parse;
 
-import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Aidinkieli;
 import lombok.extern.slf4j.Slf4j;
@@ -8,11 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseAdditionalInformation;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseString;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.serializeAdditionalInformation;
 
 @Slf4j
 public class AidinkieliParser {
-
-    private static final String ADDITIONAL_INFORMATION_FORMAT = "%1$-30s";
 
     static Aidinkieli parseAidinkieli(String value, String... tarkentavatTietoryhmat) {
         String languageCode = parseString(value, 4,2);
@@ -42,12 +40,6 @@ public class AidinkieliParser {
                     "|", serialized, serializeAdditionalInformation(aidinkieli.getAdditionalInformation()));
         }
         return serialized;
-    }
-
-    private static String serializeAdditionalInformation(String additionalInformation) {
-        return Ryhmatunnus.LISATIETO.getCode()
-                + Muutostapa.LISATIETO.getNumber()
-                + String.format(ADDITIONAL_INFORMATION_FORMAT, additionalInformation);
     }
 
 }

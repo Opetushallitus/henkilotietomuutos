@@ -20,7 +20,7 @@ public class UlkomainenSyntymapaikkaParserTest {
     @Test
     public void parsesUlkomainenSyntymapaikkaWithAdditionalInformation() {
         String tietoryhma = "0091998Pristina";
-        String lisatieto = "4521Kosovo                        ";
+        String lisatieto = "4520Kosovo                        ";
         UlkomainenSyntymapaikka syntymapaikka = parseUlkomainenSyntymapaikka(tietoryhma, lisatieto);
         assertEquals("998", syntymapaikka.getCountryCode());
         assertEquals("Pristina", syntymapaikka.getLocation());
@@ -37,7 +37,7 @@ public class UlkomainenSyntymapaikkaParserTest {
     @Test
     public void serializesUlkomainenSyntymapaikkaWithAdditionalInformation() {
         String tietoryhma = "0091998Pristina                                          ";
-        String lisatieto = "4521Kosovo                        ";
+        String lisatieto = "4520Kosovo                        ";
         UlkomainenSyntymapaikka syntymapaikka = parseUlkomainenSyntymapaikka(tietoryhma, lisatieto);
         String expected = String.join("|", tietoryhma, lisatieto);
         assertEquals(expected, serializeUlkomainenSyntymapaikka(syntymapaikka));

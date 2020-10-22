@@ -41,7 +41,7 @@ public class VRKParseUtil {
     }
 
     public static String serializeString(String string, int length) {
-        return String.format("%1$-" + length + "s", string);
+        return String.format("%1$-" + length + "s", (string != null ? string : ""));
     }
 
     public static LocalDate parseDateFromHetu(String hetu) throws TietoryhmaParseException {

@@ -6,6 +6,7 @@ import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.UlkomainenSyntymapaikka
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseAdditionalInformation;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseString;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.serializeAdditionalInformation;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
 public class UlkomainenSyntymapaikkaParser {
@@ -33,15 +34,9 @@ public class UlkomainenSyntymapaikkaParser {
                 + syntymapaikka.getCountryCode()
                 + serializeString(syntymapaikka.getLocation(), 50);
         if (syntymapaikka.getAdditionalInformation() != null) {
-            serialized = String.join("|", serialized, serializeAdditionalInformation(syntymapaikka));
+            serialized = String.join("|", serialized, serializeAdditionalInformation(syntymapaikka.getAdditionalInformation()));
         }
         return serialized;
-    }
-
-    private static String serializeAdditionalInformation(UlkomainenSyntymapaikka syntymapaikka) {
-        return Ryhmatunnus.LISATIETO.getCode()
-                + syntymapaikka.getMuutostapa().getNumber()
-                + serializeString(syntymapaikka.getAdditionalInformation(), 30);
     }
 
 }

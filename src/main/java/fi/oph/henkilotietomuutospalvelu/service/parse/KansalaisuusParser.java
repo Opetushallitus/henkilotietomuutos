@@ -8,6 +8,7 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseString;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.serializeAdditionalInformation;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
@@ -37,15 +38,9 @@ public class KansalaisuusParser {
                 + serializeDate(kansalaisuus.getStartDate())
                 + serializeDate(kansalaisuus.getEndDate());
         if (kansalaisuus.getCode().length() > 3) {
-            serialized = String.join("|", serialized, serializeAdditionalInformation(kansalaisuus));
+            serialized = String.join("|", serialized, serializeAdditionalInformation(kansalaisuus.getCode()));
         }
         return serialized;
-    }
-
-    private static String serializeAdditionalInformation(Kansalaisuus kansalaisuus) {
-        return Ryhmatunnus.LISATIETO.getCode()
-                + kansalaisuus.getMuutostapa().getNumber()
-                + serializeString(kansalaisuus.getCode(), 30);
     }
 
 }

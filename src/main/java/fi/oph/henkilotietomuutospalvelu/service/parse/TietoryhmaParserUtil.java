@@ -19,9 +19,12 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameChangePa
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameParser.parseHenkiloName;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkilotunnuskorjausParser.parseHenkilotunnuskorjaus;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.KansalaisuusParser.parseKansalaisuus;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.KotimainenOsoiteParser.parseKotimainenOsoite;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.KuolinpaivaParser.parseKuolinpaiva;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.PostiosoiteParser.parsePostiosoite;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.SukupuoliParser.parseSukupuoli;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.SyntymaKotikuntaParser.parseSyntymaKotikunta;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
 @Slf4j
 public class TietoryhmaParserUtil {
@@ -62,7 +65,7 @@ public class TietoryhmaParserUtil {
                 case ("101"):
                     return parseKotimainenOsoite(tietoryhma);
                 case ("102"):
-                    return parseTilapainenKotimainenOsoite(tietoryhma);
+                    return TilapainenKotimainenOsoite.from(parseKotimainenOsoite(tietoryhma));
                 case ("103"):
                     return parsePostiosoite(tietoryhma);
                 case ("104"):
@@ -163,50 +166,6 @@ public class TietoryhmaParserUtil {
                 .startDate(parseDate(value, 106))
                 .endDate(parseDate(value, 114))
                 .nonStandardCharacters(parseCharacter(value, 122).equals("1"))
-                .build();
-    }
-
-    private static KotimainenOsoite parseKotimainenOsoite(String value) {
-        return KotimainenOsoite.builder()
-                .ryhmatunnus(Ryhmatunnus.KOTIMAINEN_OSOITE)
-                .muutostapa(parseMuutosTapa(value))
-                .lahiosoite(parseString(value, 4, 100))
-                .lahiosoiteSV(parseString(value,104, 100))
-                .katunumero(parseString(value, 204, 7))
-                .porraskirjain(parseCharacter(value,211))
-                .huonenumero(parseString(value, 212, 3))
-                .jakokirjain(parseCharacter(value, 215))
-                .postinumero(parseString(value, 216, 5))
-                .startDate(parseDate(value,221))
-                .endDate(parseDate(value, 229))
-                .build();
-    }
-
-    private static TilapainenKotimainenOsoite parseTilapainenKotimainenOsoite(String value) {
-        return TilapainenKotimainenOsoite.builder()
-                .ryhmatunnus(Ryhmatunnus.KOTIMAINEN_OSOITE_TILAPAINEN)
-                .muutostapa(parseMuutosTapa(value))
-                .lahiosoite(parseString(value, 4, 100))
-                .lahiosoiteSV(parseString(value,104, 100))
-                .katunumero(parseString(value, 204, 7))
-                .porraskirjain(parseCharacter(value,211))
-                .huonenumero(parseString(value, 212, 3))
-                .jakokirjain(parseCharacter(value, 215))
-                .postinumero(parseString(value, 216, 5))
-                .startDate(parseDate(value,221))
-                .endDate(parseDate(value, 229))
-                .build();
-    }
-
-    private static Postiosoite parsePostiosoite(String value) {
-        return Postiosoite.builder()
-                .ryhmatunnus(Ryhmatunnus.POSTIOSOITE)
-                .muutostapa(parseMuutosTapa(value))
-                .postiosoite(parseString(value, 4, 50))
-                .postiosoiteSv(parseString(value, 54, 50))
-                .postinumero(parseString(value, 104, 5))
-                .startDate(parseDate(value, 109))
-                .endDate(parseDate(value, 117))
                 .build();
     }
 
@@ -353,7 +312,7 @@ public class TietoryhmaParserUtil {
                 .validVTJ(parseCharacter(value, 73).equals("1"))
                 .build();
     }
-
+    
     private static UlkomainenSyntymapaikka parseUlkomainenSyntymapaikka(String value, String... tarkentavatTietoryhmat) {
         String countryCode = parseString(value, 4, 3);
 
@@ -466,6 +425,12 @@ public class TietoryhmaParserUtil {
             throw new TietoryhmaParseException("Additional information was null!");
         }
         return value.substring(4).trim();
+    }
+
+    static String serializeAdditionalInformation(String information) {
+        return Ryhmatunnus.LISATIETO.getCode()
+                + Muutostapa.LISATIETO.getNumber()
+                + serializeString(information, 30);
     }
 
     static Muutostapa parseMuutosTapa(String value) {

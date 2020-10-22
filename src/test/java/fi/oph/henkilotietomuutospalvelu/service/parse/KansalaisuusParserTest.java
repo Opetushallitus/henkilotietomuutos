@@ -34,7 +34,7 @@ public class KansalaisuusParserTest {
     @Test
     public void parsesAndSerializesKansalaisuusWithAdditionalInformation() {
         String value = "007199812020102100000000";
-        String additionalInformation = "4521Kosovo                        ";
+        String additionalInformation = "4520Kosovo                        ";
         Kansalaisuus kansalaisuus = KansalaisuusParser.parseKansalaisuus(value, additionalInformation);
         assertEquals("Kosovo", kansalaisuus.getCode());
         String expected = String.join("|", value, additionalInformation);
