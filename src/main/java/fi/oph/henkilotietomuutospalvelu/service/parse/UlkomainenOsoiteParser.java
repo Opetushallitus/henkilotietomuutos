@@ -6,6 +6,7 @@ import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.UlkomainenOsoite;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseAdditionalInformation;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseRyhmatunnus;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseString;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.serializeAdditionalInformation;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
@@ -17,7 +18,7 @@ public class UlkomainenOsoiteParser {
         String countryCode = parseString(value, 164, 3);
 
         UlkomainenOsoite osoite = UlkomainenOsoite.builder()
-                .ryhmatunnus(Ryhmatunnus.ULKOMAINEN_OSOITE)
+                .ryhmatunnus(Ryhmatunnus.getEnum(parseRyhmatunnus(value)))
                 .muutostapa(parseMuutosTapa(value))
                 .streetAddress(parseString(value, 4, 80))
                 .municipality(parseString(value, 84, 80))

@@ -10,20 +10,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.AidinkieliParser.parseAidinkieli;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameChangeParser.parseHenkiloNameChange;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameParser.parseHenkiloName;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkilotunnuskorjausParser.parseHenkilotunnuskorjaus;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.HuoltajaParser.parseHuoltaja;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.KansalaisuusParser.parseKansalaisuus;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.KotikuntaParser.parseKotikunta;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.KotimainenOsoiteParser.parseKotimainenOsoite;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.KuolinpaivaParser.parseKuolinpaiva;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.PostiosoiteParser.parsePostiosoite;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.SukupuoliParser.parseSukupuoli;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.SyntymaKotikuntaParser.parseSyntymaKotikunta;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
 @Slf4j
@@ -71,7 +71,7 @@ public class TietoryhmaParserUtil {
                 case ("104"):
                     return parseUlkomainenOsoite(tietoryhma, tarkentavatTietoryhmat);
                 case ("105"):
-                    return parseTilapainenUlkomainenOsoite(tietoryhma, tarkentavatTietoryhmat);
+                    return TilapainenUlkomainenOsoite.from(parseUlkomainenOsoite(tietoryhma, tarkentavatTietoryhmat));
                 case ("204"):
                     return parseKotikunta(tietoryhma);
                 case ("305"):
@@ -217,64 +217,6 @@ public class TietoryhmaParserUtil {
                 .build();
     }
 
-    private static Kotikunta parseKotikunta(String value) {
-        return Kotikunta.builder()
-                .ryhmatunnus(Ryhmatunnus.KOTIKUNTA)
-                .muutostapa(parseMuutosTapa(value))
-                .code(parseString(value, 4, 3))
-                .moveDate(parseDate(value, 7))
-                .build();
-    }
-
-    private static Huoltaja parseHuoltaja(String value, String... tarkentavatTietoryhmat) {
-        if (value.length() == 43) {
-            // formaatti ennen 2019-12-01
-            return Huoltaja.builder()
-                    .ryhmatunnus(Ryhmatunnus.HUOLTAJA)
-                    .muutostapa(parseMuutosTapa(value))
-                    .hetu(parseString(value,4, 11))
-                    //.laji(parseString(value, 15, 2)) tiedon sisältö muuttunut uudessa versiossa
-                    //.huollonjako(Huollonjako.getEnum(parseCharacter(value, 17))) tietoa ei enää uudessa formaatissa
-                    //.voimassa(parseCharacter(value, 18).equals("1")) tietoa ei enää uudessa formaatissa
-                    .startDate(parseDate(value, 19))
-                    .endDate(parseDate(value, 27))
-                    //.resolutionDate(parseDate(value, 35)) // tietoa ei enää uudessa formaatissa
-                    .henkilotunnuksetonHenkilo(parseHenkilotunnuksetonHenkilo(tarkentavatTietoryhmat))
-                    .build();
-        }
-        return Huoltaja.builder()
-                .ryhmatunnus(Ryhmatunnus.HUOLTAJA)
-                .muutostapa(parseMuutosTapa(value))
-                .hetu(parseString(value, 4, 11))
-                .laji(parseString(value, 15, 1))
-                .rooli(parseString(value, 16, 1))
-                .startDate(parseDate(value, 17))
-                .endDate(parseDate(value, 25))
-                .asuminen(parseString(value, 33, 1))
-                .asuminenAlkupvm(parseDate(value, 34))
-                .asuminenLoppupvm(parseDate(value, 42))
-                .henkilotunnuksetonHenkilo(parseHenkilotunnuksetonHenkilo(tarkentavatTietoryhmat))
-                .oikeudet(parseOikeudet(tarkentavatTietoryhmat))
-                .build();
-    }
-
-    private static Set<Oikeus> parseOikeudet(String... tietoryhmat) {
-        return Arrays.stream(tietoryhmat)
-                .filter(tietoryhma -> "320".equals(parseRyhmatunnus(tietoryhma)))
-                .map(TietoryhmaParserUtil::parseOikeus)
-                .collect(Collectors.toSet());
-    }
-
-    private static Oikeus parseOikeus(String tietoryhmaStr) {
-        return Oikeus.builder()
-                .ryhmatunnus(Ryhmatunnus.OIKEUS)
-                .muutostapa(parseMuutosTapa(tietoryhmaStr))
-                .koodi(parseString(tietoryhmaStr, 4, 4))
-                .alkupvm(parseDate(tietoryhmaStr, 8))
-                .loppupvm(parseDate(tietoryhmaStr, 16))
-                .build();
-    }
-
     private static Ammatti parseAmmatti(String value) {
         return Ammatti.builder()
                 .ryhmatunnus(Ryhmatunnus.AMMATTI)
@@ -370,27 +312,7 @@ public class TietoryhmaParserUtil {
         return osoite;
     }
 
-    private static TilapainenUlkomainenOsoite parseTilapainenUlkomainenOsoite(String value, String... tarkentavatTietoryhmat) {
-        String countryCode = parseString(value, 164, 3);
-
-        TilapainenUlkomainenOsoite osoite =  TilapainenUlkomainenOsoite.builder()
-                .ryhmatunnus(Ryhmatunnus.ULKOMAINEN_OSOITE_TILAPAINEN)
-                .muutostapa(parseMuutosTapa(value))
-                .streetAddress(parseString(value, 4, 80))
-                .municipality(parseString(value, 84, 80))
-                .countryCode(countryCode)
-                .startDate(parseDate(value, 167))
-                .endDate(parseDate(value, 175))
-                .build();
-
-        if (countryCode.equals("998")) {
-            osoite.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
-        }
-
-        return osoite;
-    }
-
-    private static HenkilotunnuksetonHenkilo parseHenkilotunnuksetonHenkilo(String... tietoryhmat) {
+    static HenkilotunnuksetonHenkilo parseHenkilotunnuksetonHenkilo(String... tietoryhmat) {
         HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo = null;
         for (String tietoryhma : tietoryhmat) {
             String ryhmatunnus = parseRyhmatunnus(tietoryhma);
@@ -418,6 +340,21 @@ public class TietoryhmaParserUtil {
                 .firstNames(parseString(value, 113, 100))
                 .nationality(parseString(value, 213, 3))
                 .build();
+    }
+
+    static String serializeHenkilotunnuksetonHenkilo(HenkilotunnuksetonHenkilo henkilo) {
+        String serialized = Ryhmatunnus.HENKILOTUNNUKSETON_HENKILO.getCode()
+                + henkilo.getMuutostapa().getNumber()
+                + serializeDate(henkilo.getDateOfBirth())
+                + henkilo.getGender().getCode()
+                + serializeString(henkilo.getLastname(), 100)
+                + serializeString(henkilo.getFirstNames(), 100)
+                + serializeString(henkilo.getNationality(), 3);
+        if ("998".equals(henkilo.getNationality())) {
+            serialized = String.join("|", serialized,
+                    serializeAdditionalInformation(henkilo.getAdditionalInformation()));
+        }
+        return serialized;
     }
 
     static String parseAdditionalInformation(String value) {
