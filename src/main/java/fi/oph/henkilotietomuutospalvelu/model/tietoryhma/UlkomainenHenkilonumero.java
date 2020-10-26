@@ -4,6 +4,7 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 @Entity
 @DiscriminatorValue("ulkomainen_henkilonumero")
 @NoArgsConstructor
+@Getter
 public class UlkomainenHenkilonumero extends Tietoryhma {
     @Column(name = "ulkomainen_henkilonumero_id")
     private String ulkomainenHenkilonumeroId;
