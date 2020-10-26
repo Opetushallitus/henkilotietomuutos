@@ -3,7 +3,6 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.oph.henkilotietomuutospalvelu.dto.type.Toimintakelpoisuus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.*;
 import fi.oph.henkilotietomuutospalvelu.service.exception.TietoryhmaParseException;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.time.LocalDate;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.AidinkieliParser.parseAidinkieli;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.EdunvalvojaParser.parseEdunvalvoja;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.EdunvalvontaParser.parseEdunvalvonta;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameChangeParser.parseHenkiloNameChange;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameParser.parseHenkiloName;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkilotunnuskorjausParser.parseHenkilotunnuskorjaus;
@@ -20,6 +21,7 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.KansalaisuusParser.
 import static fi.oph.henkilotietomuutospalvelu.service.parse.KotikuntaParser.parseKotikunta;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.KotimainenOsoiteParser.parseKotimainenOsoite;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.KuolinpaivaParser.parseKuolinpaiva;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.KutsumanimiParser.parseKutsumanimi;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.PostiosoiteParser.parsePostiosoite;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.SukupuoliParser.parseSukupuoli;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.SyntymaKotikuntaParser.parseSyntymaKotikunta;
@@ -157,44 +159,6 @@ public class TietoryhmaParserUtil {
         return parseString(tietoryhma, 0, 3);
     }
 
-    private static Kutsumanimi parseKutsumanimi(String value) {
-        return Kutsumanimi.builder()
-                .ryhmatunnus(Ryhmatunnus.KUTSUMANIMI)
-                .muutostapa(parseMuutosTapa(value))
-                .name(parseString(value, 4,100))
-                .type(parseString(value, 104,2 ))
-                .startDate(parseDate(value, 106))
-                .endDate(parseDate(value, 114))
-                .nonStandardCharacters(parseCharacter(value, 122).equals("1"))
-                .build();
-    }
-
-    private static Edunvalvonta parseEdunvalvonta(String value) {
-        return Edunvalvonta.builder()
-                .ryhmatunnus(Ryhmatunnus.EDUNVALVONTA)
-                .muutostapa(parseMuutosTapa(value))
-                .startDate(parseDate(value, 4))
-                .endDate(parseDate(value, 12))
-                .dutiesStarted(parseCharacter(value, 20).equals("1"))
-                .edunvalvontatieto(Toimintakelpoisuus.getEnum(parseCharacter(value, 21)))
-                .edunvalvojat(Long.valueOf(parseString(value, 22, 2)))
-                .build();
-    }
-
-    private static Edunvalvoja parseEdunvalvoja(String value, String... tarkentavatTietoryhmat) {
-        return Edunvalvoja.builder()
-                .ryhmatunnus(Ryhmatunnus.EDUNVALVOJA)
-                .muutostapa(parseMuutosTapa(value))
-                .hetu(parseString(value, 4, 11))
-                .yTunnus(parseString(value, 15, 9))
-                .municipalityCode(parseString(value, 24, 3))
-                .oikeusaputoimistoKoodi(parseString(value, 27, 6))
-                .startDate(parseDate(value, 33))
-                .endDate(parseDate(value, 41))
-                .henkilotunnuksetonHenkilo(parseHenkilotunnuksetonHenkilo(tarkentavatTietoryhmat))
-                .build();
-    }
-
     private static EdunvalvontaValtuutus parseEdunvalvontaValtuutus(String value) {
         return EdunvalvontaValtuutus.builder()
                 .ryhmatunnus(Ryhmatunnus.EDUNVALVONTAVALTUUTUS)
@@ -205,7 +169,7 @@ public class TietoryhmaParserUtil {
                 .edunvalvojaValtuutetut(Long.valueOf(parseString(value, 21, 2)))
                 .build();
     }
-
+    
     private static EdunvalvontaValtuutettu parseEdunvalvontaValtuutettu(String value, String... tarkentavatTietoryhmat) {
         return EdunvalvontaValtuutettu.builder()
                 .ryhmatunnus(Ryhmatunnus.EDUNVALVONTAVALTUUTETTU)

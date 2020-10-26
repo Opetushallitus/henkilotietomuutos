@@ -2,14 +2,8 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
-import fi.oph.henkilotietomuutospalvelu.dto.type.Toimintakelpoisuus;
-import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Ammatti;
-import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Edunvalvoja;
-import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Edunvalvonta;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.HenkilotunnuksetonHenkilo;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Huoltaja;
-import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Oikeus;
-import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.SahkopostiOsoite;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,81 +11,8 @@ import org.junit.Test;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 public class TietoryhmaParserUtilTest {
-
-    @Test
-    public void parseAmmatti() {
-        String tietoryhma = "4013    luottoneuvottelija                 ";
-
-        Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhma);
-        Assert.assertTrue(ryhma instanceof Ammatti);
-
-        Ammatti ammatti = (Ammatti) ryhma;
-        Assert.assertEquals(Muutostapa.MUUTETTU, ammatti.getMuutostapa());
-        Assert.assertEquals("", ammatti.getCode());
-        Assert.assertEquals("luottoneuvottelija", ammatti.getDescription());
-    }
-
-    @Test
-    public void parseEdunvalvoja() {
-        String tietoryhma = "3071071057-108S         0000000000000000000000000";
-
-        Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhma);
-        Assert.assertTrue(ryhma instanceof Edunvalvoja);
-
-        Edunvalvoja valvoja = (Edunvalvoja) ryhma;
-        Assert.assertEquals(Muutostapa.LISATTY, valvoja.getMuutostapa());
-        Assert.assertEquals("071057-108S", valvoja.getHetu());
-        Assert.assertEquals("000", valvoja.getMunicipalityCode());
-        Assert.assertEquals("000000", valvoja.getOikeusaputoimistoKoodi());
-        Assert.assertEquals("", valvoja.getYTunnus());
-        Assert.assertNull(valvoja.getStartDate());
-        Assert.assertNull(valvoja.getEndDate());
-    }
-
-    @Test
-    public void parseEdunvalvonta() {
-        String tietoryhma = "30601989020100000000 102|3075                    0000000001989020119980101";
-
-        Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhma);
-        Assert.assertTrue(ryhma instanceof Edunvalvonta);
-
-        Edunvalvonta valvonta = (Edunvalvonta) ryhma;
-        Assert.assertEquals(Muutostapa.LISATIETO, valvonta.getMuutostapa());
-        Assert.assertEquals(LocalDate.of(1989, 2, 1), valvonta.getStartDate());
-        Assert.assertNull(valvonta.getEndDate());
-        Assert.assertEquals(false, valvonta.getDutiesStarted());
-        Assert.assertEquals(Toimintakelpoisuus.RAJOITTAMATON, valvonta.getEdunvalvontatieto());
-        Assert.assertEquals(new Long(2), valvonta.getEdunvalvojat());
-    }
-
-    @Test
-    public void parseSahkopostiOsoite() {
-        String tietoryhma = "421199katariina@kokkokolmonen.com                                                                                                                                                                                                                                    2017022200000000";
-        String toinenTietoryhma = "421399aune41@saad.net                                                                                                                                                                                                                                                2016050920170222";
-
-        Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhma);
-        Assert.assertTrue(ryhma instanceof SahkopostiOsoite);
-
-        SahkopostiOsoite osoite = (SahkopostiOsoite) ryhma;
-        Assert.assertEquals(Muutostapa.LISATTY, osoite.getMuutostapa());
-        Assert.assertEquals("99", osoite.getLajikoodi());
-        Assert.assertEquals("katariina@kokkokolmonen.com", osoite.getEmail());
-        Assert.assertEquals(LocalDate.of(2017, 2, 22), osoite.getStartDate());
-        Assert.assertNull(osoite.getEndDate());
-
-
-        Tietoryhma toinenRyhma = TietoryhmaParserUtil.deserializeTietoryhma(toinenTietoryhma);
-
-        SahkopostiOsoite toinenOsoite = (SahkopostiOsoite) toinenRyhma;
-        Assert.assertEquals(Muutostapa.MUUTETTU, toinenOsoite.getMuutostapa());
-        Assert.assertEquals("99", toinenOsoite.getLajikoodi());
-        Assert.assertEquals("aune41@saad.net", toinenOsoite.getEmail());
-        Assert.assertEquals(LocalDate.of(2016, 5, 9), toinenOsoite.getStartDate());
-        Assert.assertEquals(LocalDate.of(2017, 2, 22), toinenOsoite.getEndDate());
-    }
 
     @Test
     public void parseHetutonHenkiloWithValidCountryCode() {
