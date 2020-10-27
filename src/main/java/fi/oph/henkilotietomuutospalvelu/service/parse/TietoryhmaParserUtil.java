@@ -275,7 +275,7 @@ public class TietoryhmaParserUtil {
 
         return osoite;
     }
-
+    
     static HenkilotunnuksetonHenkilo parseHenkilotunnuksetonHenkilo(String... tietoryhmat) {
         HenkilotunnuksetonHenkilo henkilotunnuksetonHenkilo = null;
         for (String tietoryhma : tietoryhmat) {

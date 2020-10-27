@@ -67,9 +67,11 @@ public class HuoltajaParser {
             serialized = String.join("|", serialized,
                     serializeHenkilotunnuksetonHenkilo(huoltaja.getHenkilotunnuksetonHenkilo()));
         }
-        serialized = String.join("|", serialized, huoltaja.getOikeudet().stream().map(
-                HuoltajaParser::serializeOikeus
-        ).collect(Collectors.joining("|")));
+        if (huoltaja.getOikeudet() != null && !huoltaja.getOikeudet().isEmpty()) {
+            serialized = String.join("|", serialized, huoltaja.getOikeudet().stream().map(
+                    HuoltajaParser::serializeOikeus
+            ).collect(Collectors.joining("|")));
+        }
         return serialized;
     }
 
