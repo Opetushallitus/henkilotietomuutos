@@ -3,6 +3,7 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @Entity
 @DiscriminatorValue("edunvalvonta_valtuutus")
 @NoArgsConstructor
+@Getter
 public class EdunvalvontaValtuutus extends Tietoryhma {
     /**
      * Edunvalvontavaltuutuksen tietoryhmässä kerrotaan edunvalvontavaltuutuslain mukaisen edunvalvontavaltuutuksen
@@ -29,7 +31,7 @@ public class EdunvalvontaValtuutus extends Tietoryhma {
 
     /** Määräys tehtävien jaosta edunvalvontavaltuutettujen kesken on annettu. */
     @Column(name = "duties_started")
-    private Boolean dutiesStarted;
+    private Boolean dutiesStarted; // hmm, tämän tulisi kai olla "shared" eikä "started"?!
 
     @Column(name = "edunvalvoja_valtuutetut")
     private Long edunvalvojaValtuutetut;

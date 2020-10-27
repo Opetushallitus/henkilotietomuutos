@@ -8,6 +8,7 @@ import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoParseService;
 import fi.oph.henkilotietomuutospalvelu.service.exception.MuutostietoLineParseException;
 import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil;
+import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaSerializerUtil;
 import fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,15 @@ public class MuutostietoParseServiceImpl implements MuutostietoParseService {
         }
     }
 
+    @Override
+    public String serializeMuutostietoDto(MuutostietoDto dto) {
+        String serialized = serializeTunnisteosa(dto);
+        for (Tietoryhma ryhma : dto.getTietoryhmat()) {
+            serialized = String.join("|", serialized, TietoryhmaSerializerUtil.serializeTietoryhma(ryhma));
+        }
+        return serialized + "|";
+    }
+
     private static MuutostietoDto parseTunnisteosa(String tunnisteosa) {
         return MuutostietoDto.builder()
             .hetu(tunnisteosa.substring(0, 11))
@@ -39,6 +49,14 @@ public class MuutostietoParseServiceImpl implements MuutostietoParseService {
             .muutosType(MuutosType.getEnum(tunnisteosa.substring(22, 23)))
             .role(tunnisteosa.substring(23, 24))
             .build();
+    }
+
+    private static String serializeTunnisteosa(MuutostietoDto dto) {
+        return dto.getHetu()
+                + dto.getTapahtuma()
+                + VRKParseUtil.serializeDate(dto.getRekisterointipaiva())
+                + dto.getMuutosType().getCode()
+                + dto.getRole();
     }
 
     private static List<Tietoryhma> deserializeTietoryhmat(String[] tietoryhmat) {
