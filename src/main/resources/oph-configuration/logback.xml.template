@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <property name="LOGLEVEL" value="{{henkilotietomuutos_service_log_level | default('info')}}"/>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     {% raw %}
     <appender name="OPHLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -37,7 +38,7 @@
     {% endraw %}
 
     <!-- Standard logging -->
-    <root level="INFO">
+    <root level="${LOGLEVEL}">
         <appender-ref ref="OPHLOGFILE" />
     </root>
     <logger name="com.jcraft.jsch" level="WARN" />
@@ -46,7 +47,7 @@
     <logger name="org.springframework.boot.autoconfigure.security.AuthenticationManagerConfiguration" level="INFO" />
     <logger name="fi.vm.sade.java_utils.security.OpintopolkuCasAuthenticationFilter" level="ERROR" />
     <logger name="org.hibernate.SQL" level="ERROR" />
-    <logger name="fi.oph.henkilotietomuutospalvelu" level="INFO" />
+    <logger name="fi.oph.henkilotietomuutospalvelu" level="${LOGLEVEL}" />
     <logger name="fi.oph.henkilotietomuutospalvelu.client.BIXClient" level="WARN" />
     <logger name="fi.oph" level="WARN" />
 
