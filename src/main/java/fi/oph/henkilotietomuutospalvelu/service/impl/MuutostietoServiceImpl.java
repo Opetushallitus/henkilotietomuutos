@@ -45,7 +45,12 @@ public class MuutostietoServiceImpl implements MuutostietoService {
             throws IOException, MuutostietoFileException {
         Optional<String> optional = this.fileService.findNextFile();
         if (optional.isPresent()) {
-            return handleFile(optional.get(), lastHandledLineNumber);
+            try {
+                return handleFile(optional.get(), lastHandledLineNumber);
+            } catch (MuutostietoFileException e) {
+                log.error("Handling muutostieto file failed", e);
+                throw e;
+            }
         }
         return Collections.emptyList();
     }
