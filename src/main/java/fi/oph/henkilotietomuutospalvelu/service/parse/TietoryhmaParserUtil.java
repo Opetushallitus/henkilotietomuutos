@@ -441,14 +441,18 @@ public class TietoryhmaParserUtil {
         String countryCode = parseString(value, 4, 3);
 
         UlkomainenSyntymapaikka syntymapaikka = UlkomainenSyntymapaikka.builder()
-                .ryhmatunnus(Ryhmatunnus.KUOLINPAIVA)
+                .ryhmatunnus(Ryhmatunnus.ULKOMAINEN_SYNTYMAPAIKKA)
                 .muutostapa(parseMuutosTapa(value))
                 .countryCode(countryCode)
                 .location(parseString(value, 7, 50))
                 .build();
 
         if (countryCode.equals("998")) {
-            syntymapaikka.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
+            if (tarkentavatTietoryhmat.length > 0) {
+                syntymapaikka.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
+            } else {
+                log.warn("Missing foreign birth place additional information!");
+            }
         }
 
         return syntymapaikka;
