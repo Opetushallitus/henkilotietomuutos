@@ -11,8 +11,11 @@ import org.jetbrains.annotations.NotNull;
 import java.time.LocalDate;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.AidinkieliParser.parseAidinkieli;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.AmmattiParser.parseAmmatti;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.EdunvalvojaParser.parseEdunvalvoja;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.EdunvalvontaParser.parseEdunvalvonta;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.EdunvalvontaValtuutettuParser.parseEdunvalvontaValtuutettu;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.EdunvalvontaValtuutusParser.parseEdunvalvontaValtuutus;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameChangeParser.parseHenkiloNameChange;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameParser.parseHenkiloName;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.HenkilotunnuskorjausParser.parseHenkilotunnuskorjaus;
@@ -23,8 +26,13 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.KotimainenOsoitePar
 import static fi.oph.henkilotietomuutospalvelu.service.parse.KuolinpaivaParser.parseKuolinpaiva;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.KutsumanimiParser.parseKutsumanimi;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.PostiosoiteParser.parsePostiosoite;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.SahkopostiOsoiteParser.parseSahkopostiOsoite;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.SukupuoliParser.parseSukupuoli;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.SyntymaKotikuntaParser.parseSyntymaKotikunta;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.TurvakieltoParser.parseTurvakielto;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.UlkomainenHenkilonumeroParser.parseUlkomainenHenkilonumero;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.UlkomainenOsoiteParser.parseUlkomainenOsoite;
+import static fi.oph.henkilotietomuutospalvelu.service.parse.UlkomainenSyntymapaikkaParser.parseUlkomainenSyntymapaikka;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
@@ -157,123 +165,6 @@ public class TietoryhmaParserUtil {
     @NotNull
     public static String parseRyhmatunnus(String tietoryhma) {
         return parseString(tietoryhma, 0, 3);
-    }
-
-    private static EdunvalvontaValtuutus parseEdunvalvontaValtuutus(String value) {
-        return EdunvalvontaValtuutus.builder()
-                .ryhmatunnus(Ryhmatunnus.EDUNVALVONTAVALTUUTUS)
-                .muutostapa(parseMuutosTapa(value))
-                .startDate(parseDate(value, 4))
-                .endDate(parseDate(value, 12))
-                .dutiesStarted(parseCharacter(value, 20).equals("1"))
-                .edunvalvojaValtuutetut(Long.valueOf(parseString(value, 21, 2)))
-                .build();
-    }
-    
-    private static EdunvalvontaValtuutettu parseEdunvalvontaValtuutettu(String value, String... tarkentavatTietoryhmat) {
-        return EdunvalvontaValtuutettu.builder()
-                .ryhmatunnus(Ryhmatunnus.EDUNVALVONTAVALTUUTETTU)
-                .muutostapa(parseMuutosTapa(value))
-                .hetu(parseString(value, 4, 11))
-                .startDate(parseDate(value, 15))
-                .endDate(parseDate(value, 23))
-                .henkilotunnuksetonHenkilo(parseHenkilotunnuksetonHenkilo(tarkentavatTietoryhmat))
-                .build();
-    }
-
-    private static Ammatti parseAmmatti(String value) {
-        return Ammatti.builder()
-                .ryhmatunnus(Ryhmatunnus.AMMATTI)
-                .muutostapa(parseMuutosTapa(value))
-                .code(parseString(value, 4, 4))
-                .description(parseString(value, 8, 35))
-                .build();
-    }
-
-    private static SahkopostiOsoite parseSahkopostiOsoite(String value) {
-        return SahkopostiOsoite.builder()
-                .ryhmatunnus(Ryhmatunnus.SAHKOPOSTIOSOITE)
-                .muutostapa(parseMuutosTapa(value))
-                .lajikoodi(parseString(value, 4, 2))
-                .email(parseString(value, 6, 255))
-                .startDate(parseDate(value, 261))
-                .endDate(parseDate(value, 269))
-                .build();
-    }
-
-    private static UlkomainenHenkilonumero parseUlkomainenHenkilonumero(String value) {
-        return UlkomainenHenkilonumero.builder()
-                .ryhmatunnus(Ryhmatunnus.ULKOMAINEN_HENKILONUMERO)
-                .muutostapa(parseMuutosTapa(value))
-                .ulkomainenHenkilonumeroId(parseString(value, 4, 30))
-                .gender(Gender.getEnum(parseCharacter(value, 34)))
-                .countryCode(parseString(value, 35, 3))
-                .tietolahde(parseCharacter(value, 38))
-                .type(parseCharacter(value, 39))
-                .valid(parseCharacter(value, 40).equals("1"))
-                .issueDate(parseDate(value, 41))
-                .passivointiDate(parseDate(value, 49))
-                .saveDateVTJ(parseDate(value, 57))
-                .passivointiDateVTJ(parseDate(value, 65))
-                .validVTJ(parseCharacter(value, 73).equals("1"))
-                .build();
-    }
-    
-    private static UlkomainenSyntymapaikka parseUlkomainenSyntymapaikka(String value, String... tarkentavatTietoryhmat) {
-        String countryCode = parseString(value, 4, 3);
-
-        UlkomainenSyntymapaikka syntymapaikka = UlkomainenSyntymapaikka.builder()
-                .ryhmatunnus(Ryhmatunnus.ULKOMAINEN_SYNTYMAPAIKKA)
-                .muutostapa(parseMuutosTapa(value))
-                .countryCode(countryCode)
-                .location(parseString(value, 7, 50))
-                .build();
-
-        if (countryCode.equals("998")) {
-            if (tarkentavatTietoryhmat.length > 0) {
-                syntymapaikka.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
-            } else {
-                log.warn("Missing foreign birth place additional information!");
-            }
-        }
-
-        return syntymapaikka;
-    }
-
-    private static Turvakielto parseTurvakielto(String value) {
-
-        LocalDate endDate = null;
-        String dateStr = parseString(value, 4, 8);
-        /* Toistaiseksi voimassa oleva turvakielto merkitään loppuajalla 99990000. */
-        if (!dateStr.equals("99990000")) {
-            endDate = parseDate(value, 4);
-        }
-
-        return Turvakielto.builder()
-                .ryhmatunnus(Ryhmatunnus.TURVAKIELTO)
-                .muutostapa(parseMuutosTapa(value))
-                .endDate(endDate)
-                .build();
-    }
-    
-    private static UlkomainenOsoite parseUlkomainenOsoite(String value, String... tarkentavatTietoryhmat) {
-        String countryCode = parseString(value, 164, 3);
-
-        UlkomainenOsoite osoite = UlkomainenOsoite.builder()
-                .ryhmatunnus(Ryhmatunnus.ULKOMAINEN_OSOITE)
-                .muutostapa(parseMuutosTapa(value))
-                .streetAddress(parseString(value, 4, 80))
-                .municipality(parseString(value, 84, 80))
-                .countryCode(countryCode)
-                .startDate(parseDate(value, 167))
-                .endDate(parseDate(value, 175))
-                .build();
-
-        if (countryCode.equals("998")) {
-            osoite.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
-        }
-
-        return osoite;
     }
     
     static HenkilotunnuksetonHenkilo parseHenkilotunnuksetonHenkilo(String... tietoryhmat) {
