@@ -118,14 +118,19 @@ public class MuutostietoServiceImpl implements MuutostietoService {
         Optional<String> firstFileToProcess = unprocessedFileNames.stream()
                 .min(this.fileService.byFileExtension().thenComparing(this.fileService.bySequentalNumbering()));
 
-        firstFileToProcess.ifPresent(fileName ->
-                this.henkiloMuutostietoRepository
-                        .findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(fileName)
-                        .forEach(id -> {
-                            HenkiloMuutostietoRivi henkiloMuutostietoRivi = this.henkiloMuutostietoRepository.findById(id)
-                                    .orElseThrow(() -> new IllegalStateException(String.format("Could not find HenkiloMuutostietoRivi by id %d", id)));
-                            this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
-                        }));
+        try {
+            firstFileToProcess.ifPresent(fileName ->
+                    this.henkiloMuutostietoRepository
+                            .findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(fileName)
+                            .forEach(id -> {
+                                HenkiloMuutostietoRivi henkiloMuutostietoRivi = this.henkiloMuutostietoRepository.findById(id)
+                                        .orElseThrow(() -> new IllegalStateException(String.format("Could not find HenkiloMuutostietoRivi by id %d", id)));
+                                this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
+                            }));
+        } catch (RuntimeException e) { // lokitetaan, jotta virhe ei huku mikäli notifikaatio epäonnistuu
+            log.error("Muutostieto handling failed", e);
+            throw e;
+        }
     }
 
     /**
