@@ -11,7 +11,7 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serial
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
 public class EdunvalvontaValtuutusParser {
-
+    
     static EdunvalvontaValtuutus parseEdunvalvontaValtuutus(String value) {
         return EdunvalvontaValtuutus.builder()
                 .ryhmatunnus(Ryhmatunnus.EDUNVALVONTAVALTUUTUS)

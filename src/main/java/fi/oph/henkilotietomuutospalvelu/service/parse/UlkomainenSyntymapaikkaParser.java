@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.UlkomainenSyntymapaikka;
+import lombok.extern.slf4j.Slf4j;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseAdditionalInformation;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
@@ -9,6 +10,7 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.serializeAdditionalInformation;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
+@Slf4j
 public class UlkomainenSyntymapaikkaParser {
 
     static UlkomainenSyntymapaikka parseUlkomainenSyntymapaikka(String value, String... tarkentavatTietoryhmat) {
@@ -20,9 +22,12 @@ public class UlkomainenSyntymapaikkaParser {
                 .countryCode(countryCode)
                 .location(parseString(value, 7, 50))
                 .build();
-
         if (countryCode.equals("998")) {
-            syntymapaikka.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
+            if (tarkentavatTietoryhmat.length > 0) {
+                syntymapaikka.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
+            } else {
+                log.warn("Missing foreign birth place additional information!");
+            }
         }
 
         return syntymapaikka;
