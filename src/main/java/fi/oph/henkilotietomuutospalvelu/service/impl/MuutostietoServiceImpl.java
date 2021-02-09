@@ -114,11 +114,12 @@ public class MuutostietoServiceImpl implements MuutostietoService {
     @Transactional(readOnly = true)
     @Override
     public void updateMuutostietos() {
-        List<String> unprocessedFileNames = this.henkiloMuutostietoRepository.findDistinctUnprocessedTiedostoFileName();
-        Optional<String> firstFileToProcess = unprocessedFileNames.stream()
-                .min(this.fileService.byFileExtension().thenComparing(this.fileService.bySequentalNumbering()));
-
         try {
+            List<String> unprocessedFileNames = this.henkiloMuutostietoRepository.findDistinctUnprocessedTiedostoFileName();
+            Optional<String> firstFileToProcess = unprocessedFileNames.stream()
+                    .min(this.fileService.byFileExtension().thenComparing(this.fileService.bySequentalNumbering()));
+
+
             firstFileToProcess.ifPresent(fileName ->
                     this.henkiloMuutostietoRepository
                             .findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(fileName)
@@ -128,7 +129,7 @@ public class MuutostietoServiceImpl implements MuutostietoService {
                                 this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
                             }));
         } catch (RuntimeException e) { // lokitetaan, jotta virhe ei huku mikäli notifikaatio epäonnistuu
-            log.error("Muutostieto handling failed", e);
+            log.error("Failed to update muutostietos", e); // ihanaa sekakieltä! <3
             throw e;
         }
     }
