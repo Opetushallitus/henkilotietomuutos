@@ -55,5 +55,11 @@ public class MuutostietoParseServiceImplTest {
                 .build();
         String serialized = service.serializeMuutostietoDto(dto);
         System.out.println(serialized);
+        /*
+        - muutostiedosto kaivetaan kontin import-hakemistosta
+        - serialisoidut muutostiedot riveittäin tiedostoon
+        - tiedoston lopussa ei saa olla tyhjää riviä
+        - tiedoston nimeämiskäytäntö: ks. FileServiceImpl.parsePartNumber()
+         */
     }
 }
