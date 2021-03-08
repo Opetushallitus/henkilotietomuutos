@@ -5,10 +5,10 @@
 
     <groupId>fi.vm.sade.henkilotietomuutospalvelu</groupId>
     <artifactId>henkilotietomuutospalvelu</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.1.2-SNAPSHOT</version>
 
     <properties>
-        <java.version>1.8</java.version>
+        <maven.compiler.release>11</maven.compiler.release>
         <buildNumber>default build number</buildNumber>
         <branch>default branch</branch>
         <revision>default revision</revision>
@@ -365,6 +365,11 @@ buildTtime=${maven.build.timestamp}
                         <groupId>org.hibernate</groupId>
                         <artifactId>hibernate-entitymanager</artifactId>
                         <version>${hibernate.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.3.1</version>
                     </dependency>
                 </dependencies>
             </plugin>
