@@ -1,6 +1,7 @@
 package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.service.exception.TietoryhmaParseException;
+import fi.oph.henkilotietomuutospalvelu.utils.HenkiloUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -61,7 +62,7 @@ public class VRKParseUtil {
             case '+':
                 return 1800;
             default:
-               throw new TietoryhmaParseException("Invalid sign in hetu " + hetu + "!");
+               throw new TietoryhmaParseException("Invalid sign in hetu " + HenkiloUtils.sensuroiHetu(hetu) + "!");
         }
     }
 

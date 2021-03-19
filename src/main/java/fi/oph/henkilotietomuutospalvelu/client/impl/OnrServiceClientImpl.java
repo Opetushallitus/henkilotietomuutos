@@ -73,7 +73,6 @@ public class OnrServiceClientImpl implements OnrServiceClient {
                             .contentType(ContentType.APPLICATION_JSON)
                             .build())
                     .build();
-            log.debug("Sending ONR update request:\n{}", content); // TODO: poista, ettei lokita henkilötietoja prodissa
             ophHttpClient.execute(request)
                     .handleErrorStatus(400).with(returnString -> {
                         throw new RestClientException(
