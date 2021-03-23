@@ -24,9 +24,7 @@ import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.setYhteyst
 @Getter
 @Slf4j
 @NoArgsConstructor
-public class SahkopostiOsoite extends YhteystietoTietoryhma<SahkopostiOsoite> {
-
-    private static final SahkopostiOsoiteParser PARSER = new SahkopostiOsoiteParser();
+public class SahkopostiOsoite extends YhteystietoTietoryhma {
 
     /**
      * 99=henkilon ilmoittama sahkopostiosoite,
@@ -61,15 +59,5 @@ public class SahkopostiOsoite extends YhteystietoTietoryhma<SahkopostiOsoite> {
     @Override
     protected void updateYhteystietoryhma(Context context, YhteystiedotRyhmaDto yhteystietoryhma) {
         setYhteystietoArvo(yhteystietoryhma, YhteystietoTyyppi.YHTEYSTIETO_SAHKOPOSTI, email);
-    }
-
-    @Override
-    protected SahkopostiOsoite getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<SahkopostiOsoite> getParser() {
-        return PARSER;
     }
 }

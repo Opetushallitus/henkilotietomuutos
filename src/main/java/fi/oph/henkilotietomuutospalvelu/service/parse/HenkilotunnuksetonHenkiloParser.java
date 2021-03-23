@@ -3,6 +3,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.HenkilotunnuksetonHenkilo;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseAdditionalInformation;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseCharacter;
@@ -13,9 +14,7 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class HenkilotunnuksetonHenkiloParser implements TietoryhmaParser<HenkilotunnuksetonHenkilo> {
-
-    public static final HenkilotunnuksetonHenkiloParser INSTANCE = new HenkilotunnuksetonHenkiloParser();
+public class HenkilotunnuksetonHenkiloParser implements TietoryhmaParser {
 
     @Override
     public HenkilotunnuksetonHenkilo parse(String tietoryhma, String... tarkentavatTietoryhmat) {
@@ -35,7 +34,8 @@ public class HenkilotunnuksetonHenkiloParser implements TietoryhmaParser<Henkilo
     }
 
     @Override
-    public String serialize(HenkilotunnuksetonHenkilo henkilo) {
+    public String serialize(Tietoryhma tietoryhma) {
+        HenkilotunnuksetonHenkilo henkilo = (HenkilotunnuksetonHenkilo) tietoryhma;
         String serialized = Ryhmatunnus.HENKILOTUNNUKSETON_HENKILO.getCode()
                 + henkilo.getMuutostapa().getNumber()
                 + serializeDate(henkilo.getDateOfBirth())

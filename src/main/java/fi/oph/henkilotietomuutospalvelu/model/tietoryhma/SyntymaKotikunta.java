@@ -15,9 +15,7 @@ import javax.persistence.Entity;
 @DiscriminatorValue("syntyma_kotikunta")
 @NoArgsConstructor
 @Getter
-public class SyntymaKotikunta extends Tietoryhma<SyntymaKotikunta> {
-
-    private static final SyntymaKotikuntaParser PARSER = new SyntymaKotikuntaParser();
+public class SyntymaKotikunta extends Tietoryhma {
 
     private String kuntakoodi; // kolmenumeroinen
 
@@ -25,15 +23,5 @@ public class SyntymaKotikunta extends Tietoryhma<SyntymaKotikunta> {
     public SyntymaKotikunta(Ryhmatunnus ryhmatunnus, Muutostapa muutostapa, String kuntakoodi) {
         super(ryhmatunnus, muutostapa);
         this.kuntakoodi = kuntakoodi;
-    }
-
-    @Override
-    protected SyntymaKotikunta getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<SyntymaKotikunta> getParser() {
-        return PARSER;
     }
 }

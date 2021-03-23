@@ -15,9 +15,8 @@ import javax.persistence.Entity;
 @DiscriminatorValue("ammatti")
 @Getter
 @NoArgsConstructor
-public class Ammatti extends Tietoryhma<Ammatti> {
+public class Ammatti extends Tietoryhma {
 
-    private static final AmmattiParser PARSER = new AmmattiParser();
     private String code;
     private String description;
 
@@ -26,15 +25,5 @@ public class Ammatti extends Tietoryhma<Ammatti> {
         super(ryhmatunnus, muutostapa);
         this.code = code;
         this.description = description;
-    }
-
-    @Override
-    protected Ammatti getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Ammatti> getParser() {
-        return PARSER;
     }
 }

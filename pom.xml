@@ -357,6 +357,11 @@ buildTtime=${maven.build.timestamp}
                 </executions>
                 <dependencies>
                     <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                    <dependency>
                         <groupId>org.eclipse.persistence</groupId>
                         <artifactId>org.eclipse.persistence.jpa</artifactId>
                         <version>${org.eclipse.persistence.jpa.version}</version>

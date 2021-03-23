@@ -1,5 +1,7 @@
 package fi.oph.henkilotietomuutospalvelu.service.parse;
 
+import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Edunvalvoja;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.EdunvalvontaValtuutettu;
 import org.junit.Test;
 
@@ -10,10 +12,12 @@ import static org.junit.Assert.assertNull;
 
 public class EdunvalvontaValtuutettuParserTest {
 
+    EdunvalvontaValtuutettuParser parser = new EdunvalvontaValtuutettuParser();
+
     @Test
     public void parsesEdunvalvontaValtuutettu() {
         String tietoryhma = "3171111111-99911970010120300101";
-        EdunvalvontaValtuutettu valtuutettu = EdunvalvontaValtuutettuParser.parseEdunvalvontaValtuutettu(tietoryhma);
+        EdunvalvontaValtuutettu valtuutettu = parser.parse(tietoryhma);
         assertEquals("111111-9991", valtuutettu.getHetu());
         assertEquals(LocalDate.of(1970, 1, 1), valtuutettu.getStartDate());
         assertEquals(LocalDate.of(2030, 1, 1), valtuutettu.getEndDate());
@@ -23,7 +27,7 @@ public class EdunvalvontaValtuutettuParserTest {
     @Test
     public void serializesEdunvalvontaValtuutettu() {
         String tietoryhma = "3171111111-99911970010120300101";
-        EdunvalvontaValtuutettu valtuutettu = EdunvalvontaValtuutettuParser.parseEdunvalvontaValtuutettu(tietoryhma);
-        assertEquals(tietoryhma, EdunvalvontaValtuutettuParser.serializeEdunvalvontaValtuutettu(valtuutettu));
+        EdunvalvontaValtuutettu valtuutettu = parser.parse(tietoryhma);
+        assertEquals(tietoryhma, parser.serialize(valtuutettu));
     }
 }

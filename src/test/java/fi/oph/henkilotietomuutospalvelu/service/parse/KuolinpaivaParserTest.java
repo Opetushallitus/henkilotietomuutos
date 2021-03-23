@@ -9,17 +9,19 @@ import static org.junit.Assert.assertEquals;
 
 public class KuolinpaivaParserTest {
 
+    KuolinpaivaParser parser = new KuolinpaivaParser();
+
     @Test
     public void parsesKuolinpaiva() {
         String tietoryhma = "013120201022";
-        Kuolinpaiva kuolinpaiva = KuolinpaivaParser.parseKuolinpaiva(tietoryhma);
+        Kuolinpaiva kuolinpaiva = parser.parse(tietoryhma);
         assertEquals(LocalDate.of(2020, 10, 22), kuolinpaiva.getDateOfDeath());
     }
 
     @Test
     public void serializesKuolinpaiva() {
         String tietoryhma = "013120201022";
-        Kuolinpaiva kuolinpaiva = KuolinpaivaParser.parseKuolinpaiva(tietoryhma);
-        assertEquals(tietoryhma, KuolinpaivaParser.serializeKuolinpaiva(kuolinpaiva));
+        Kuolinpaiva kuolinpaiva = parser.parse(tietoryhma);
+        assertEquals(tietoryhma, parser.serialize(kuolinpaiva));
     }
 }

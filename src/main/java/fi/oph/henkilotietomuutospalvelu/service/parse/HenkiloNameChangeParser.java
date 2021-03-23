@@ -4,6 +4,7 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.NameType;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.HenkiloNameChange;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,9 +16,7 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class HenkiloNameChangeParser implements TietoryhmaParser<HenkiloNameChange> {
-
-    public static final HenkiloNameChangeParser INSTANCE = new HenkiloNameChangeParser();
+public class HenkiloNameChangeParser implements TietoryhmaParser {
 
     /** Henkilön nimen laji. */
     private enum NimiLaji {
@@ -61,6 +60,7 @@ public class HenkiloNameChangeParser implements TietoryhmaParser<HenkiloNameChan
     private static final List<NimiLaji> KUTSUMANIMI_LAJIT = Arrays.asList(
             NimiLaji.NYKYINEN_KUTSUMANIMI, NimiLaji.ENTINEN_KUTSUMANIMI, NimiLaji.KORJATTU_KUTSUMANIMI);
 
+    @Override
     public HenkiloNameChange parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         String laji = parseString(tietoryhma, 104, 2);
         NimiLaji nimiLaji = NimiLaji.fromLaji(laji);
@@ -86,7 +86,9 @@ public class HenkiloNameChangeParser implements TietoryhmaParser<HenkiloNameChan
                 .build();
     }
 
-    public String serialize(HenkiloNameChange change) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        HenkiloNameChange change = (HenkiloNameChange) tietoryhma;
         return Ryhmatunnus.HENKILO_NIMENMUUTOS.getCode()
                 + change.getMuutostapa().getNumber()
                 + serializeString(change.getName(), 100)

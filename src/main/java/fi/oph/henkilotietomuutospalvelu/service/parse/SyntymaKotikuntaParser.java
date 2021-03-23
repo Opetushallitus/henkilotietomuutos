@@ -2,14 +2,14 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.SyntymaKotikunta;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseString;
 
-public class SyntymaKotikuntaParser implements TietoryhmaParser<SyntymaKotikunta> {
+public class SyntymaKotikuntaParser implements TietoryhmaParser {
 
-    public static final SyntymaKotikuntaParser INSTANCE = new SyntymaKotikuntaParser();
-
+    @Override
     public SyntymaKotikunta parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return SyntymaKotikunta.builder()
                 .ryhmatunnus(Ryhmatunnus.SYNTYMAKOTIKUNTA)
@@ -18,7 +18,9 @@ public class SyntymaKotikuntaParser implements TietoryhmaParser<SyntymaKotikunta
                 .build();
     }
 
-    public String serialize(SyntymaKotikunta syntymaKotikunta) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        SyntymaKotikunta syntymaKotikunta = (SyntymaKotikunta) tietoryhma;
         return Ryhmatunnus.SYNTYMAKOTIKUNTA.getCode()
                 + syntymaKotikunta.getMuutostapa().getNumber()
                 + syntymaKotikunta.getKuntakoodi();

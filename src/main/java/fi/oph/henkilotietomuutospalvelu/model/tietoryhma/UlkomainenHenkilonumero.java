@@ -18,7 +18,7 @@ import java.time.LocalDate;
 @DiscriminatorValue("ulkomainen_henkilonumero")
 @NoArgsConstructor
 @Getter
-public class UlkomainenHenkilonumero extends Tietoryhma<UlkomainenHenkilonumero> {
+public class UlkomainenHenkilonumero extends Tietoryhma {
 
     private static final UlkomainenHenkilonumeroParser PARSER = new UlkomainenHenkilonumeroParser();
 
@@ -78,15 +78,5 @@ public class UlkomainenHenkilonumero extends Tietoryhma<UlkomainenHenkilonumero>
         this.saveDateVTJ = saveDateVTJ;
         this.passivointiDateVTJ = passivointiDateVTJ;
         this.validVTJ = validVTJ;
-    }
-
-    @Override
-    protected UlkomainenHenkilonumero getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<UlkomainenHenkilonumero> getParser() {
-        return PARSER;
     }
 }

@@ -2,10 +2,9 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
-public interface TietoryhmaParser<T extends Tietoryhma> {
+public interface TietoryhmaParser {
 
-    T parse(String tietoryhma, String... tarkentavatTietoryhmat);
+    Tietoryhma parse(String tietoryhma, String... tarkentavatTietoryhmat);
 
-    String serialize(T tietoryhma);
-
+    String serialize(Tietoryhma tietoryhma);
 }

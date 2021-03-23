@@ -28,9 +28,7 @@ import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.setYhteyst
 @Getter
 @Setter
 @NoArgsConstructor
-public class Postiosoite extends YhteystietoTietoryhma<Postiosoite> {
-
-    private static final PostiosoiteParser PARSER = new PostiosoiteParser();
+public class Postiosoite extends YhteystietoTietoryhma {
 
     private String postiosoite;
 
@@ -78,15 +76,5 @@ public class Postiosoite extends YhteystietoTietoryhma<Postiosoite> {
                 .ifPresent(postitoimipaikka -> setYhteystietoArvo(yhteystietoryhma, YhteystietoTyyppi.YHTEYSTIETO_KAUPUNKI, postitoimipaikka));
         context.getMaa(ISO3166_FI, asiointikieli)
                 .ifPresent(maa -> setYhteystietoArvo(yhteystietoryhma, YhteystietoTyyppi.YHTEYSTIETO_MAA, maa));
-    }
-
-    @Override
-    protected Postiosoite getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Postiosoite> getParser() {
-        return PARSER;
     }
 }

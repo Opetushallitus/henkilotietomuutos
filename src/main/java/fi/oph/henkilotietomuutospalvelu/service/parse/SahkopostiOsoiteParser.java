@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.SahkopostiOsoite;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
@@ -9,10 +10,9 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class SahkopostiOsoiteParser implements TietoryhmaParser<SahkopostiOsoite> {
+public class SahkopostiOsoiteParser implements TietoryhmaParser {
 
-    public static final SahkopostiOsoiteParser INSTANCE = new SahkopostiOsoiteParser();
-
+    @Override
     public SahkopostiOsoite parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return SahkopostiOsoite.builder()
                 .ryhmatunnus(Ryhmatunnus.SAHKOPOSTIOSOITE)
@@ -24,7 +24,9 @@ public class SahkopostiOsoiteParser implements TietoryhmaParser<SahkopostiOsoite
                 .build();
     }
 
-    public String serialize(SahkopostiOsoite sahkoposti) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        SahkopostiOsoite sahkoposti = (SahkopostiOsoite) tietoryhma;
         return Ryhmatunnus.SAHKOPOSTIOSOITE.getCode()
                 + sahkoposti.getMuutostapa().getNumber()
                 + serializeString(sahkoposti.getLajikoodi(), 2)

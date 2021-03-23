@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Aidinkieli;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import lombok.extern.slf4j.Slf4j;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseAdditionalInformation;
@@ -10,10 +11,9 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.serializeAdditionalInformation;
 
 @Slf4j
-public class AidinkieliParser implements TietoryhmaParser<Aidinkieli> {
+public class AidinkieliParser implements TietoryhmaParser {
 
-    public static final AidinkieliParser INSTANCE = new AidinkieliParser();
-
+    @Override
     public Aidinkieli parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         String languageCode = parseString(tietoryhma, 4,2);
 
@@ -33,7 +33,9 @@ public class AidinkieliParser implements TietoryhmaParser<Aidinkieli> {
         return aidinkieli;
     }
 
-    public String serialize(Aidinkieli aidinkieli) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        Aidinkieli aidinkieli = (Aidinkieli)tietoryhma;
         String serialized = Ryhmatunnus.AIDINKIELI.getCode()
                 + aidinkieli.getMuutostapa().getNumber()
                 + aidinkieli.getLanguageCode();

@@ -11,12 +11,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class KotimainenOsoiteParserTest {
-//Humikkalabacken
-//Humikkalabrinken
+
+    KotimainenOsoiteParser parser = new KotimainenOsoiteParser();
+
     @Test
     public void parsesKotimainenOsoite() {
         String tietoryhma = "1011Humikkalanrinne                                                                                     Humikkalabrinken                                                                                    1           009402019102600000000";
-        KotimainenOsoite osoite = KotimainenOsoiteParser.parseKotimainenOsoite(tietoryhma);
+        KotimainenOsoite osoite = parser.parse(tietoryhma);
         assertEquals(Ryhmatunnus.KOTIMAINEN_OSOITE, osoite.getRyhmatunnus());
         assertEquals("Humikkalanrinne", osoite.getLahiosoite());
         assertEquals("Humikkalabrinken", osoite.getLahiosoiteSV());
@@ -29,22 +30,22 @@ public class KotimainenOsoiteParserTest {
     @Test
     public void parsesTilapainenKotimainenOsoite() {
         String tietoryhma = "1021Humikkalanrinne                                                                                     Humikkalabrinken                                                                                    1           009402019102600000000";
-        KotimainenOsoite osoite = KotimainenOsoiteParser.parseKotimainenOsoite(tietoryhma);
+        KotimainenOsoite osoite = parser.parse(tietoryhma);
         assertEquals(Ryhmatunnus.KOTIMAINEN_OSOITE_TILAPAINEN, osoite.getRyhmatunnus());
     }
 
     @Test
     public void serializesKotimainenOsoite() {
         String tietoryhma = "1011Humikkalanrinne                                                                                     Humikkalabrinken                                                                                    1           009402019102600000000";
-        KotimainenOsoite osoite = KotimainenOsoiteParser.parseKotimainenOsoite(tietoryhma);
-        assertEquals(tietoryhma, KotimainenOsoiteParser.serializeKotimainenOsoite(osoite));
+        KotimainenOsoite osoite = parser.parse(tietoryhma);
+        assertEquals(tietoryhma, parser.serialize(osoite));
     }
 
     @Test
     public void serializesTilapainenKotimainenOsoite() {
         String tietoryhma = "1021Humikkalanrinne                                                                                     Humikkalabrinken                                                                                    1           009402019102600000000";
         TilapainenKotimainenOsoite osoite = TilapainenKotimainenOsoite.from(
-                KotimainenOsoiteParser.parseKotimainenOsoite(tietoryhma));
-        assertEquals(tietoryhma, KotimainenOsoiteParser.serializeKotimainenOsoite(osoite));
+                parser.parse(tietoryhma));
+        assertEquals(tietoryhma, parser.serialize(osoite));
     }
 }

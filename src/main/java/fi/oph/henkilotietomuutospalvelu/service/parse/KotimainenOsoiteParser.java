@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.KotimainenOsoite;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseCharacter;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseDate;
@@ -11,10 +12,9 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class KotimainenOsoiteParser implements TietoryhmaParser<KotimainenOsoite> {
+public class KotimainenOsoiteParser implements TietoryhmaParser {
 
-    public static final KotimainenOsoiteParser INSTANCE = new KotimainenOsoiteParser();
-
+    @Override
     public KotimainenOsoite parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return KotimainenOsoite.builder()
                 .ryhmatunnus(Ryhmatunnus.getEnum(parseRyhmatunnus(tietoryhma)))
@@ -31,7 +31,9 @@ public class KotimainenOsoiteParser implements TietoryhmaParser<KotimainenOsoite
                 .build();
     }
 
-    public String serialize(KotimainenOsoite osoite) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        KotimainenOsoite osoite = (KotimainenOsoite) tietoryhma;
         return osoite.getRyhmatunnus().getCode()
                 + osoite.getMuutostapa().getNumber()
                 + serializeString(osoite.getLahiosoite(), 100)

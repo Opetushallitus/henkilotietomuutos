@@ -1,6 +1,7 @@
 package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.UlkomainenOsoite;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseAdditionalInformation;
@@ -12,10 +13,9 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class UlkomainenOsoiteParser implements TietoryhmaParser<UlkomainenOsoite> {
+public class UlkomainenOsoiteParser implements TietoryhmaParser {
 
-    public static final UlkomainenOsoiteParser INSTANCE = new UlkomainenOsoiteParser();
-
+    @Override
     public UlkomainenOsoite parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         String countryCode = parseString(tietoryhma, 164, 3);
 
@@ -36,7 +36,9 @@ public class UlkomainenOsoiteParser implements TietoryhmaParser<UlkomainenOsoite
         return osoite;
     }
 
-    public String serialize(UlkomainenOsoite osoite) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        UlkomainenOsoite osoite = (UlkomainenOsoite) tietoryhma;
         String serialized = osoite.getRyhmatunnus().getCode()
                 + osoite.getMuutostapa().getNumber()
                 + serializeString(osoite.getStreetAddress(), 80)

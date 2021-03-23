@@ -27,7 +27,7 @@ import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.setYhteyst
 @Getter
 @Setter
 @NoArgsConstructor
-public class KotimainenOsoite extends YhteystietoTietoryhma<KotimainenOsoite> {
+public class KotimainenOsoite extends YhteystietoTietoryhma {
 
     private static final KotimainenOsoiteParser PARSER = new KotimainenOsoiteParser();
 
@@ -93,15 +93,5 @@ public class KotimainenOsoite extends YhteystietoTietoryhma<KotimainenOsoite> {
                 .ifPresent(postitoimipaikka -> setYhteystietoArvo(yhteystietoryhma, YhteystietoTyyppi.YHTEYSTIETO_KAUPUNKI, postitoimipaikka));
         context.getMaa(ISO3166_FI, asiointikieli)
                 .ifPresent(maa -> setYhteystietoArvo(yhteystietoryhma, YhteystietoTyyppi.YHTEYSTIETO_MAA, maa));
-    }
-
-    @Override
-    protected KotimainenOsoite getThis() {
-        return this;
-    }
-
-    @Override
-    protected KotimainenOsoiteParser getParser() {
-        return null;
     }
 }

@@ -29,8 +29,6 @@ import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.setYhteyst
 @NoArgsConstructor
 public class UlkomainenOsoite extends YhteystietoTietoryhma<UlkomainenOsoite> {
 
-    private static final UlkomainenOsoiteParser PARSER = new UlkomainenOsoiteParser();
-
     @Column(name = "street_address")
     private String streetAddress;
 
@@ -75,15 +73,5 @@ public class UlkomainenOsoite extends YhteystietoTietoryhma<UlkomainenOsoite> {
                 .filter(StringUtils::hasLength)
                 .flatMap(maakoodi -> context.getMaa(maakoodi, asiointikieli))
                 .ifPresent(maa -> setYhteystietoArvo(yhteystietoryhma, YhteystietoTyyppi.YHTEYSTIETO_MAA, maa));
-    }
-
-    @Override
-    protected UlkomainenOsoite getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<UlkomainenOsoite> getParser() {
-        return PARSER;
     }
 }

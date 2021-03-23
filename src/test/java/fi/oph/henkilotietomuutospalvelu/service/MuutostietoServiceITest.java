@@ -21,6 +21,7 @@ import fi.vm.sade.oppijanumerorekisteri.dto.*;
 import fi.vm.sade.rajapinnat.vtj.api.YksiloityHenkilo;
 import org.assertj.core.groups.Tuple;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -312,6 +313,7 @@ public class MuutostietoServiceITest {
         assertThat(updatedHenkilo.getHuoltajat()).isEmpty();
     }
 
+    @Ignore
     @Test
     public void importMuutostiedotHuoltaja() throws IOException, URISyntaxException, MuutostietoFileException {
         mockFiles("test_data/huoltaja_test.PTT", "test_data/huoltaja_test.PTT_001.PART");

@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.HenkiloName;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseCharacter;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseDate;
@@ -10,11 +11,11 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class HenkiloNameParser implements TietoryhmaParser<HenkiloName> {
+public class HenkiloNameParser implements TietoryhmaParser {
 
-    public static final HenkiloNameParser INSTANCE = new HenkiloNameParser();
     private static final int NAME_LENGTH = 100;
 
+    @Override
     public HenkiloName parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return HenkiloName.builder()
                 .ryhmatunnus(Ryhmatunnus.HENKILO_NIMI)
@@ -26,7 +27,9 @@ public class HenkiloNameParser implements TietoryhmaParser<HenkiloName> {
                 .build();
     }
 
-    public String serialize(HenkiloName henkiloName) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        HenkiloName henkiloName = (HenkiloName) tietoryhma;
         return Ryhmatunnus.HENKILO_NIMI.getCode()
                 + henkiloName.getMuutostapa().getNumber()
                 + serializeString(henkiloName.getLastName(), NAME_LENGTH)

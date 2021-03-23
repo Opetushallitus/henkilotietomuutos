@@ -12,10 +12,12 @@ import static org.junit.Assert.assertNull;
 
 public class UlkomainenOsoiteParserTest {
 
+    UlkomainenOsoiteParser parser = new UlkomainenOsoiteParser();
+
     @Test
     public void parsesUlkomainenOsoite() {
         String tietoryhma = "1041Abcdef                                                                          Asdfasdf                                                                        1231970010100000000";
-        UlkomainenOsoite osoite = UlkomainenOsoiteParser.parseUlkomainenOsoite(tietoryhma);
+        UlkomainenOsoite osoite = parser.parse(tietoryhma);
         assertEquals(Ryhmatunnus.ULKOMAINEN_OSOITE, osoite.getRyhmatunnus());
         assertEquals("123", osoite.getCountryCode());
         assertEquals("Abcdef", osoite.getStreetAddress());
@@ -27,15 +29,15 @@ public class UlkomainenOsoiteParserTest {
     @Test
     public void serializesUlkomainenOsoite() {
         String tietoryhma = "1041Abcdef                                                                          Asdfasdf                                                                        1231970010100000000";
-        UlkomainenOsoite osoite = UlkomainenOsoiteParser.parseUlkomainenOsoite(tietoryhma);
-        assertEquals(tietoryhma, UlkomainenOsoiteParser.serializeUlkomainenOsoite(osoite));
+        UlkomainenOsoite osoite = parser.parse(tietoryhma);
+        assertEquals(tietoryhma, parser.serialize(osoite));
     }
 
     @Test
     public void parsesUlkomainenOsoiteWithAdditionalInformation() {
         String tietoryhma = "1041Abcdef                                                                          Asdfasdf                                                                        9981970010100000000";
         String lisatieto = "4520Kosovo                        ";
-        UlkomainenOsoite osoite = UlkomainenOsoiteParser.parseUlkomainenOsoite(tietoryhma, lisatieto);
+        UlkomainenOsoite osoite = parser.parse(tietoryhma, lisatieto);
         assertEquals("998", osoite.getCountryCode());
         assertEquals("Kosovo", osoite.getAdditionalInformation());
     }
@@ -44,17 +46,17 @@ public class UlkomainenOsoiteParserTest {
     public void serializesUlkomainenOsoiteWithAdditionalInformation() {
         String tietoryhma = "1041Abcdef                                                                          Asdfasdf                                                                        9981970010100000000";
         String lisatieto = "4520Kosovo                        ";
-        UlkomainenOsoite osoite = UlkomainenOsoiteParser.parseUlkomainenOsoite(tietoryhma, lisatieto);
+        UlkomainenOsoite osoite = parser.parse(tietoryhma, lisatieto);
         String expected = String.join("|", tietoryhma, lisatieto);
-        assertEquals(expected, UlkomainenOsoiteParser.serializeUlkomainenOsoite(osoite));
+        assertEquals(expected, parser.serialize(osoite));
     }
 
     @Test
     public void parsesAndSerializesTilapainenUlkomainenOsoite() {
         String tietoryhma = "1051Abcdef                                                                          Asdfasdf                                                                        1231970010100000000";
         TilapainenUlkomainenOsoite osoite = TilapainenUlkomainenOsoite.from(
-                UlkomainenOsoiteParser.parseUlkomainenOsoite(tietoryhma));
+                parser.parse(tietoryhma));
         assertEquals(Ryhmatunnus.ULKOMAINEN_OSOITE_TILAPAINEN, osoite.getRyhmatunnus());
-        assertEquals(tietoryhma, UlkomainenOsoiteParser.serializeUlkomainenOsoite(osoite));
+        assertEquals(tietoryhma, parser.serialize(osoite));
     }
 }

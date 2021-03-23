@@ -30,7 +30,8 @@ public class TilapainenUlkomainenOsoite extends UlkomainenOsoite {
         super(ryhmatunnus, muutostapa, streetAddress, municipality, countryCode, startDate, endDate, additionalInformation);
     }
 
-    public static TilapainenUlkomainenOsoite from(UlkomainenOsoite osoite) {
+    public static TilapainenUlkomainenOsoite from(Tietoryhma tietoryhma) {
+        UlkomainenOsoite osoite = (UlkomainenOsoite) tietoryhma;
         return new TilapainenUlkomainenOsoite(
                 Ryhmatunnus.ULKOMAINEN_OSOITE_TILAPAINEN, osoite.getMuutostapa(), osoite.getStreetAddress(),
                 osoite.getMunicipality(), osoite.getCountryCode(), osoite.getStartDate(), osoite.getEndDate(),

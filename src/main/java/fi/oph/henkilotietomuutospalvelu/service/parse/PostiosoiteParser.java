@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Postiosoite;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
@@ -9,10 +10,9 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class PostiosoiteParser implements TietoryhmaParser<Postiosoite> {
+public class PostiosoiteParser implements TietoryhmaParser {
 
-    public static final PostiosoiteParser INSTANCE = new PostiosoiteParser();
-
+    @Override
     public Postiosoite parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return Postiosoite.builder()
                 .ryhmatunnus(Ryhmatunnus.POSTIOSOITE)
@@ -25,7 +25,9 @@ public class PostiosoiteParser implements TietoryhmaParser<Postiosoite> {
                 .build();
     }
 
-    public String serialize(Postiosoite postiosoite) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        Postiosoite postiosoite = (Postiosoite) tietoryhma;
         return Ryhmatunnus.POSTIOSOITE.getCode()
                 + postiosoite.getMuutostapa().getNumber()
                 + serializeString(postiosoite.getPostiosoite(), 50)

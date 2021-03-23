@@ -3,6 +3,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Edunvalvoja;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.HenkilotunnuksetonHenkilo;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
@@ -10,11 +11,11 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class EdunvalvojaParser implements TietoryhmaParser<Edunvalvoja> {
+public class EdunvalvojaParser implements TietoryhmaParser {
 
-    public static final EdunvalvojaParser INSTANCE = new EdunvalvojaParser();
-    private static final HenkilotunnuksetonHenkiloParser HENKILO_PARSER = HenkilotunnuksetonHenkiloParser.INSTANCE;
+    private static final HenkilotunnuksetonHenkiloParser HENKILO_PARSER = new HenkilotunnuksetonHenkiloParser();
 
+    @Override
     public Edunvalvoja parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return Edunvalvoja.builder()
                 .ryhmatunnus(Ryhmatunnus.EDUNVALVOJA)
@@ -39,7 +40,9 @@ public class EdunvalvojaParser implements TietoryhmaParser<Edunvalvoja> {
         );
     }
 
-    public String serialize(Edunvalvoja edunvalvoja) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        Edunvalvoja edunvalvoja = (Edunvalvoja) tietoryhma;
         String serialized = Ryhmatunnus.EDUNVALVOJA.getCode()
                 + edunvalvoja.getMuutostapa().getNumber()
                 + serializeString(edunvalvoja.getHetu(), 11)

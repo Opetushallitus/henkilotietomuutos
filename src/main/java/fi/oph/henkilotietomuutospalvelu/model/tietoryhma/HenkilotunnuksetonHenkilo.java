@@ -20,9 +20,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-public class HenkilotunnuksetonHenkilo extends Tietoryhma<HenkilotunnuksetonHenkilo> {
-
-    private static final HenkilotunnuksetonHenkiloParser PARSER = new HenkilotunnuksetonHenkiloParser();
+public class HenkilotunnuksetonHenkilo extends Tietoryhma {
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
@@ -51,15 +49,5 @@ public class HenkilotunnuksetonHenkilo extends Tietoryhma<HenkilotunnuksetonHenk
         this.firstNames = firstNames;
         this.nationality = nationality;
         this.additionalInformation = additionalInformation;
-    }
-
-    @Override
-    protected HenkilotunnuksetonHenkilo getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<HenkilotunnuksetonHenkilo> getParser() {
-        return PARSER;
     }
 }

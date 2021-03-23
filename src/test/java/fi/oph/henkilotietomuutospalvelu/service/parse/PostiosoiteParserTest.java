@@ -10,10 +10,12 @@ import static org.junit.Assert.assertNull;
 
 public class PostiosoiteParserTest {
 
+    PostiosoiteParser parser = new PostiosoiteParser();
+
     @Test
     public void parsesPostiosoite() {
         String tietoryhma = "1031Humikkalanrinne 1                                 Humikkalabrinken 1                                009402020010100000000";
-        Postiosoite osoite = PostiosoiteParser.parsePostiosoite(tietoryhma);
+        Postiosoite osoite = parser.parse(tietoryhma);
         assertEquals("Humikkalanrinne 1", osoite.getPostiosoite());
         assertEquals("Humikkalabrinken 1", osoite.getPostiosoiteSv());
         assertEquals(LocalDate.of(2020, 1, 1), osoite.getStartDate());
@@ -23,7 +25,7 @@ public class PostiosoiteParserTest {
     @Test
     public void serializesPostiosoite() {
         String tietoryhma = "1031Humikkalanrinne 1                                 Humikkalabrinken 1                                009402020010100000000";
-        Postiosoite osoite = PostiosoiteParser.parsePostiosoite(tietoryhma);
-        assertEquals(tietoryhma, PostiosoiteParser.serializePostiosoite(osoite));
+        Postiosoite osoite = parser.parse(tietoryhma);
+        assertEquals(tietoryhma, parser.serialize(osoite));
     }
 }

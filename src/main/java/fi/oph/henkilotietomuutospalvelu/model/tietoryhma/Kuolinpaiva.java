@@ -18,9 +18,7 @@ import java.time.LocalDate;
 @DiscriminatorValue("kuolinpaiva")
 @Getter
 @NoArgsConstructor
-public class Kuolinpaiva extends Tietoryhma<Kuolinpaiva> {
-
-    private static final KuolinpaivaParser PARSER = new KuolinpaivaParser();
+public class Kuolinpaiva extends Tietoryhma {
 
     @Column(name = "date_of_death")
     private LocalDate dateOfDeath;
@@ -29,16 +27,6 @@ public class Kuolinpaiva extends Tietoryhma<Kuolinpaiva> {
     public Kuolinpaiva(Ryhmatunnus ryhmatunnus, Muutostapa muutostapa, LocalDate dateOfDeath) {
         super(ryhmatunnus, muutostapa);
         this.dateOfDeath = dateOfDeath;
-    }
-
-    @Override
-    protected Kuolinpaiva getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Kuolinpaiva> getParser() {
-        return PARSER;
     }
 
     @Override

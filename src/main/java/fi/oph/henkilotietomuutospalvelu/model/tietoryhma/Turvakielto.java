@@ -24,7 +24,7 @@ import java.util.Set;
 @Setter
 @Slf4j
 @NoArgsConstructor
-public class Turvakielto extends Tietoryhma<Turvakielto> {
+public class Turvakielto extends Tietoryhma {
 
     private static final TurvakieltoParser PARSER = new TurvakieltoParser();
 
@@ -39,16 +39,6 @@ public class Turvakielto extends Tietoryhma<Turvakielto> {
     public Turvakielto(Ryhmatunnus ryhmatunnus, Muutostapa muutostapa, LocalDate endDate) {
         super(ryhmatunnus, muutostapa);
         this.endDate = endDate;
-    }
-
-    @Override
-    protected Turvakielto getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Turvakielto> getParser() {
-        return PARSER;
     }
 
     @Override

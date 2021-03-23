@@ -3,6 +3,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.EdunvalvontaValtuutettu;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.HenkilotunnuksetonHenkilo;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
@@ -10,11 +11,11 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class EdunvalvontaValtuutettuParser implements TietoryhmaParser<EdunvalvontaValtuutettu> {
+public class EdunvalvontaValtuutettuParser implements TietoryhmaParser {
 
-    public static final EdunvalvontaValtuutettuParser INSTANCE = new EdunvalvontaValtuutettuParser();
-    private static final HenkilotunnuksetonHenkiloParser HENKILO_PARSER = HenkilotunnuksetonHenkiloParser.INSTANCE;
+    private static final HenkilotunnuksetonHenkiloParser HENKILO_PARSER = new HenkilotunnuksetonHenkiloParser();
 
+    @Override
     public EdunvalvontaValtuutettu parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return EdunvalvontaValtuutettu.builder()
                 .ryhmatunnus(Ryhmatunnus.EDUNVALVONTAVALTUUTETTU)
@@ -26,7 +27,9 @@ public class EdunvalvontaValtuutettuParser implements TietoryhmaParser<Edunvalvo
                 .build();
     }
 
-    public String serialize(EdunvalvontaValtuutettu valtuutettu) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        EdunvalvontaValtuutettu valtuutettu = (EdunvalvontaValtuutettu) tietoryhma;
         String serialized = Ryhmatunnus.EDUNVALVONTAVALTUUTETTU.getCode()
                 + valtuutettu.getMuutostapa().getNumber()
                 + serializeString(valtuutettu.getHetu(), 11)

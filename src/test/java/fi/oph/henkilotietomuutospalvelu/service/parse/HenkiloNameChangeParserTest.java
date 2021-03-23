@@ -12,13 +12,15 @@ import static org.junit.Assert.assertNull;
 
 public class HenkiloNameChangeParserTest {
 
+    HenkiloNameChangeParser parser = new HenkiloNameChangeParser();
+
     @Test
     public void parsesHenkiloNameChange() {
         String firstTietoryhmaString = "0051Olli Santeri                                                                                        022017010100000000 ";
         String secondTietoryhmaString = "0053Outi Susanna                                                                                        060000000020170101 ";
 
-        HenkiloNameChange newName = HenkiloNameChangeParser.parseHenkiloNameChange(firstTietoryhmaString);
-        HenkiloNameChange oldName = HenkiloNameChangeParser.parseHenkiloNameChange(secondTietoryhmaString);
+        HenkiloNameChange newName = parser.parse(firstTietoryhmaString);
+        HenkiloNameChange oldName = parser.parse(secondTietoryhmaString);
 
         assertEquals(Muutostapa.LISATTY, newName.getMuutostapa());
         assertEquals(LocalDate.of(2017, 1, 1), newName.getStartDate());
@@ -39,11 +41,11 @@ public class HenkiloNameChangeParserTest {
         String firstTietoryhmaString = "0051Olli Santeri                                                                                        022017010100000000 ";
         String secondTietoryhmaString = "0053Outi Susanna                                                                                        060000000020170101 ";
 
-        HenkiloNameChange newName = HenkiloNameChangeParser.parseHenkiloNameChange(firstTietoryhmaString);
-        HenkiloNameChange oldName = HenkiloNameChangeParser.parseHenkiloNameChange(secondTietoryhmaString);
+        HenkiloNameChange newName = parser.parse(firstTietoryhmaString);
+        HenkiloNameChange oldName = parser.parse(secondTietoryhmaString);
 
-        assertEquals(firstTietoryhmaString, HenkiloNameChangeParser.serializeHenkiloNameChange(newName));
-        assertEquals(secondTietoryhmaString, HenkiloNameChangeParser.serializeHenkiloNameChange(oldName));
+        assertEquals(firstTietoryhmaString, parser.serialize(newName));
+        assertEquals(secondTietoryhmaString, parser.serialize(oldName));
     }
 
 }

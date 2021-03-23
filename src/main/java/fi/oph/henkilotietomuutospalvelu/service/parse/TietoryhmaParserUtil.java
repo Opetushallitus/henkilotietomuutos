@@ -14,7 +14,7 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serial
 @Slf4j
 public class TietoryhmaParserUtil {
 
-    public static Tietoryhma<?> deserializeTietoryhma(String tietoryhma, String... tarkentavatTietoryhmat)
+    public static Tietoryhma deserializeTietoryhma(String tietoryhma, String... tarkentavatTietoryhmat)
             throws TietoryhmaParseException {
         if (tietoryhma.length() < 4) {
             throw new TietoryhmaParseException("Tietoryhmä has a length less than 4 and is not valid!");
@@ -25,7 +25,7 @@ public class TietoryhmaParserUtil {
             if (ryhmatunnus == null) {
                 throw new TietoryhmaParseException("Unsupported Tietoryhma! Ryhmatunnus: " + ryhmakoodi);
             }
-            TietoryhmaParser<?> parser = ryhmatunnus.getParser();
+            TietoryhmaParser parser = ryhmatunnus.getParser();
             return parser != null ? parser.parse(tietoryhma, tarkentavatTietoryhmat) : null;
         } catch (RuntimeException e) {
             if (e instanceof TietoryhmaParseException) {

@@ -18,9 +18,7 @@ import java.time.LocalDate;
 @DiscriminatorValue("henkilo_name")
 @Getter
 @NoArgsConstructor
-public class HenkiloName extends Tietoryhma<HenkiloName> {
-
-    private static final HenkiloNameParser PARSER = new HenkiloNameParser();
+public class HenkiloName extends Tietoryhma {
 
     /**
      * Tietoryhmä toimitetaan lisäyksenä ensimmäistä kertaa henkilön nimitietoja ilmoitettaessa esim. perustietojen
@@ -54,16 +52,6 @@ public class HenkiloName extends Tietoryhma<HenkiloName> {
         this.firstNames = firstNames;
         this.lastUpdateDate = lastUpdateDate;
         this.additionalInformation = additionalInformation;
-    }
-
-    @Override
-    protected HenkiloName getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<HenkiloName> getParser() {
-        return PARSER;
     }
 
     @Override

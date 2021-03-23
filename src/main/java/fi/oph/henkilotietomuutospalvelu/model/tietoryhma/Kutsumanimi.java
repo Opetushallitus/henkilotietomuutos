@@ -23,9 +23,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @Slf4j
-public class Kutsumanimi extends Tietoryhma<Kutsumanimi> {
-
-    private static final KutsumanimiParser PARSER = new KutsumanimiParser();
+public class Kutsumanimi extends Tietoryhma {
 
     private String name;
     private String type;
@@ -48,16 +46,6 @@ public class Kutsumanimi extends Tietoryhma<Kutsumanimi> {
         this.startDate = startDate;
         this.endDate = endDate;
         this.nonStandardCharacters = nonStandardCharacters;
-    }
-
-    @Override
-    protected Kutsumanimi getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Kutsumanimi> getParser() {
-        return PARSER;
     }
 
     @Override

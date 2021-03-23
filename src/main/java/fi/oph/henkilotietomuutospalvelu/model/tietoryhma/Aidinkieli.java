@@ -20,9 +20,7 @@ import javax.persistence.Entity;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Aidinkieli extends Tietoryhma<Aidinkieli> {
-
-    private static final TietoryhmaParser<Aidinkieli> PARSER = new AidinkieliParser();
+public class Aidinkieli extends Tietoryhma {
 
     /**
      * Äidinkieli on esitetty ISO639-standardin mukaisella kielikoodilla.
@@ -42,20 +40,9 @@ public class Aidinkieli extends Tietoryhma<Aidinkieli> {
     }
 
     @Override
-    protected Aidinkieli getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Aidinkieli> getParser() {
-        return PARSER;
-    }
-
-    @Override
     protected void updateHenkiloInternal(Context context, HenkiloForceUpdateDto henkilo) {
         KielisyysDto aidinkieli = new KielisyysDto();
         aidinkieli.setKieliKoodi(this.languageCode);
         henkilo.setAidinkieli(aidinkieli);
     }
-
 }

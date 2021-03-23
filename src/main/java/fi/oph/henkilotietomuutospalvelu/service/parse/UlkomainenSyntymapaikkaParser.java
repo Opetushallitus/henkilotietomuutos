@@ -1,6 +1,7 @@
 package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.UlkomainenSyntymapaikka;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,10 +12,9 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
 @Slf4j
-public class UlkomainenSyntymapaikkaParser implements TietoryhmaParser<UlkomainenSyntymapaikka> {
+public class UlkomainenSyntymapaikkaParser implements TietoryhmaParser {
 
-    public static final UlkomainenSyntymapaikkaParser INSTANCE = new UlkomainenSyntymapaikkaParser();
-
+    @Override
     public UlkomainenSyntymapaikka parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         String countryCode = parseString(tietoryhma, 4, 3);
 
@@ -35,7 +35,9 @@ public class UlkomainenSyntymapaikkaParser implements TietoryhmaParser<Ulkomaine
         return syntymapaikka;
     }
 
-    public String serialize(UlkomainenSyntymapaikka syntymapaikka) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        UlkomainenSyntymapaikka syntymapaikka = (UlkomainenSyntymapaikka) tietoryhma;
         String serialized = Ryhmatunnus.ULKOMAINEN_SYNTYMAPAIKKA.getCode()
                 + syntymapaikka.getMuutostapa().getNumber()
                 + syntymapaikka.getCountryCode()

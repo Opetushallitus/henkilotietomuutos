@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.UlkomainenHenkilonumero;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseCharacter;
@@ -11,10 +12,9 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class UlkomainenHenkilonumeroParser implements TietoryhmaParser<UlkomainenHenkilonumero> {
+public class UlkomainenHenkilonumeroParser implements TietoryhmaParser {
 
-    public static final UlkomainenHenkilonumeroParser INSTANCE = new UlkomainenHenkilonumeroParser();
-
+    @Override
     public UlkomainenHenkilonumero parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return UlkomainenHenkilonumero.builder()
                 .ryhmatunnus(Ryhmatunnus.ULKOMAINEN_HENKILONUMERO)
@@ -33,7 +33,9 @@ public class UlkomainenHenkilonumeroParser implements TietoryhmaParser<Ulkomaine
                 .build();
     }
 
-    public String serialize(UlkomainenHenkilonumero henkilonumero) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        UlkomainenHenkilonumero henkilonumero = (UlkomainenHenkilonumero) tietoryhma;
         return Ryhmatunnus.ULKOMAINEN_HENKILONUMERO.getCode()
                 + henkilonumero.getMuutostapa().getNumber()
                 + serializeString(henkilonumero.getUlkomainenHenkilonumeroId(), 30)

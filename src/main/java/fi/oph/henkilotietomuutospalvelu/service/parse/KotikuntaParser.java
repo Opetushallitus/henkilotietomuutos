@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Kotikunta;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
@@ -9,10 +10,9 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class KotikuntaParser implements TietoryhmaParser<Kotikunta> {
+public class KotikuntaParser implements TietoryhmaParser {
 
-    public static KotikuntaParser INSTANCE = new KotikuntaParser();
-
+    @Override
     public Kotikunta parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return Kotikunta.builder()
                 .ryhmatunnus(Ryhmatunnus.KOTIKUNTA)
@@ -22,7 +22,9 @@ public class KotikuntaParser implements TietoryhmaParser<Kotikunta> {
                 .build();
     }
 
-    public String serialize(Kotikunta kunta) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        Kotikunta kunta = (Kotikunta) tietoryhma;
         return Ryhmatunnus.KOTIKUNTA.getCode()
                 + kunta.getMuutostapa().getNumber()
                 + serializeString(kunta.getCode(), 3)

@@ -27,7 +27,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
-public abstract class Tietoryhma<T extends Tietoryhma<T>> extends IdentifiableAndVersionedEntity {
+public abstract class Tietoryhma extends IdentifiableAndVersionedEntity {
 
     @Transient
     private Ryhmatunnus ryhmatunnus;
@@ -60,14 +60,6 @@ public abstract class Tietoryhma<T extends Tietoryhma<T>> extends IdentifiableAn
             log.debug("Redundant change skipped");
         }
     }
-
-    public String serialize() {
-        return getParser().serialize(getThis());
-    }
-
-    protected abstract T getThis();
-
-    protected abstract TietoryhmaParser<T> getParser();
 
     protected Set<Muutostapa> getRedundantChanges() {
         return REDUNDANT_CHANGES;

@@ -4,6 +4,7 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.HenkilotunnuksetonHenkilo;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Huoltaja;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Oikeus;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -16,12 +17,11 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class HuoltajaParser implements TietoryhmaParser<Huoltaja> {
+public class HuoltajaParser implements TietoryhmaParser {
+    private static final HenkilotunnuksetonHenkiloParser HENKILO_PARSER = new HenkilotunnuksetonHenkiloParser();
+    private static final OikeusParser OIKEUS_PARSER = new OikeusParser();
 
-    public static final HuoltajaParser INSTANCE = new HuoltajaParser();
-    private static final HenkilotunnuksetonHenkiloParser HENKILO_PARSER = HenkilotunnuksetonHenkiloParser.INSTANCE;
-    private static final OikeusParser OIKEUS_PARSER = OikeusParser.INSTANCE;
-
+    @Override
     public Huoltaja parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         if (tietoryhma.length() == 43) {
             // formaatti ennen 2019-12-01
@@ -66,7 +66,9 @@ public class HuoltajaParser implements TietoryhmaParser<Huoltaja> {
     }
 
     // formaatti ennen 2019-12-01 ei tuettu!
-    public String serialize(Huoltaja huoltaja) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        Huoltaja huoltaja = (Huoltaja) tietoryhma;
         String serialized = Ryhmatunnus.HUOLTAJA.getCode()
                 + huoltaja.getMuutostapa().getNumber()
                 + serializeString(huoltaja.getHetu(), 11)
@@ -95,5 +97,4 @@ public class HuoltajaParser implements TietoryhmaParser<Huoltaja> {
                 .map(OIKEUS_PARSER::parse)
                 .collect(Collectors.toSet());
     }
-
 }

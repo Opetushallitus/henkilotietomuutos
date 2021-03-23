@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Kutsumanimi;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseCharacter;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseDate;
@@ -10,10 +11,9 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class KutsumanimiParser implements TietoryhmaParser<Kutsumanimi> {
+public class KutsumanimiParser implements TietoryhmaParser {
 
-    public static final KutsumanimiParser INSTANCE = new KutsumanimiParser();
-
+    @Override
     public Kutsumanimi parse(String value, String... tarkentavatTietoryhmat) {
         return Kutsumanimi.builder()
                 .ryhmatunnus(Ryhmatunnus.KUTSUMANIMI)
@@ -26,7 +26,9 @@ public class KutsumanimiParser implements TietoryhmaParser<Kutsumanimi> {
                 .build();
     }
 
-    public String serialize(Kutsumanimi nimi) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        Kutsumanimi nimi = (Kutsumanimi) tietoryhma;
         return Ryhmatunnus.KUTSUMANIMI.getCode()
                 + nimi.getMuutostapa().getNumber()
                 + serializeString(nimi.getName(), 100)

@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Kansalaisuus;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseAdditionalInformation;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseCharacter;
@@ -11,10 +12,9 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.serializeAdditionalInformation;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 
-public class KansalaisuusParser implements TietoryhmaParser<Kansalaisuus> {
+public class KansalaisuusParser implements TietoryhmaParser {
 
-    public static final KansalaisuusParser INSTANCE = new KansalaisuusParser();
-
+    @Override
     public Kansalaisuus parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         String code = parseString(tietoryhma, 4, 3);
         if (code.equals("998")) {
@@ -31,7 +31,9 @@ public class KansalaisuusParser implements TietoryhmaParser<Kansalaisuus> {
                 .build();
     }
 
-    public String serialize(Kansalaisuus kansalaisuus) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        Kansalaisuus kansalaisuus = (Kansalaisuus) tietoryhma;
         String serialized = Ryhmatunnus.KANSALAISUUS.getCode()
                 + kansalaisuus.getMuutostapa().getNumber()
                 + (kansalaisuus.getCode().length() > 3 ? "998" : kansalaisuus.getCode())

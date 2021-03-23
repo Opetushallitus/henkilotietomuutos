@@ -2,15 +2,15 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Ammatti;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseString;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class AmmattiParser implements TietoryhmaParser<Ammatti> {
+public class AmmattiParser implements TietoryhmaParser {
 
-    public static final AmmattiParser INSTANCE = new AmmattiParser();
-
+    @Override
     public Ammatti parse(String ammatti, String... tarkentavatTietoryhmat) {
         return Ammatti.builder()
                 .ryhmatunnus(Ryhmatunnus.AMMATTI)
@@ -20,7 +20,9 @@ public class AmmattiParser implements TietoryhmaParser<Ammatti> {
                 .build();
     }
 
-    public String serialize(Ammatti ammatti) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        Ammatti ammatti = (Ammatti) tietoryhma;
         return Ryhmatunnus.AMMATTI.getCode()
                 + ammatti.getMuutostapa().getNumber()
                 + serializeString(ammatti.getCode(), 4)

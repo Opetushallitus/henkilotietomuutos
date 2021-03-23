@@ -22,7 +22,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Oikeus extends Tietoryhma<Oikeus> {
+public class Oikeus extends Tietoryhma {
 
     private static final OikeusParser PARSER = new OikeusParser();
 
@@ -46,15 +46,5 @@ public class Oikeus extends Tietoryhma<Oikeus> {
         this.koodi = koodi;
         this.alkupvm = alkupvm;
         this.loppupvm = loppupvm;
-    }
-
-    @Override
-    protected Oikeus getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Oikeus> getParser() {
-        return PARSER;
     }
 }

@@ -22,9 +22,7 @@ import java.util.*;
 @DiscriminatorValue("huoltaja")
 @Getter
 @NoArgsConstructor
-public class Huoltaja extends Tietoryhma<Huoltaja> {
-
-    private static final HuoltajaParser PARSER = new HuoltajaParser();
+public class Huoltaja extends Tietoryhma {
 
     /** Mikäli Hetu on tyhjä, annetaan lisäksi Henkilötunnuksettoman Henkilön -tietoryhmä */
     private String hetu;
@@ -126,16 +124,6 @@ public class Huoltaja extends Tietoryhma<Huoltaja> {
     public boolean isVoimassa(Context context) {
         return (this.startDate == null || context.getLocalDateNow().isAfter(this.startDate))
                 && (this.endDate == null || context.getLocalDateNow().isBefore(this.endDate));
-    }
-
-    @Override
-    protected Huoltaja getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Huoltaja> getParser() {
-        return PARSER;
     }
 
     @Override

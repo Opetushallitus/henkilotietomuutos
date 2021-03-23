@@ -22,7 +22,7 @@ import java.time.LocalDate;
 @DiscriminatorValue("henkilo_name_change")
 @Getter
 @NoArgsConstructor
-public class HenkiloNameChange extends Tietoryhma<HenkiloNameChange> {
+public class HenkiloNameChange extends Tietoryhma {
 
     private static final HenkiloNameChangeParser PARSER = new HenkiloNameChangeParser();
 
@@ -50,16 +50,6 @@ public class HenkiloNameChange extends Tietoryhma<HenkiloNameChange> {
         this.startDate = startDate;
         this.endDate = endDate;
         this.hasNonStandardCharacters = hasNonStandardCharacters;
-    }
-
-    @Override
-    protected HenkiloNameChange getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<HenkiloNameChange> getParser() {
-        return PARSER;
     }
 
     @Override

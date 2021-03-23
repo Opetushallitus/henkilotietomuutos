@@ -17,9 +17,7 @@ import java.time.LocalDate;
 @DiscriminatorValue("edunvalvonta_valtuutus")
 @NoArgsConstructor
 @Getter
-public class EdunvalvontaValtuutus extends Tietoryhma<EdunvalvontaValtuutus> {
-
-    private static final EdunvalvontaValtuutusParser PARSER = new EdunvalvontaValtuutusParser();
+public class EdunvalvontaValtuutus extends Tietoryhma {
 
     /**
      * Edunvalvontavaltuutuksen tietoryhmässä kerrotaan edunvalvontavaltuutuslain mukaisen edunvalvontavaltuutuksen
@@ -49,15 +47,5 @@ public class EdunvalvontaValtuutus extends Tietoryhma<EdunvalvontaValtuutus> {
         this.endDate = endDate;
         this.dutiesStarted = dutiesStarted;
         this.edunvalvojaValtuutetut = edunvalvojaValtuutetut;
-    }
-
-    @Override
-    protected EdunvalvontaValtuutus getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<EdunvalvontaValtuutus> getParser() {
-        return PARSER;
     }
 }

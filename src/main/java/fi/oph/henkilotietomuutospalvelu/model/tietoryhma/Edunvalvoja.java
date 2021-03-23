@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @DiscriminatorValue("edunvalvoja")
 @Getter
 @NoArgsConstructor
-public class Edunvalvoja extends Tietoryhma<Edunvalvoja> {
+public class Edunvalvoja extends Tietoryhma {
 
     private static final EdunvalvojaParser PARSER = new EdunvalvojaParser();
     /** Mikäli Hetu on tyhjä, annetaan lisäksi Henkilötunnuksettoman Henkilön -tietoryhmä */
@@ -55,15 +55,5 @@ public class Edunvalvoja extends Tietoryhma<Edunvalvoja> {
         this.startDate = startDate;
         this.endDate = endDate;
         this.henkilotunnuksetonHenkilo = henkilotunnuksetonHenkilo;
-    }
-
-    @Override
-    protected Edunvalvoja getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Edunvalvoja> getParser() {
-        return PARSER;
     }
 }

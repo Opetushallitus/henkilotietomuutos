@@ -1,7 +1,9 @@
 package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
+import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Toimintakelpoisuus;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Edunvalvoja;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Edunvalvonta;
 import org.junit.Test;
 
@@ -12,10 +14,12 @@ import static org.junit.Assert.assertNull;
 
 public class EdunvalvontaParserTest {
 
+    EdunvalvontaParser parser = new EdunvalvontaParser();
+
     @Test
     public void parseEdunvalvonta() {
         String tietoryhma = "30601989020100000000 102|3075                    0000000001989020119980101";
-        Edunvalvonta valvonta = EdunvalvontaParser.parseEdunvalvonta(tietoryhma);
+        Edunvalvonta valvonta = parser.parse(tietoryhma);
         assertEquals(Muutostapa.LISATIETO, valvonta.getMuutostapa());
         assertEquals(LocalDate.of(1989, 2, 1), valvonta.getStartDate());
         assertNull(valvonta.getEndDate());

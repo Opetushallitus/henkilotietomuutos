@@ -21,9 +21,7 @@ import java.util.Collection;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Henkilotunnuskorjaus extends Tietoryhma<Henkilotunnuskorjaus> {
-
-    private static final HenkilotunnuskorjausParser PARSER = new HenkilotunnuskorjausParser();
+public class Henkilotunnuskorjaus extends Tietoryhma {
 
     /**
      * Henkilön nimi tr 004 (nykyinen nimi) annetaan aina lisätietona (muutosattribuutilla 0=lisätieto).
@@ -59,16 +57,6 @@ public class Henkilotunnuskorjaus extends Tietoryhma<Henkilotunnuskorjaus> {
         if (allowedMuutostapas.contains(this.getMuutostapa())) {
             this.updateHenkiloInternal(context, henkilo);
         }
-    }
-
-    @Override
-    protected Henkilotunnuskorjaus getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Henkilotunnuskorjaus> getParser() {
-        return PARSER;
     }
 
     @Override

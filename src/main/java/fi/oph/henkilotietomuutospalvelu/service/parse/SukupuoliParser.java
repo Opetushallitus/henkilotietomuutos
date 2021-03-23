@@ -3,14 +3,14 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Sukupuoli;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseCharacter;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
 
-public class SukupuoliParser implements TietoryhmaParser<Sukupuoli> {
+public class SukupuoliParser implements TietoryhmaParser {
 
-    public static final SukupuoliParser INSTANCE = new SukupuoliParser();
-
+    @Override
     public Sukupuoli parse(String tietoryhma, String... tarkentavatTietoryhma) {
         return Sukupuoli.builder()
                 .ryhmatunnus(Ryhmatunnus.SUKUPUOLI)
@@ -19,7 +19,9 @@ public class SukupuoliParser implements TietoryhmaParser<Sukupuoli> {
                 .build();
     }
 
-    public String serialize(Sukupuoli sukupuoli) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        Sukupuoli sukupuoli = (Sukupuoli) tietoryhma;
         return Ryhmatunnus.SUKUPUOLI.getCode()
                 + sukupuoli.getMuutostapa().getNumber()
                 + sukupuoli.getGender().getCode();

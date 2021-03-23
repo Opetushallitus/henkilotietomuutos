@@ -2,6 +2,7 @@ package fi.oph.henkilotietomuutospalvelu.service.parse;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.EdunvalvontaValtuutus;
+import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseCharacter;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseDate;
@@ -10,10 +11,9 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class EdunvalvontaValtuutusParser implements TietoryhmaParser<EdunvalvontaValtuutus> {
+public class EdunvalvontaValtuutusParser implements TietoryhmaParser {
 
-    public static final EdunvalvontaValtuutusParser INSTANCE = new EdunvalvontaValtuutusParser();
-    
+    @Override
     public EdunvalvontaValtuutus parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return EdunvalvontaValtuutus.builder()
                 .ryhmatunnus(Ryhmatunnus.EDUNVALVONTAVALTUUTUS)
@@ -25,7 +25,9 @@ public class EdunvalvontaValtuutusParser implements TietoryhmaParser<Edunvalvont
                 .build();
     }
 
-    public String serialize(EdunvalvontaValtuutus valtuutus) {
+    @Override
+    public String serialize(Tietoryhma tietoryhma) {
+        EdunvalvontaValtuutus valtuutus = (EdunvalvontaValtuutus) tietoryhma;
         return Ryhmatunnus.EDUNVALVONTAVALTUUTUS.getCode()
                 + valtuutus.getMuutostapa().getNumber()
                 + serializeDate(valtuutus.getStartDate())

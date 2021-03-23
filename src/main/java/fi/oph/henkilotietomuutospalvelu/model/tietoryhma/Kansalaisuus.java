@@ -28,9 +28,7 @@ import static java.util.stream.Collectors.toSet;
 @Getter
 @Slf4j
 @NoArgsConstructor
-public class Kansalaisuus extends Tietoryhma<Kansalaisuus> {
-
-    private static final KansalaisuusParser PARSER = new KansalaisuusParser();
+public class Kansalaisuus extends Tietoryhma {
 
     /**
      * Kansalaisuudet valtiokoodiston (ISO3166-standardi) mukaisina tai sitten selväkielisenä tietona.
@@ -55,16 +53,6 @@ public class Kansalaisuus extends Tietoryhma<Kansalaisuus> {
         this.valid = valid;
         this.startDate = startDate;
         this.endDate = endDate;
-    }
-
-    @Override
-    protected Kansalaisuus getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Kansalaisuus> getParser() {
-        return PARSER;
     }
 
     @Override

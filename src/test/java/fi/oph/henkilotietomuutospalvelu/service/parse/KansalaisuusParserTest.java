@@ -12,10 +12,12 @@ import static org.junit.Assert.assertTrue;
 
 public class KansalaisuusParserTest {
 
+    KansalaisuusParser parser = new KansalaisuusParser();
+
     @Test
     public void parsesKansalaisuus() {
         String value = "0071FIN12020102100000000";
-        Kansalaisuus kansalaisuus = KansalaisuusParser.parseKansalaisuus(value);
+        Kansalaisuus kansalaisuus = parser.parse(value);
         assertEquals(Muutostapa.LISATTY, kansalaisuus.getMuutostapa());
         assertEquals("FIN", kansalaisuus.getCode());
         assertEquals(LocalDate.of(2020, 10, 21), kansalaisuus.getStartDate());
@@ -26,8 +28,8 @@ public class KansalaisuusParserTest {
     @Test
     public void serializesKansalaisuus() {
         String value = "0071FIN12020102100000000";
-        Kansalaisuus kansalaisuus = KansalaisuusParser.parseKansalaisuus(value);
-        String serialized = KansalaisuusParser.serializeKansalaisuus(kansalaisuus);
+        Kansalaisuus kansalaisuus = parser.parse(value);
+        String serialized = parser.serialize(kansalaisuus);
         assertEquals(value, serialized);
     }
 
@@ -35,9 +37,9 @@ public class KansalaisuusParserTest {
     public void parsesAndSerializesKansalaisuusWithAdditionalInformation() {
         String value = "007199812020102100000000";
         String additionalInformation = "4520Kosovo                        ";
-        Kansalaisuus kansalaisuus = KansalaisuusParser.parseKansalaisuus(value, additionalInformation);
+        Kansalaisuus kansalaisuus = parser.parse(value, additionalInformation);
         assertEquals("Kosovo", kansalaisuus.getCode());
         String expected = String.join("|", value, additionalInformation);
-        assertEquals(expected, KansalaisuusParser.serializeKansalaisuus(kansalaisuus));
+        assertEquals(expected, parser.serialize(kansalaisuus));
     }
 }

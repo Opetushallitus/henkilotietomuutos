@@ -9,10 +9,12 @@ import static org.junit.Assert.assertEquals;
 
 public class KotikuntaParserTest {
 
+    KotikuntaParser parser = new KotikuntaParser();
+
     @Test
     public void parsesKotikunta() {
         String tietoryhma = "204112320201022";
-        Kotikunta kotikunta = KotikuntaParser.parseKotikunta(tietoryhma);
+        Kotikunta kotikunta = parser.parse(tietoryhma);
         assertEquals("123", kotikunta.getCode());
         assertEquals(LocalDate.of(2020, 10, 22), kotikunta.getMoveDate());
     }
@@ -20,7 +22,7 @@ public class KotikuntaParserTest {
     @Test
     public void serializesKotikunta() {
         String tietoryhma = "204112320201022";
-        Kotikunta kotikunta = KotikuntaParser.parseKotikunta(tietoryhma);
-        assertEquals(tietoryhma, KotikuntaParser.serializeKotikunta(kotikunta));
+        Kotikunta kotikunta = parser.parse(tietoryhma);
+        assertEquals(tietoryhma, parser.serialize(kotikunta));
     }
 }
