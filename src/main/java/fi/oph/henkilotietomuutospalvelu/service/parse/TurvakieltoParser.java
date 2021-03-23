@@ -10,26 +10,26 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseString;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 
-public class TurvakieltoParser {
+public class TurvakieltoParser implements TietoryhmaParser<Turvakielto> {
 
     private static final String INDEFINITE_DATESTRING = "99990000";
 
-    static Turvakielto parseTurvakielto(String value) {
+    public Turvakielto parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         LocalDate endDate = null;
-        String dateStr = parseString(value, 4, 8);
+        String dateStr = parseString(tietoryhma, 4, 8);
         /* Toistaiseksi voimassa oleva turvakielto merkitään loppuajalla 99990000. */
         if (!dateStr.equals(INDEFINITE_DATESTRING)) {
-            endDate = parseDate(value, 4);
+            endDate = parseDate(tietoryhma, 4);
         }
 
         return Turvakielto.builder()
                 .ryhmatunnus(Ryhmatunnus.TURVAKIELTO)
-                .muutostapa(parseMuutosTapa(value))
+                .muutostapa(parseMuutosTapa(tietoryhma))
                 .endDate(endDate)
                 .build();
     }
 
-    static String serializeTurvakielto(Turvakielto turvakielto) {
+    public String serialize(Turvakielto turvakielto) {
         return Ryhmatunnus.TURVAKIELTO.getCode()
                 + turvakielto.getMuutostapa().getNumber()
                 + (turvakielto.getEndDate() == null ? INDEFINITE_DATESTRING : serializeDate(turvakielto.getEndDate()));

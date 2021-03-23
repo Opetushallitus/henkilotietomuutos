@@ -10,11 +10,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 public class KutsumanimiParserTest {
+    
+    
+    private final KutsumanimiParser parser = new KutsumanimiParser();
 
     @Test
     public void parsesKutsumanimi() {
         String tietoryhma = "4231Kosovon Härkä                                                                                       181976111000000000 ";
-        Kutsumanimi nimi = KutsumanimiParser.parseKutsumanimi(tietoryhma);
+        Kutsumanimi nimi = parser.parse(tietoryhma);
         assertEquals("Kosovon Härkä", nimi.getName());
         assertEquals("18", nimi.getType());
         assertEquals(LocalDate.of(1976, 11, 10), nimi.getStartDate());
@@ -25,7 +28,7 @@ public class KutsumanimiParserTest {
     @Test
     public void serializesKutsumanimi() {
         String tietoryhma = "4231Kosovon Härkä                                                                                       181976111000000000 ";
-        Kutsumanimi nimi = KutsumanimiParser.parseKutsumanimi(tietoryhma);
-        assertEquals(tietoryhma, KutsumanimiParser.serializeKutsumanimi(nimi));
+        Kutsumanimi nimi = parser.parse(tietoryhma);
+        assertEquals(tietoryhma, parser.serialize(nimi));
     }
 }

@@ -2,6 +2,8 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameParser;
+import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +18,9 @@ import java.time.LocalDate;
 @DiscriminatorValue("henkilo_name")
 @Getter
 @NoArgsConstructor
-public class HenkiloName extends Tietoryhma {
+public class HenkiloName extends Tietoryhma<HenkiloName> {
+
+    private static final HenkiloNameParser PARSER = new HenkiloNameParser();
 
     /**
      * Tietoryhmä toimitetaan lisäyksenä ensimmäistä kertaa henkilön nimitietoja ilmoitettaessa esim. perustietojen
@@ -50,6 +54,16 @@ public class HenkiloName extends Tietoryhma {
         this.firstNames = firstNames;
         this.lastUpdateDate = lastUpdateDate;
         this.additionalInformation = additionalInformation;
+    }
+
+    @Override
+    protected HenkiloName getThis() {
+        return this;
+    }
+
+    @Override
+    protected TietoryhmaParser<HenkiloName> getParser() {
+        return PARSER;
     }
 
     @Override

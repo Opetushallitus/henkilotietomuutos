@@ -7,18 +7,18 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseString;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class AmmattiParser {
+public class AmmattiParser implements TietoryhmaParser<Ammatti> {
 
-    static Ammatti parseAmmatti(String value) {
+    public Ammatti parse(String ammatti, String... tarkentavatTietoryhmat) {
         return Ammatti.builder()
                 .ryhmatunnus(Ryhmatunnus.AMMATTI)
-                .muutostapa(parseMuutosTapa(value))
-                .code(parseString(value, 4, 4))
-                .description(parseString(value, 8, 35))
+                .muutostapa(parseMuutosTapa(ammatti))
+                .code(parseString(ammatti, 4, 4))
+                .description(parseString(ammatti, 8, 35))
                 .build();
     }
 
-    static String serializeAmmatti(Ammatti ammatti) {
+    public String serialize(Ammatti ammatti) {
         return Ryhmatunnus.AMMATTI.getCode()
                 + ammatti.getMuutostapa().getNumber()
                 + serializeString(ammatti.getCode(), 4)

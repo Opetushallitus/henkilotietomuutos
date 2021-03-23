@@ -7,17 +7,17 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 
-public class KuolinpaivaParser {
+public class KuolinpaivaParser implements TietoryhmaParser<Kuolinpaiva> {
 
-    static Kuolinpaiva parseKuolinpaiva(String value) {
+    public Kuolinpaiva parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return Kuolinpaiva.builder()
                 .ryhmatunnus(Ryhmatunnus.KUOLINPAIVA)
-                .muutostapa(parseMuutosTapa(value))
-                .dateOfDeath(parseDate(value, 4))
+                .muutostapa(parseMuutosTapa(tietoryhma))
+                .dateOfDeath(parseDate(tietoryhma, 4))
                 .build();
     }
 
-    static String serializeKuolinpaiva(Kuolinpaiva kuolinpaiva) {
+    public String serialize(Kuolinpaiva kuolinpaiva) {
         return Ryhmatunnus.KUOLINPAIVA.getCode()
                 + kuolinpaiva.getMuutostapa().getNumber()
                 + serializeDate(kuolinpaiva.getDateOfDeath());

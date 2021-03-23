@@ -10,27 +10,26 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseString;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.serializeAdditionalInformation;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
-import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class KansalaisuusParser {
+public class KansalaisuusParser implements TietoryhmaParser<Kansalaisuus> {
 
-    static Kansalaisuus parseKansalaisuus(String value, String... tarkentavatTietoryhmat) {
-        String code = parseString(value, 4, 3);
+    public Kansalaisuus parse(String tietoryhma, String... tarkentavatTietoryhmat) {
+        String code = parseString(tietoryhma, 4, 3);
         if (code.equals("998")) {
             code = parseAdditionalInformation(tarkentavatTietoryhmat[0]);
         }
 
         return Kansalaisuus.builder()
                 .ryhmatunnus(Ryhmatunnus.KANSALAISUUS)
-                .muutostapa(parseMuutosTapa(value))
+                .muutostapa(parseMuutosTapa(tietoryhma))
                 .code(code)
-                .valid(parseCharacter(value, 7).equals("1"))
-                .startDate(parseDate(value, 8))
-                .endDate(parseDate(value,16))
+                .valid(parseCharacter(tietoryhma, 7).equals("1"))
+                .startDate(parseDate(tietoryhma, 8))
+                .endDate(parseDate(tietoryhma,16))
                 .build();
     }
 
-    static String serializeKansalaisuus(Kansalaisuus kansalaisuus) {
+    public String serialize(Kansalaisuus kansalaisuus) {
         String serialized = Ryhmatunnus.KANSALAISUUS.getCode()
                 + kansalaisuus.getMuutostapa().getNumber()
                 + (kansalaisuus.getCode().length() > 3 ? "998" : kansalaisuus.getCode())

@@ -29,19 +29,20 @@ public class HenkiloMuutostietoRivi extends IdentifiableAndVersionedEntity {
 
     @OrderBy
     @OneToMany(mappedBy = "henkiloMuutostietoRivi", cascade = CascadeType.ALL)
-    private List<Tietoryhma> tietoryhmaList = new ArrayList<>();
+    private List<Tietoryhma<?>> tietoryhmaList = new ArrayList<>();
 
     @Column(name = "process_timestamp")
     private LocalDateTime processTimestamp;
 
-    public void addTietoryhma(Tietoryhma... tietoryhmat) {
-        for (Tietoryhma tietoryhma : tietoryhmat) {
+    @SafeVarargs
+    public final void addTietoryhma(Tietoryhma<?>... tietoryhmat) {
+        for (Tietoryhma<?> tietoryhma : tietoryhmat) {
             tietoryhma.setHenkiloMuutostietoRivi(this);
             tietoryhmaList.add(tietoryhma);
         }
     }
 
-    public Stream<Tietoryhma> getTietoryhmaStream() {
+    public Stream<Tietoryhma<?>> getTietoryhmaStream() {
         return tietoryhmaList.stream();
     }
 

@@ -90,7 +90,7 @@ public class MuutostietoServiceImplTest {
 
     @Test
     public void squashMultipartTietoryhmatWithOneThingToSquash() {
-        List<Tietoryhma> t = new ArrayList<>();
+        List<Tietoryhma<?>> t = new ArrayList<>();
         Kotikunta kotikunta = Kotikunta.builder().build();
         t.add(kotikunta);
 
@@ -112,11 +112,11 @@ public class MuutostietoServiceImplTest {
 
     @Test
     public void squashMultipartTietoryhmatWithOneVeryLongThingToSquash() {
-        List<Tietoryhma> t = new ArrayList<>();
+        List<Tietoryhma<?>> t = new ArrayList<>();
         Kotikunta kotikunta = Kotikunta.builder().build();
         t.add(kotikunta);
 
-        List<Tietoryhma> ta = new ArrayList<>();
+        List<Tietoryhma<?>> ta = new ArrayList<>();
         Ammatti ammatti = Ammatti.builder().build();
         Aidinkieli aidinkieli = Aidinkieli.builder().build();
         ta.add(ammatti);

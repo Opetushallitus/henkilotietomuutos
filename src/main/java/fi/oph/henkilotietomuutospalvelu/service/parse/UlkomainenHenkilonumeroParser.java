@@ -11,27 +11,27 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class UlkomainenHenkilonumeroParser {
+public class UlkomainenHenkilonumeroParser implements TietoryhmaParser<UlkomainenHenkilonumero> {
 
-    static UlkomainenHenkilonumero parseUlkomainenHenkilonumero(String value) {
+    public UlkomainenHenkilonumero parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return UlkomainenHenkilonumero.builder()
                 .ryhmatunnus(Ryhmatunnus.ULKOMAINEN_HENKILONUMERO)
-                .muutostapa(parseMuutosTapa(value))
-                .ulkomainenHenkilonumeroId(parseString(value, 4, 30))
-                .gender(Gender.getEnum(parseCharacter(value, 34)))
-                .countryCode(parseString(value, 35, 3))
-                .tietolahde(parseCharacter(value, 38))
-                .type(parseCharacter(value, 39))
-                .valid(parseCharacter(value, 40).equals("1"))
-                .issueDate(parseDate(value, 41))
-                .passivointiDate(parseDate(value, 49))
-                .saveDateVTJ(parseDate(value, 57))
-                .passivointiDateVTJ(parseDate(value, 65))
-                .validVTJ(parseCharacter(value, 73).equals("1"))
+                .muutostapa(parseMuutosTapa(tietoryhma))
+                .ulkomainenHenkilonumeroId(parseString(tietoryhma, 4, 30))
+                .gender(Gender.getEnum(parseCharacter(tietoryhma, 34)))
+                .countryCode(parseString(tietoryhma, 35, 3))
+                .tietolahde(parseCharacter(tietoryhma, 38))
+                .type(parseCharacter(tietoryhma, 39))
+                .valid(parseCharacter(tietoryhma, 40).equals("1"))
+                .issueDate(parseDate(tietoryhma, 41))
+                .passivointiDate(parseDate(tietoryhma, 49))
+                .saveDateVTJ(parseDate(tietoryhma, 57))
+                .passivointiDateVTJ(parseDate(tietoryhma, 65))
+                .validVTJ(parseCharacter(tietoryhma, 73).equals("1"))
                 .build();
     }
 
-    static String serializeUlkomainenHenkilonumero(UlkomainenHenkilonumero henkilonumero) {
+    public String serialize(UlkomainenHenkilonumero henkilonumero) {
         return Ryhmatunnus.ULKOMAINEN_HENKILONUMERO.getCode()
                 + henkilonumero.getMuutostapa().getNumber()
                 + serializeString(henkilonumero.getUlkomainenHenkilonumeroId(), 30)

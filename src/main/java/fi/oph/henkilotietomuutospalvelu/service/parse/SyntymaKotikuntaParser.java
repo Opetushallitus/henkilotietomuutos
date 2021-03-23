@@ -6,17 +6,17 @@ import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.SyntymaKotikunta;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseString;
 
-public class SyntymaKotikuntaParser {
+public class SyntymaKotikuntaParser implements TietoryhmaParser<SyntymaKotikunta> {
 
-    static SyntymaKotikunta parseSyntymaKotikunta(String value) {
+    public SyntymaKotikunta parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return SyntymaKotikunta.builder()
                 .ryhmatunnus(Ryhmatunnus.SYNTYMAKOTIKUNTA)
-                .muutostapa(parseMuutosTapa(value))
-                .kuntakoodi(parseString(value, 4, 3))
+                .muutostapa(parseMuutosTapa(tietoryhma))
+                .kuntakoodi(parseString(tietoryhma, 4, 3))
                 .build();
     }
 
-    static String serializeSyntymaKotikunta(SyntymaKotikunta syntymaKotikunta) {
+    public String serialize(SyntymaKotikunta syntymaKotikunta) {
         return Ryhmatunnus.SYNTYMAKOTIKUNTA.getCode()
                 + syntymaKotikunta.getMuutostapa().getNumber()
                 + syntymaKotikunta.getKuntakoodi();

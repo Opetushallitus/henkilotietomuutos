@@ -9,20 +9,20 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class SahkopostiOsoiteParser {
+public class SahkopostiOsoiteParser implements TietoryhmaParser<SahkopostiOsoite> {
 
-    static SahkopostiOsoite parseSahkopostiOsoite(String value) {
+    public SahkopostiOsoite parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return SahkopostiOsoite.builder()
                 .ryhmatunnus(Ryhmatunnus.SAHKOPOSTIOSOITE)
-                .muutostapa(parseMuutosTapa(value))
-                .lajikoodi(parseString(value, 4, 2))
-                .email(parseString(value, 6, 255))
-                .startDate(parseDate(value, 261))
-                .endDate(parseDate(value, 269))
+                .muutostapa(parseMuutosTapa(tietoryhma))
+                .lajikoodi(parseString(tietoryhma, 4, 2))
+                .email(parseString(tietoryhma, 6, 255))
+                .startDate(parseDate(tietoryhma, 261))
+                .endDate(parseDate(tietoryhma, 269))
                 .build();
     }
 
-    static String serializeSahkopostiOsoite(SahkopostiOsoite sahkoposti) {
+    public String serialize(SahkopostiOsoite sahkoposti) {
         return Ryhmatunnus.SAHKOPOSTIOSOITE.getCode()
                 + sahkoposti.getMuutostapa().getNumber()
                 + serializeString(sahkoposti.getLajikoodi(), 2)

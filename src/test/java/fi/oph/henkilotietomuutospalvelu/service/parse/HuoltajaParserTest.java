@@ -14,11 +14,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class HuoltajaParserTest {
+    
+    private final HuoltajaParser parser = new HuoltajaParser();
 
     @Test
     public void parsesHuoltaja() {
         String tietoryhma = "3051111177-094V36 1201702140000000020170220";
-        Huoltaja huoltaja = HuoltajaParser.parseHuoltaja(tietoryhma);
+        Huoltaja huoltaja = parser.parse(tietoryhma);
         assertEquals(Muutostapa.LISATTY, huoltaja.getMuutostapa());
         assertEquals("111177-094V", huoltaja.getHetu());
         assertEquals(LocalDate.of(2017, 2,14), huoltaja.getStartDate());
@@ -30,7 +32,7 @@ public class HuoltajaParserTest {
         String huoltajaStr = "3051081184-175B212017022020330501 0000000000000000";
         String oikeudetStr1 = "3201P5012018031220180414";
         String oikeudetStr2 = "3204T3012019010120321231";
-        Huoltaja huoltaja = HuoltajaParser.parseHuoltaja(huoltajaStr, oikeudetStr1, oikeudetStr2);
+        Huoltaja huoltaja = parser.parse(huoltajaStr, oikeudetStr1, oikeudetStr2);
         assertThat(huoltaja)
                 .returns(Muutostapa.LISATTY, Huoltaja::getMuutostapa)
                 .returns("081184-175B", Huoltaja::getHetu)
@@ -52,8 +54,8 @@ public class HuoltajaParserTest {
         String huoltajaStr = "3051081184-175B212017022020330501 0000000000000000";
         String oikeudetStr1 = "3201P5012018031220180414";
         String oikeudetStr2 = "3204T3012019010120321231";
-        Huoltaja huoltaja = HuoltajaParser.parseHuoltaja(huoltajaStr, oikeudetStr1, oikeudetStr2);
-        String serialized = HuoltajaParser.serializeHuoltaja(huoltaja);
+        Huoltaja huoltaja = parser.parse(huoltajaStr, oikeudetStr1, oikeudetStr2);
+        String serialized = parser.serialize(huoltaja);
         assertTrue(serialized.startsWith(huoltajaStr));
         // oikeudet serialisoituvat määrittämättömässä järjestyksessä?
         assertTrue(serialized.contains(oikeudetStr1));
@@ -69,7 +71,7 @@ public class HuoltajaParserTest {
             + "Amorphous                                                                                           "
             + "998";
         String lisatietoStr = "4520Kosovo                        ";
-        Huoltaja huoltaja = HuoltajaParser.parseHuoltaja(huoltajaStr, oikeudetStr, hetutonStr, lisatietoStr);
+        Huoltaja huoltaja = parser.parse(huoltajaStr, oikeudetStr, hetutonStr, lisatietoStr);
         assertEquals("", huoltaja.getHetu());
         assertEquals(LocalDate.of(2017, 2,20), huoltaja.getStartDate());
         assertEquals(LocalDate.of(2033, 5, 1), huoltaja.getEndDate());
@@ -88,9 +90,9 @@ public class HuoltajaParserTest {
                 + "Amorphous                                                                                           "
                 + "998";
         String lisatietoStr = "4520Kosovo                        ";
-        Huoltaja huoltaja = HuoltajaParser.parseHuoltaja(huoltajaStr, oikeudetStr, hetutonStr, lisatietoStr);
+        Huoltaja huoltaja = parser.parse(huoltajaStr, oikeudetStr, hetutonStr, lisatietoStr);
         String expected = String.join("|", huoltajaStr, hetutonStr, lisatietoStr, oikeudetStr);
-        assertEquals(expected, HuoltajaParser.serializeHuoltaja(huoltaja));
+        assertEquals(expected, parser.serialize(huoltaja));
     }
 
 }

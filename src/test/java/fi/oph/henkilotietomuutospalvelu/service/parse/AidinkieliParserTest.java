@@ -7,10 +7,12 @@ import static org.junit.Assert.assertEquals;
 
 public class AidinkieliParserTest {
 
+    private final AidinkieliParser parser = new AidinkieliParser();
+
     @Test
     public void parseAidinkieliWhenLanguageCodeIsValid() {
         String tietoryhmaStr = "0021fi";
-        Aidinkieli aidinkieli = AidinkieliParser.parseAidinkieli(tietoryhmaStr);
+        Aidinkieli aidinkieli = parser.parse(tietoryhmaStr);
         assertEquals("fi", aidinkieli.getLanguageCode());
     }
 
@@ -18,7 +20,7 @@ public class AidinkieliParserTest {
     public void parseAidinkieliWhenLanguageCodeContainsAdditionalInformation() {
         String tietoryhmaStr = "002198";
         String lisatiedot = "4520suomalainen viittomakieli     ";
-        Aidinkieli aidinkieli = AidinkieliParser.parseAidinkieli(tietoryhmaStr, lisatiedot);
+        Aidinkieli aidinkieli = parser.parse(tietoryhmaStr, lisatiedot);
         assertEquals("98", aidinkieli.getLanguageCode());
         assertEquals("suomalainen viittomakieli", aidinkieli.getAdditionalInformation());
     }
@@ -26,15 +28,15 @@ public class AidinkieliParserTest {
     @Test
     public void parseAidinkieliSkipsMissingAdditionalInformation() {
         String tietoryhmaStr = "002198";
-        Aidinkieli aidinkieli = AidinkieliParser.parseAidinkieli(tietoryhmaStr);
+        Aidinkieli aidinkieli = parser.parse(tietoryhmaStr);
         assertEquals("98", aidinkieli.getLanguageCode());
     }
 
     @Test
     public void serializesAidinkieli() {
         String tietoryhmaStr = "0021fi";
-        Aidinkieli aidinkieli = AidinkieliParser.parseAidinkieli(tietoryhmaStr);
-        String serialized = AidinkieliParser.serializeAidinkieli(aidinkieli);
+        Aidinkieli aidinkieli = parser.parse(tietoryhmaStr);
+        String serialized = parser.serialize(aidinkieli);
         assertEquals(tietoryhmaStr, serialized);
     }
 
@@ -42,9 +44,9 @@ public class AidinkieliParserTest {
     public void serializesAidinkieliWithAdditionalInformation() {
         String tietoryhmaStr = "002198";
         String lisatiedot = "4520suomalainen viittomakieli     ";
-        Aidinkieli aidinkieli = AidinkieliParser.parseAidinkieli(tietoryhmaStr, lisatiedot);
+        Aidinkieli aidinkieli = parser.parse(tietoryhmaStr, lisatiedot);
         String expected = String.join("|", tietoryhmaStr, lisatiedot);
-        String serialized = AidinkieliParser.serializeAidinkieli(aidinkieli);
+        String serialized = parser.serialize(aidinkieli);
         assertEquals(expected, serialized);
     }
 

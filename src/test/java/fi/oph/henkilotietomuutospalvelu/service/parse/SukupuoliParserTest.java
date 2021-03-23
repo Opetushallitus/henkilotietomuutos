@@ -8,14 +8,16 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class SukupuoliParserTest {
+    
+    private final SukupuoliParser parser = new SukupuoliParser();
 
     @Test
     public void parsesSukupuoli() {
         String maleString = "00331";
         String femaleString = "00312";
 
-        Sukupuoli male = SukupuoliParser.parseSukupuoli(maleString);
-        Sukupuoli female = SukupuoliParser.parseSukupuoli(femaleString);
+        Sukupuoli male = parser.parse(maleString);
+        Sukupuoli female = parser.parse(femaleString);
 
         assertEquals(Muutostapa.MUUTETTU, male.getMuutostapa());
         assertEquals(Gender.MALE, male.getGender());
@@ -29,11 +31,11 @@ public class SukupuoliParserTest {
         String maleString = "00331";
         String femaleString = "00312";
 
-        Sukupuoli male = SukupuoliParser.parseSukupuoli(maleString);
-        Sukupuoli female = SukupuoliParser.parseSukupuoli(femaleString);
+        Sukupuoli male = parser.parse(maleString);
+        Sukupuoli female = parser.parse(femaleString);
 
-        assertEquals(maleString, SukupuoliParser.serializeSukupuoli(male));
-        assertEquals(femaleString, SukupuoliParser.serializeSukupuoli(female));
+        assertEquals(maleString, parser.serialize(male));
+        assertEquals(femaleString, parser.serialize(female));
     }
 
 }

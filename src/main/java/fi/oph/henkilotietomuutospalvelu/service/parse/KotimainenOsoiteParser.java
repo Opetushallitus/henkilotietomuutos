@@ -11,25 +11,27 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class KotimainenOsoiteParser {
+public class KotimainenOsoiteParser implements TietoryhmaParser<KotimainenOsoite> {
 
-    static KotimainenOsoite parseKotimainenOsoite(String value) {
+    public static final KotimainenOsoiteParser INSTANCE = new KotimainenOsoiteParser();
+
+    public KotimainenOsoite parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return KotimainenOsoite.builder()
-                .ryhmatunnus(Ryhmatunnus.getEnum(parseRyhmatunnus(value)))
-                .muutostapa(parseMuutosTapa(value))
-                .lahiosoite(parseString(value, 4, 100))
-                .lahiosoiteSV(parseString(value,104, 100))
-                .katunumero(parseString(value, 204, 7))
-                .porraskirjain(parseCharacter(value,211))
-                .huonenumero(parseString(value, 212, 3))
-                .jakokirjain(parseCharacter(value, 215))
-                .postinumero(parseString(value, 216, 5))
-                .startDate(parseDate(value,221))
-                .endDate(parseDate(value, 229))
+                .ryhmatunnus(Ryhmatunnus.getEnum(parseRyhmatunnus(tietoryhma)))
+                .muutostapa(parseMuutosTapa(tietoryhma))
+                .lahiosoite(parseString(tietoryhma, 4, 100))
+                .lahiosoiteSV(parseString(tietoryhma,104, 100))
+                .katunumero(parseString(tietoryhma, 204, 7))
+                .porraskirjain(parseCharacter(tietoryhma,211))
+                .huonenumero(parseString(tietoryhma, 212, 3))
+                .jakokirjain(parseCharacter(tietoryhma, 215))
+                .postinumero(parseString(tietoryhma, 216, 5))
+                .startDate(parseDate(tietoryhma,221))
+                .endDate(parseDate(tietoryhma, 229))
                 .build();
     }
 
-    static String serializeKotimainenOsoite(KotimainenOsoite osoite) {
+    public String serialize(KotimainenOsoite osoite) {
         return osoite.getRyhmatunnus().getCode()
                 + osoite.getMuutostapa().getNumber()
                 + serializeString(osoite.getLahiosoite(), 100)

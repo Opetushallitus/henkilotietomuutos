@@ -7,17 +7,17 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseString;
 
-public class HenkilotunnuskorjausParser {
+public class HenkilotunnuskorjausParser implements TietoryhmaParser<Henkilotunnuskorjaus> {
 
-    static Henkilotunnuskorjaus parseHenkilotunnuskorjaus(String value) {
+    public Henkilotunnuskorjaus parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return Henkilotunnuskorjaus.builder()
                 .ryhmatunnus(Ryhmatunnus.HENKILOTUNNUS_KORJAUS)
-                .muutostapa(parseMuutosTapa(value))
-                .hetu(parseString(value, 4, 11))
-                .active(parseCharacter(value, 15).equals("1")).build();
+                .muutostapa(parseMuutosTapa(tietoryhma))
+                .hetu(parseString(tietoryhma, 4, 11))
+                .active(parseCharacter(tietoryhma, 15).equals("1")).build();
     }
 
-    static String serializeHenkilotunnuskorjaus(Henkilotunnuskorjaus korjaus) {
+    public String serialize(Henkilotunnuskorjaus korjaus) {
         return Ryhmatunnus.HENKILOTUNNUS_KORJAUS.getCode()
                 + korjaus.getMuutostapa().getNumber()
                 + korjaus.getHetu()

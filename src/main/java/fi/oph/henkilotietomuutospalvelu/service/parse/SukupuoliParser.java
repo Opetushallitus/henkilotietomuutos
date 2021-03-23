@@ -7,17 +7,17 @@ import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Sukupuoli;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseCharacter;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.parseMuutosTapa;
 
-public class SukupuoliParser {
+public class SukupuoliParser implements TietoryhmaParser<Sukupuoli> {
 
-    static Sukupuoli parseSukupuoli(String value) {
+    public Sukupuoli parse(String tietoryhma, String... tarkentavatTietoryhma) {
         return Sukupuoli.builder()
                 .ryhmatunnus(Ryhmatunnus.SUKUPUOLI)
-                .muutostapa(parseMuutosTapa(value))
-                .gender(Gender.getEnum(parseCharacter(value, 4)))
+                .muutostapa(parseMuutosTapa(tietoryhma))
+                .gender(Gender.getEnum(parseCharacter(tietoryhma, 4)))
                 .build();
     }
 
-    static String serializeSukupuoli(Sukupuoli sukupuoli) {
+    public String serialize(Sukupuoli sukupuoli) {
         return Ryhmatunnus.SUKUPUOLI.getCode()
                 + sukupuoli.getMuutostapa().getNumber()
                 + sukupuoli.getGender().getCode();

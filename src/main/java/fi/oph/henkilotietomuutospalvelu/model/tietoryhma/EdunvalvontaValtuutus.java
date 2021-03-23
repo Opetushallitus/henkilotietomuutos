@@ -2,6 +2,8 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.service.parse.EdunvalvontaValtuutusParser;
+import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +17,10 @@ import java.time.LocalDate;
 @DiscriminatorValue("edunvalvonta_valtuutus")
 @NoArgsConstructor
 @Getter
-public class EdunvalvontaValtuutus extends Tietoryhma {
+public class EdunvalvontaValtuutus extends Tietoryhma<EdunvalvontaValtuutus> {
+
+    private static final EdunvalvontaValtuutusParser PARSER = new EdunvalvontaValtuutusParser();
+
     /**
      * Edunvalvontavaltuutuksen tietoryhmässä kerrotaan edunvalvontavaltuutuslain mukaisen edunvalvontavaltuutuksen
      * alkamis- ja päättymispäivä, sekä edunvalvojavaltuutettujen tietoryhmien lukumäärä. Edunvalvontavaltuutustietoryhmää
@@ -44,5 +49,15 @@ public class EdunvalvontaValtuutus extends Tietoryhma {
         this.endDate = endDate;
         this.dutiesStarted = dutiesStarted;
         this.edunvalvojaValtuutetut = edunvalvojaValtuutetut;
+    }
+
+    @Override
+    protected EdunvalvontaValtuutus getThis() {
+        return this;
+    }
+
+    @Override
+    protected TietoryhmaParser<EdunvalvontaValtuutus> getParser() {
+        return PARSER;
     }
 }

@@ -10,22 +10,22 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class HenkiloNameParser {
+public class HenkiloNameParser implements TietoryhmaParser<HenkiloName> {
 
     private static final int NAME_LENGTH = 100;
 
-    static HenkiloName parseHenkiloName(String value) {
+    public HenkiloName parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return HenkiloName.builder()
                 .ryhmatunnus(Ryhmatunnus.HENKILO_NIMI)
-                .muutostapa(parseMuutosTapa(value))
-                .lastName(parseString(value, 4, NAME_LENGTH))
-                .firstNames(parseString(value, 104, NAME_LENGTH))
-                .lastUpdateDate(parseDate(value, 204))
-                .additionalInformation(parseCharacter(value, 212))
+                .muutostapa(parseMuutosTapa(tietoryhma))
+                .lastName(parseString(tietoryhma, 4, NAME_LENGTH))
+                .firstNames(parseString(tietoryhma, 104, NAME_LENGTH))
+                .lastUpdateDate(parseDate(tietoryhma, 204))
+                .additionalInformation(parseCharacter(tietoryhma, 212))
                 .build();
     }
 
-    static String serializeHenkiloName(HenkiloName henkiloName) {
+    public String serialize(HenkiloName henkiloName) {
         return Ryhmatunnus.HENKILO_NIMI.getCode()
                 + henkiloName.getMuutostapa().getNumber()
                 + serializeString(henkiloName.getLastName(), NAME_LENGTH)

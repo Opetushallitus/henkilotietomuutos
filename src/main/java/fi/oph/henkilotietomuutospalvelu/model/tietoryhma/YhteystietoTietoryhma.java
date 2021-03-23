@@ -16,7 +16,7 @@ import java.util.Set;
 import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.removeYhteystietoryhma;
 
 @NoArgsConstructor
-public abstract class YhteystietoTietoryhma extends Tietoryhma {
+public abstract class YhteystietoTietoryhma<T extends Tietoryhma<T>> extends Tietoryhma<T> {
 
     private static final Set<Muutostapa> REDUNDANT_CHANGES = EnumSet
             .of(Muutostapa.LISATIETO, Muutostapa.KORJATTAVAA);
