@@ -64,16 +64,12 @@ public enum Ryhmatunnus {
         return tarkentava;
     }
 
-    public TietoryhmaParser getParser() {
-        return parser;
-    }
-
     public Tietoryhma parse(String tietoryhma, String... tarkentavatTietoryhmat) {
-        return parser.parse(tietoryhma, tarkentavatTietoryhmat);
+        return parser != null ? parser.parse(tietoryhma, tarkentavatTietoryhmat) : null;
     }
 
     public String serialize(Tietoryhma tietoryhma) {
-        return parser.serialize(tietoryhma);
+        return parser != null ? parser.serialize(tietoryhma) : "";
     }
 
     public static Ryhmatunnus getEnum(String code) {

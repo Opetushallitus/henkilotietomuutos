@@ -25,8 +25,7 @@ public class TietoryhmaParserUtil {
             if (ryhmatunnus == null) {
                 throw new TietoryhmaParseException("Unsupported Tietoryhma! Ryhmatunnus: " + ryhmakoodi);
             }
-            TietoryhmaParser parser = ryhmatunnus.getParser();
-            return parser != null ? parser.parse(tietoryhma, tarkentavatTietoryhmat) : null;
+            return ryhmatunnus.parse(tietoryhma, tarkentavatTietoryhmat);
         } catch (RuntimeException e) {
             if (e instanceof TietoryhmaParseException) {
                 throw e;
