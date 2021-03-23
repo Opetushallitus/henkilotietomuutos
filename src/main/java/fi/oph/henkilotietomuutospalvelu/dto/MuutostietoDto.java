@@ -4,9 +4,7 @@ import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.MuutosType;
 import lombok.*;
 
-import javax.persistence.Column;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +47,7 @@ public class MuutostietoDto {
      * Sisältää tietueeseen kuuluvat tietoryhmät.
      */
     @Builder.Default
-    private List<Tietoryhma> tietoryhmat = new ArrayList<>();
+    private List<Tietoryhma<?>> tietoryhmat = new ArrayList<>();
 
     private int rivi;
 

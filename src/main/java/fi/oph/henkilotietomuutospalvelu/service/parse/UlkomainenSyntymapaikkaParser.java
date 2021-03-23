@@ -11,16 +11,18 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
 @Slf4j
-public class UlkomainenSyntymapaikkaParser {
+public class UlkomainenSyntymapaikkaParser implements TietoryhmaParser<UlkomainenSyntymapaikka> {
 
-    static UlkomainenSyntymapaikka parseUlkomainenSyntymapaikka(String value, String... tarkentavatTietoryhmat) {
-        String countryCode = parseString(value, 4, 3);
+    public static final UlkomainenSyntymapaikkaParser INSTANCE = new UlkomainenSyntymapaikkaParser();
+
+    public UlkomainenSyntymapaikka parse(String tietoryhma, String... tarkentavatTietoryhmat) {
+        String countryCode = parseString(tietoryhma, 4, 3);
 
         UlkomainenSyntymapaikka syntymapaikka = UlkomainenSyntymapaikka.builder()
                 .ryhmatunnus(Ryhmatunnus.ULKOMAINEN_SYNTYMAPAIKKA)
-                .muutostapa(parseMuutosTapa(value))
+                .muutostapa(parseMuutosTapa(tietoryhma))
                 .countryCode(countryCode)
-                .location(parseString(value, 7, 50))
+                .location(parseString(tietoryhma, 7, 50))
                 .build();
         if (countryCode.equals("998")) {
             if (tarkentavatTietoryhmat.length > 0) {
@@ -33,7 +35,7 @@ public class UlkomainenSyntymapaikkaParser {
         return syntymapaikka;
     }
 
-    static String serializeUlkomainenSyntymapaikka(UlkomainenSyntymapaikka syntymapaikka) {
+    public String serialize(UlkomainenSyntymapaikka syntymapaikka) {
         String serialized = Ryhmatunnus.ULKOMAINEN_SYNTYMAPAIKKA.getCode()
                 + syntymapaikka.getMuutostapa().getNumber()
                 + syntymapaikka.getCountryCode()

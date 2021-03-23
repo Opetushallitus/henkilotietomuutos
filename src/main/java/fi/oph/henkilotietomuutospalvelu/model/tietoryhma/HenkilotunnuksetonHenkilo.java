@@ -3,6 +3,8 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.service.parse.HenkilotunnuksetonHenkiloParser;
+import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +20,9 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-public class HenkilotunnuksetonHenkilo extends Tietoryhma {
+public class HenkilotunnuksetonHenkilo extends Tietoryhma<HenkilotunnuksetonHenkilo> {
+
+    private static final HenkilotunnuksetonHenkiloParser PARSER = new HenkilotunnuksetonHenkiloParser();
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
@@ -49,4 +53,13 @@ public class HenkilotunnuksetonHenkilo extends Tietoryhma {
         this.additionalInformation = additionalInformation;
     }
 
+    @Override
+    protected HenkilotunnuksetonHenkilo getThis() {
+        return this;
+    }
+
+    @Override
+    protected TietoryhmaParser<HenkilotunnuksetonHenkilo> getParser() {
+        return PARSER;
+    }
 }

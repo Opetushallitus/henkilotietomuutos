@@ -4,6 +4,8 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.NameType;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.service.build.HenkiloUpdateUtil;
+import fi.oph.henkilotietomuutospalvelu.service.parse.HenkiloNameChangeParser;
+import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +22,9 @@ import java.time.LocalDate;
 @DiscriminatorValue("henkilo_name_change")
 @Getter
 @NoArgsConstructor
-public class HenkiloNameChange extends Tietoryhma {
+public class HenkiloNameChange extends Tietoryhma<HenkiloNameChange> {
+
+    private static final HenkiloNameChangeParser PARSER = new HenkiloNameChangeParser();
 
     private String name;
 
@@ -46,6 +50,16 @@ public class HenkiloNameChange extends Tietoryhma {
         this.startDate = startDate;
         this.endDate = endDate;
         this.hasNonStandardCharacters = hasNonStandardCharacters;
+    }
+
+    @Override
+    protected HenkiloNameChange getThis() {
+        return this;
+    }
+
+    @Override
+    protected TietoryhmaParser<HenkiloNameChange> getParser() {
+        return PARSER;
     }
 
     @Override

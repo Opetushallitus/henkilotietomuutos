@@ -10,14 +10,16 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil.serializeAdditionalInformation;
 
 @Slf4j
-public class AidinkieliParser {
+public class AidinkieliParser implements TietoryhmaParser<Aidinkieli> {
 
-    static Aidinkieli parseAidinkieli(String value, String... tarkentavatTietoryhmat) {
-        String languageCode = parseString(value, 4,2);
+    public static final AidinkieliParser INSTANCE = new AidinkieliParser();
+
+    public Aidinkieli parse(String tietoryhma, String... tarkentavatTietoryhmat) {
+        String languageCode = parseString(tietoryhma, 4,2);
 
         Aidinkieli aidinkieli = Aidinkieli.builder()
                 .ryhmatunnus(Ryhmatunnus.AIDINKIELI)
-                .muutostapa(parseMuutosTapa(value))
+                .muutostapa(parseMuutosTapa(tietoryhma))
                 .languageCode(languageCode).build();
 
         if (languageCode.equals("98")) {
@@ -31,7 +33,7 @@ public class AidinkieliParser {
         return aidinkieli;
     }
 
-    static String serializeAidinkieli(Aidinkieli aidinkieli) {
+    public String serialize(Aidinkieli aidinkieli) {
         String serialized = Ryhmatunnus.AIDINKIELI.getCode()
                 + aidinkieli.getMuutostapa().getNumber()
                 + aidinkieli.getLanguageCode();

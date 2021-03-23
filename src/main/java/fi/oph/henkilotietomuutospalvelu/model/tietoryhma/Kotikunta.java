@@ -2,6 +2,8 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.service.parse.KotikuntaParser;
+import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +22,9 @@ import java.time.LocalDate;
 @Setter
 @Slf4j
 @NoArgsConstructor
-public class Kotikunta extends Tietoryhma {
+public class Kotikunta extends Tietoryhma<Kotikunta> {
+
+    private static final KotikuntaParser PARSER = new KotikuntaParser();
 
     /**
      * Kolmenumeroinen kuntanumero.
@@ -35,6 +39,16 @@ public class Kotikunta extends Tietoryhma {
         super(ryhmatunnus, muutostapa);
         this.code = code;
         this.moveDate = moveDate;
+    }
+
+    @Override
+    protected Kotikunta getThis() {
+        return this;
+    }
+
+    @Override
+    protected TietoryhmaParser<Kotikunta> getParser() {
+        return PARSER;
     }
 
     @Override

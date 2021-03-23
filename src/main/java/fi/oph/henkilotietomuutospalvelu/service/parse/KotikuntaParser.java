@@ -9,18 +9,20 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class KotikuntaParser {
+public class KotikuntaParser implements TietoryhmaParser<Kotikunta> {
 
-    static Kotikunta parseKotikunta(String value) {
+    public static KotikuntaParser INSTANCE = new KotikuntaParser();
+
+    public Kotikunta parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return Kotikunta.builder()
                 .ryhmatunnus(Ryhmatunnus.KOTIKUNTA)
-                .muutostapa(parseMuutosTapa(value))
-                .code(parseString(value, 4, 3))
-                .moveDate(parseDate(value, 7))
+                .muutostapa(parseMuutosTapa(tietoryhma))
+                .code(parseString(tietoryhma, 4, 3))
+                .moveDate(parseDate(tietoryhma, 7))
                 .build();
     }
 
-    static String serializeKotikunta(Kotikunta kunta) {
+    public String serialize(Kotikunta kunta) {
         return Ryhmatunnus.KOTIKUNTA.getCode()
                 + kunta.getMuutostapa().getNumber()
                 + serializeString(kunta.getCode(), 3)

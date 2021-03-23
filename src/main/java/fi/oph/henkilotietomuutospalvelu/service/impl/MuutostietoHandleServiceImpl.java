@@ -78,7 +78,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
         HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
         henkiloMuutostietoRivi.setRivi(muutostietoDto.getRivi());
         henkiloMuutostietoRivi.setQueryHetu(muutostietoDto.getHetu());
-        List<Tietoryhma> tietoryhmaList = new ArrayList<>(muutostietoDto.getTietoryhmat());
+        List<Tietoryhma<?>> tietoryhmaList = new ArrayList<>(muutostietoDto.getTietoryhmat());
         tietoryhmaList.forEach(tietoryhma -> tietoryhma.setHenkiloMuutostietoRivi(henkiloMuutostietoRivi));
         this.tietoryhmaRepository.saveAll(tietoryhmaList);
         henkiloMuutostietoRivi.setTietoryhmaList(tietoryhmaList);

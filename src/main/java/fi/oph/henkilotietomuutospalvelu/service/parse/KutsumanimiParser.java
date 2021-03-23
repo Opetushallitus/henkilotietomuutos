@@ -10,9 +10,11 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class KutsumanimiParser {
+public class KutsumanimiParser implements TietoryhmaParser<Kutsumanimi> {
 
-    static Kutsumanimi parseKutsumanimi(String value) {
+    public static final KutsumanimiParser INSTANCE = new KutsumanimiParser();
+
+    public Kutsumanimi parse(String value, String... tarkentavatTietoryhmat) {
         return Kutsumanimi.builder()
                 .ryhmatunnus(Ryhmatunnus.KUTSUMANIMI)
                 .muutostapa(parseMuutosTapa(value))
@@ -24,7 +26,7 @@ public class KutsumanimiParser {
                 .build();
     }
 
-    static String serializeKutsumanimi(Kutsumanimi nimi) {
+    public String serialize(Kutsumanimi nimi) {
         return Ryhmatunnus.KUTSUMANIMI.getCode()
                 + nimi.getMuutostapa().getNumber()
                 + serializeString(nimi.getName(), 100)

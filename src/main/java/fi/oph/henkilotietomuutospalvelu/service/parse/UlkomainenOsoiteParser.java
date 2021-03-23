@@ -12,19 +12,21 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class UlkomainenOsoiteParser {
+public class UlkomainenOsoiteParser implements TietoryhmaParser<UlkomainenOsoite> {
 
-    static UlkomainenOsoite parseUlkomainenOsoite(String value, String... tarkentavatTietoryhmat) {
-        String countryCode = parseString(value, 164, 3);
+    public static final UlkomainenOsoiteParser INSTANCE = new UlkomainenOsoiteParser();
+
+    public UlkomainenOsoite parse(String tietoryhma, String... tarkentavatTietoryhmat) {
+        String countryCode = parseString(tietoryhma, 164, 3);
 
         UlkomainenOsoite osoite = UlkomainenOsoite.builder()
-                .ryhmatunnus(Ryhmatunnus.getEnum(parseRyhmatunnus(value)))
-                .muutostapa(parseMuutosTapa(value))
-                .streetAddress(parseString(value, 4, 80))
-                .municipality(parseString(value, 84, 80))
+                .ryhmatunnus(Ryhmatunnus.getEnum(parseRyhmatunnus(tietoryhma)))
+                .muutostapa(parseMuutosTapa(tietoryhma))
+                .streetAddress(parseString(tietoryhma, 4, 80))
+                .municipality(parseString(tietoryhma, 84, 80))
                 .countryCode(countryCode)
-                .startDate(parseDate(value, 167))
-                .endDate(parseDate(value, 175))
+                .startDate(parseDate(tietoryhma, 167))
+                .endDate(parseDate(tietoryhma, 175))
                 .build();
 
         if (countryCode.equals("998")) {
@@ -34,7 +36,7 @@ public class UlkomainenOsoiteParser {
         return osoite;
     }
 
-    static String serializeUlkomainenOsoite(UlkomainenOsoite osoite) {
+    public String serialize(UlkomainenOsoite osoite) {
         String serialized = osoite.getRyhmatunnus().getCode()
                 + osoite.getMuutostapa().getNumber()
                 + serializeString(osoite.getStreetAddress(), 80)

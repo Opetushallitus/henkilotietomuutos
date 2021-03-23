@@ -2,6 +2,8 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.service.parse.EdunvalvontaValtuutettuParser;
+import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +15,9 @@ import java.time.LocalDate;
 @DiscriminatorValue("edunvalvonta_valtuutettu")
 @NoArgsConstructor
 @Getter
-public class EdunvalvontaValtuutettu extends Tietoryhma {
+public class EdunvalvontaValtuutettu extends Tietoryhma<EdunvalvontaValtuutettu> {
+
+    private static final EdunvalvontaValtuutettuParser PARSER = new EdunvalvontaValtuutettuParser();
 
     /** Mikäli Hetu on tyhjä, annetaan lisäksi Henkilötunnuksettoman Henkilön -tietoryhmä */
     private String hetu;
@@ -36,5 +40,15 @@ public class EdunvalvontaValtuutettu extends Tietoryhma {
         this.startDate = startDate;
         this.endDate = endDate;
         this.henkilotunnuksetonHenkilo = henkilotunnuksetonHenkilo;
+    }
+
+    @Override
+    protected EdunvalvontaValtuutettu getThis() {
+        return this;
+    }
+
+    @Override
+    protected TietoryhmaParser<EdunvalvontaValtuutettu> getParser() {
+        return PARSER;
     }
 }

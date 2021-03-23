@@ -2,6 +2,8 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
+import fi.oph.henkilotietomuutospalvelu.service.parse.EdunvalvojaParser;
+import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +15,9 @@ import java.time.LocalDate;
 @DiscriminatorValue("edunvalvoja")
 @Getter
 @NoArgsConstructor
-public class Edunvalvoja extends Tietoryhma {
+public class Edunvalvoja extends Tietoryhma<Edunvalvoja> {
 
+    private static final EdunvalvojaParser PARSER = new EdunvalvojaParser();
     /** Mikäli Hetu on tyhjä, annetaan lisäksi Henkilötunnuksettoman Henkilön -tietoryhmä */
     private String hetu;
     @Column(name = "y_tunnus")
@@ -54,4 +57,13 @@ public class Edunvalvoja extends Tietoryhma {
         this.henkilotunnuksetonHenkilo = henkilotunnuksetonHenkilo;
     }
 
+    @Override
+    protected Edunvalvoja getThis() {
+        return this;
+    }
+
+    @Override
+    protected TietoryhmaParser<Edunvalvoja> getParser() {
+        return PARSER;
+    }
 }

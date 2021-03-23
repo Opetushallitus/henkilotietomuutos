@@ -9,21 +9,23 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class PostiosoiteParser {
+public class PostiosoiteParser implements TietoryhmaParser<Postiosoite> {
 
-    static Postiosoite parsePostiosoite(String value) {
+    public static final PostiosoiteParser INSTANCE = new PostiosoiteParser();
+
+    public Postiosoite parse(String tietoryhma, String... tarkentavatTietoryhmat) {
         return Postiosoite.builder()
                 .ryhmatunnus(Ryhmatunnus.POSTIOSOITE)
-                .muutostapa(parseMuutosTapa(value))
-                .postiosoite(parseString(value, 4, 50))
-                .postiosoiteSv(parseString(value, 54, 50))
-                .postinumero(parseString(value, 104, 5))
-                .startDate(parseDate(value, 109))
-                .endDate(parseDate(value, 117))
+                .muutostapa(parseMuutosTapa(tietoryhma))
+                .postiosoite(parseString(tietoryhma, 4, 50))
+                .postiosoiteSv(parseString(tietoryhma, 54, 50))
+                .postinumero(parseString(tietoryhma, 104, 5))
+                .startDate(parseDate(tietoryhma, 109))
+                .endDate(parseDate(tietoryhma, 117))
                 .build();
     }
 
-    static String serializePostiosoite(Postiosoite postiosoite) {
+    public String serialize(Postiosoite postiosoite) {
         return Ryhmatunnus.POSTIOSOITE.getCode()
                 + postiosoite.getMuutostapa().getNumber()
                 + serializeString(postiosoite.getPostiosoite(), 50)

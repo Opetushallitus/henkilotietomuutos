@@ -3,6 +3,8 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.service.build.HenkiloUpdateUtil;
+import fi.oph.henkilotietomuutospalvelu.service.parse.HuoltajaParser;
+import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HuoltajaCreateDto;
 import lombok.Builder;
@@ -20,7 +22,9 @@ import java.util.*;
 @DiscriminatorValue("huoltaja")
 @Getter
 @NoArgsConstructor
-public class Huoltaja extends Tietoryhma {
+public class Huoltaja extends Tietoryhma<Huoltaja> {
+
+    private static final HuoltajaParser PARSER = new HuoltajaParser();
 
     /** Mikäli Hetu on tyhjä, annetaan lisäksi Henkilötunnuksettoman Henkilön -tietoryhmä */
     private String hetu;
@@ -122,6 +126,16 @@ public class Huoltaja extends Tietoryhma {
     public boolean isVoimassa(Context context) {
         return (this.startDate == null || context.getLocalDateNow().isAfter(this.startDate))
                 && (this.endDate == null || context.getLocalDateNow().isBefore(this.endDate));
+    }
+
+    @Override
+    protected Huoltaja getThis() {
+        return this;
+    }
+
+    @Override
+    protected TietoryhmaParser<Huoltaja> getParser() {
+        return PARSER;
     }
 
     @Override

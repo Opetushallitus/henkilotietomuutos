@@ -15,7 +15,9 @@ import static fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUti
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeDate;
 import static fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil.serializeString;
 
-public class HenkiloNameChangeParser {
+public class HenkiloNameChangeParser implements TietoryhmaParser<HenkiloNameChange> {
+
+    public static final HenkiloNameChangeParser INSTANCE = new HenkiloNameChangeParser();
 
     /** Henkilön nimen laji. */
     private enum NimiLaji {
@@ -59,8 +61,8 @@ public class HenkiloNameChangeParser {
     private static final List<NimiLaji> KUTSUMANIMI_LAJIT = Arrays.asList(
             NimiLaji.NYKYINEN_KUTSUMANIMI, NimiLaji.ENTINEN_KUTSUMANIMI, NimiLaji.KORJATTU_KUTSUMANIMI);
 
-    static HenkiloNameChange parseHenkiloNameChange(String value) {
-        String laji = parseString(value, 104, 2);
+    public HenkiloNameChange parse(String tietoryhma, String... tarkentavatTietoryhmat) {
+        String laji = parseString(tietoryhma, 104, 2);
         NimiLaji nimiLaji = NimiLaji.fromLaji(laji);
         NameType type = NameType.TUNTEMATON;
         if (SUKUNIMI_LAJIT.contains(nimiLaji)) {
@@ -75,16 +77,16 @@ public class HenkiloNameChangeParser {
 
         return HenkiloNameChange.builder()
                 .ryhmatunnus(Ryhmatunnus.HENKILO_NIMENMUUTOS)
-                .muutostapa(parseMuutosTapa(value))
-                .name(parseString(value,4, 100))
+                .muutostapa(parseMuutosTapa(tietoryhma))
+                .name(parseString(tietoryhma,4, 100))
                 .nameType(type)
-                .startDate(parseDate(value, 106))
-                .endDate(parseDate(value, 114))
-                .hasNonStandardCharacters(parseCharacter(value, 122).equals("1"))
+                .startDate(parseDate(tietoryhma, 106))
+                .endDate(parseDate(tietoryhma, 114))
+                .hasNonStandardCharacters(parseCharacter(tietoryhma, 122).equals("1"))
                 .build();
     }
 
-    static String serializeHenkiloNameChange(HenkiloNameChange change) {
+    public String serialize(HenkiloNameChange change) {
         return Ryhmatunnus.HENKILO_NIMENMUUTOS.getCode()
                 + change.getMuutostapa().getNumber()
                 + serializeString(change.getName(), 100)
