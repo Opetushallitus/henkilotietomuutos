@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @DiscriminatorValue("edunvalvonta_valtuutettu")
 @NoArgsConstructor
 @Getter
-public class EdunvalvontaValtuutettu extends Tietoryhma<EdunvalvontaValtuutettu> {
+public class EdunvalvontaValtuutettu extends Tietoryhma {
 
     private static final EdunvalvontaValtuutettuParser PARSER = new EdunvalvontaValtuutettuParser();
 
@@ -42,13 +42,4 @@ public class EdunvalvontaValtuutettu extends Tietoryhma<EdunvalvontaValtuutettu>
         this.henkilotunnuksetonHenkilo = henkilotunnuksetonHenkilo;
     }
 
-    @Override
-    protected EdunvalvontaValtuutettu getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<EdunvalvontaValtuutettu> getParser() {
-        return PARSER;
-    }
 }

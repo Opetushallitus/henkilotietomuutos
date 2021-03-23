@@ -3,8 +3,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.KoodistoYhteystietoTyyppi;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.oph.henkilotietomuutospalvelu.service.parse.PostiosoiteParser;
-import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.oph.henkilotietomuutospalvelu.utils.HenkiloUtils;
 import fi.oph.henkilotietomuutospalvelu.utils.Katuosoite;
 import fi.vm.sade.oppijanumerorekisteri.dto.YhteystiedotRyhmaDto;
@@ -28,9 +26,7 @@ import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.setYhteyst
 @Getter
 @Setter
 @NoArgsConstructor
-public class Postiosoite extends YhteystietoTietoryhma<Postiosoite> {
-
-    private static final PostiosoiteParser PARSER = new PostiosoiteParser();
+public class Postiosoite extends YhteystietoTietoryhma {
 
     private String postiosoite;
 
@@ -80,13 +76,4 @@ public class Postiosoite extends YhteystietoTietoryhma<Postiosoite> {
                 .ifPresent(maa -> setYhteystietoArvo(yhteystietoryhma, YhteystietoTyyppi.YHTEYSTIETO_MAA, maa));
     }
 
-    @Override
-    protected Postiosoite getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Postiosoite> getParser() {
-        return PARSER;
-    }
 }

@@ -3,8 +3,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.oph.henkilotietomuutospalvelu.service.parse.SukupuoliParser;
-import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,9 +17,7 @@ import javax.persistence.Entity;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Sukupuoli extends Tietoryhma<Sukupuoli> {
-
-    private static final SukupuoliParser PARSER = new SukupuoliParser();
+public class Sukupuoli extends Tietoryhma {
 
     private Gender gender;
 
@@ -29,16 +25,6 @@ public class Sukupuoli extends Tietoryhma<Sukupuoli> {
     public Sukupuoli(Ryhmatunnus ryhmatunnus, Muutostapa muutostapa, Gender gender){
         super(ryhmatunnus, muutostapa);
         this.gender = gender;
-    }
-
-    @Override
-    protected Sukupuoli getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Sukupuoli> getParser() {
-        return PARSER;
     }
 
     @Override

@@ -3,8 +3,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.KoodistoYhteystietoTyyppi;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.oph.henkilotietomuutospalvelu.service.parse.SahkopostiOsoiteParser;
-import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.vm.sade.oppijanumerorekisteri.dto.YhteystiedotRyhmaDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.YhteystietoTyyppi;
 import lombok.Builder;
@@ -24,9 +22,7 @@ import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.setYhteyst
 @Getter
 @Slf4j
 @NoArgsConstructor
-public class SahkopostiOsoite extends YhteystietoTietoryhma<SahkopostiOsoite> {
-
-    private static final SahkopostiOsoiteParser PARSER = new SahkopostiOsoiteParser();
+public class SahkopostiOsoite extends YhteystietoTietoryhma {
 
     /**
      * 99=henkilon ilmoittama sahkopostiosoite,
@@ -63,13 +59,4 @@ public class SahkopostiOsoite extends YhteystietoTietoryhma<SahkopostiOsoite> {
         setYhteystietoArvo(yhteystietoryhma, YhteystietoTyyppi.YHTEYSTIETO_SAHKOPOSTI, email);
     }
 
-    @Override
-    protected SahkopostiOsoite getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<SahkopostiOsoite> getParser() {
-        return PARSER;
-    }
 }

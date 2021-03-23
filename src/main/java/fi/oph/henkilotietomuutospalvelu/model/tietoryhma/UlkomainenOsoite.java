@@ -3,8 +3,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.KoodistoYhteystietoTyyppi;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
-import fi.oph.henkilotietomuutospalvelu.service.parse.UlkomainenOsoiteParser;
 import fi.oph.henkilotietomuutospalvelu.utils.HenkiloUtils;
 import fi.vm.sade.oppijanumerorekisteri.dto.YhteystiedotRyhmaDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.YhteystietoTyyppi;
@@ -27,9 +25,7 @@ import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.setYhteyst
 @Getter
 @Setter
 @NoArgsConstructor
-public class UlkomainenOsoite extends YhteystietoTietoryhma<UlkomainenOsoite> {
-
-    private static final UlkomainenOsoiteParser PARSER = new UlkomainenOsoiteParser();
+public class UlkomainenOsoite extends YhteystietoTietoryhma {
 
     @Column(name = "street_address")
     private String streetAddress;
@@ -77,13 +73,4 @@ public class UlkomainenOsoite extends YhteystietoTietoryhma<UlkomainenOsoite> {
                 .ifPresent(maa -> setYhteystietoArvo(yhteystietoryhma, YhteystietoTyyppi.YHTEYSTIETO_MAA, maa));
     }
 
-    @Override
-    protected UlkomainenOsoite getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<UlkomainenOsoite> getParser() {
-        return PARSER;
-    }
 }

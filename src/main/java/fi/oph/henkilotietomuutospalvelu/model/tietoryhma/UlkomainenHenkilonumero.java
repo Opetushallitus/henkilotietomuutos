@@ -3,8 +3,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Gender;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
-import fi.oph.henkilotietomuutospalvelu.service.parse.UlkomainenHenkilonumeroParser;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,9 +16,7 @@ import java.time.LocalDate;
 @DiscriminatorValue("ulkomainen_henkilonumero")
 @NoArgsConstructor
 @Getter
-public class UlkomainenHenkilonumero extends Tietoryhma<UlkomainenHenkilonumero> {
-
-    private static final UlkomainenHenkilonumeroParser PARSER = new UlkomainenHenkilonumeroParser();
+public class UlkomainenHenkilonumero extends Tietoryhma {
 
     @Column(name = "ulkomainen_henkilonumero_id")
     private String ulkomainenHenkilonumeroId;
@@ -80,13 +76,4 @@ public class UlkomainenHenkilonumero extends Tietoryhma<UlkomainenHenkilonumero>
         this.validVTJ = validVTJ;
     }
 
-    @Override
-    protected UlkomainenHenkilonumero getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<UlkomainenHenkilonumero> getParser() {
-        return PARSER;
-    }
 }

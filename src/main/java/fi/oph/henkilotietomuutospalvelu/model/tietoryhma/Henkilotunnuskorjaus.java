@@ -2,8 +2,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.oph.henkilotietomuutospalvelu.service.parse.HenkilotunnuskorjausParser;
-import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,9 +19,7 @@ import java.util.Collection;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Henkilotunnuskorjaus extends Tietoryhma<Henkilotunnuskorjaus> {
-
-    private static final HenkilotunnuskorjausParser PARSER = new HenkilotunnuskorjausParser();
+public class Henkilotunnuskorjaus extends Tietoryhma {
 
     /**
      * Henkilön nimi tr 004 (nykyinen nimi) annetaan aina lisätietona (muutosattribuutilla 0=lisätieto).
@@ -59,16 +55,6 @@ public class Henkilotunnuskorjaus extends Tietoryhma<Henkilotunnuskorjaus> {
         if (allowedMuutostapas.contains(this.getMuutostapa())) {
             this.updateHenkiloInternal(context, henkilo);
         }
-    }
-
-    @Override
-    protected Henkilotunnuskorjaus getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Henkilotunnuskorjaus> getParser() {
-        return PARSER;
     }
 
     @Override

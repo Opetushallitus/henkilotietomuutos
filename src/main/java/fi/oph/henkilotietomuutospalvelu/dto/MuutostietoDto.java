@@ -47,7 +47,7 @@ public class MuutostietoDto {
      * Sisältää tietueeseen kuuluvat tietoryhmät.
      */
     @Builder.Default
-    private List<Tietoryhma<?>> tietoryhmat = new ArrayList<>();
+    private List<Tietoryhma> tietoryhmat = new ArrayList<>();
 
     private int rivi;
 

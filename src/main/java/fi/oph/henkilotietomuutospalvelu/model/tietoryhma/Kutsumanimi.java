@@ -3,8 +3,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.service.build.HenkiloUpdateUtil;
-import fi.oph.henkilotietomuutospalvelu.service.parse.KutsumanimiParser;
-import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,9 +21,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @Slf4j
-public class Kutsumanimi extends Tietoryhma<Kutsumanimi> {
-
-    private static final KutsumanimiParser PARSER = new KutsumanimiParser();
+public class Kutsumanimi extends Tietoryhma {
 
     private String name;
     private String type;
@@ -48,16 +44,6 @@ public class Kutsumanimi extends Tietoryhma<Kutsumanimi> {
         this.startDate = startDate;
         this.endDate = endDate;
         this.nonStandardCharacters = nonStandardCharacters;
-    }
-
-    @Override
-    protected Kutsumanimi getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Kutsumanimi> getParser() {
-        return PARSER;
     }
 
     @Override

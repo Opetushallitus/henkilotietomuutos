@@ -7,6 +7,7 @@ import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Huoltaja;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoParseService;
 import fi.oph.henkilotietomuutospalvelu.service.exception.MuutostietoLineParseException;
+import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil;
 import fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil;
 import org.springframework.stereotype.Service;
@@ -34,10 +35,16 @@ public class MuutostietoParseServiceImpl implements MuutostietoParseService {
     @Override
     public String serializeMuutostietoDto(MuutostietoDto dto) {
         String serialized = serializeTunnisteosa(dto);
-        for (Tietoryhma<?> ryhma : dto.getTietoryhmat()) {
-            serialized = String.join("|", serialized, ryhma.serialize());
+        for (Tietoryhma ryhma : dto.getTietoryhmat()) {
+            serialized = String.join("|", serialized, serializeTietoryhma(ryhma));
         }
         return serialized + "|";
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends Tietoryhma> String serializeTietoryhma(T tietoryhma) {
+        TietoryhmaParser<T> parser = (TietoryhmaParser<T>) tietoryhma.getRyhmatunnus().getParser();
+        return parser.serialize(tietoryhma);
     }
 
     private static MuutostietoDto parseTunnisteosa(String tunnisteosa) {
@@ -58,11 +65,11 @@ public class MuutostietoParseServiceImpl implements MuutostietoParseService {
                 + dto.getRole();
     }
 
-    private static List<Tietoryhma<?>> deserializeTietoryhmat(String[] tietoryhmat) {
-        List<Tietoryhma<?>> ryhmat = new ArrayList<>();
+    private static List<Tietoryhma> deserializeTietoryhmat(String[] tietoryhmat) {
+        List<Tietoryhma> ryhmat = new ArrayList<>();
         for (int i = 1; i <= tietoryhmat.length - 1; i++) {
             List<String> tarkentavatTietoryhmat = etsiTarkentavatTietoryhmat(tietoryhmat, i);
-            Tietoryhma<?> ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmat[i],
+            Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmat[i],
                     tarkentavatTietoryhmat.toArray(new String[0]));
 
             ryhmat.add(ryhma);

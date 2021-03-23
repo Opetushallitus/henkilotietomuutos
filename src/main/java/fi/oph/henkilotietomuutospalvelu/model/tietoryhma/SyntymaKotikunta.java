@@ -2,8 +2,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.oph.henkilotietomuutospalvelu.service.parse.SyntymaKotikuntaParser;
-import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,9 +13,7 @@ import javax.persistence.Entity;
 @DiscriminatorValue("syntyma_kotikunta")
 @NoArgsConstructor
 @Getter
-public class SyntymaKotikunta extends Tietoryhma<SyntymaKotikunta> {
-
-    private static final SyntymaKotikuntaParser PARSER = new SyntymaKotikuntaParser();
+public class SyntymaKotikunta extends Tietoryhma {
 
     private String kuntakoodi; // kolmenumeroinen
 
@@ -27,13 +23,4 @@ public class SyntymaKotikunta extends Tietoryhma<SyntymaKotikunta> {
         this.kuntakoodi = kuntakoodi;
     }
 
-    @Override
-    protected SyntymaKotikunta getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<SyntymaKotikunta> getParser() {
-        return PARSER;
-    }
 }

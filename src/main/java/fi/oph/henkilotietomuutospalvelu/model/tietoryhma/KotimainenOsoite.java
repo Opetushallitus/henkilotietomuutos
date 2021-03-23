@@ -3,7 +3,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.dto.type.KoodistoYhteystietoTyyppi;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.oph.henkilotietomuutospalvelu.service.parse.KotimainenOsoiteParser;
 import fi.oph.henkilotietomuutospalvelu.utils.HenkiloUtils;
 import fi.oph.henkilotietomuutospalvelu.utils.Katuosoite;
 import fi.vm.sade.oppijanumerorekisteri.dto.YhteystiedotRyhmaDto;
@@ -27,9 +26,7 @@ import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.setYhteyst
 @Getter
 @Setter
 @NoArgsConstructor
-public class KotimainenOsoite extends YhteystietoTietoryhma<KotimainenOsoite> {
-
-    private static final KotimainenOsoiteParser PARSER = new KotimainenOsoiteParser();
+public class KotimainenOsoite extends YhteystietoTietoryhma {
 
     private String lahiosoite;
 
@@ -95,13 +92,4 @@ public class KotimainenOsoite extends YhteystietoTietoryhma<KotimainenOsoite> {
                 .ifPresent(maa -> setYhteystietoArvo(yhteystietoryhma, YhteystietoTyyppi.YHTEYSTIETO_MAA, maa));
     }
 
-    @Override
-    protected KotimainenOsoite getThis() {
-        return this;
-    }
-
-    @Override
-    protected KotimainenOsoiteParser getParser() {
-        return null;
-    }
 }

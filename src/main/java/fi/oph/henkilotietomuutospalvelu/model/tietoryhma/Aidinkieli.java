@@ -2,8 +2,6 @@ package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
-import fi.oph.henkilotietomuutospalvelu.service.parse.AidinkieliParser;
-import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.KielisyysDto;
 import lombok.Builder;
@@ -20,9 +18,7 @@ import javax.persistence.Entity;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Aidinkieli extends Tietoryhma<Aidinkieli> {
-
-    private static final TietoryhmaParser<Aidinkieli> PARSER = new AidinkieliParser();
+public class Aidinkieli extends Tietoryhma {
 
     /**
      * Äidinkieli on esitetty ISO639-standardin mukaisella kielikoodilla.
@@ -39,16 +35,6 @@ public class Aidinkieli extends Tietoryhma<Aidinkieli> {
         super(ryhmatunnus, muutostapa);
         this.languageCode = languageCode;
         this.additionalInformation = additionalInformation;
-    }
-
-    @Override
-    protected Aidinkieli getThis() {
-        return this;
-    }
-
-    @Override
-    protected TietoryhmaParser<Aidinkieli> getParser() {
-        return PARSER;
     }
 
     @Override

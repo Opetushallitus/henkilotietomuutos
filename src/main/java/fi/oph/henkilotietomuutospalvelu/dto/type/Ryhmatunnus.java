@@ -41,16 +41,16 @@ public enum Ryhmatunnus {
 
     private final String code;
     private final boolean tarkentava;
-    private final TietoryhmaParser<? extends Tietoryhma<?>> parser;
+    private final TietoryhmaParser<? extends Tietoryhma> parser;
 
     private static final Map<String, Ryhmatunnus> map =
             Arrays.stream(Ryhmatunnus.values()).collect(Collectors.toMap(type -> type.code, type -> type));
 
-    Ryhmatunnus(String code, TietoryhmaParser<? extends Tietoryhma<?>> parser) {
+    Ryhmatunnus(String code, TietoryhmaParser<? extends Tietoryhma> parser) {
         this(code, false, parser);
     }
 
-    Ryhmatunnus(String code, boolean tarkentava, TietoryhmaParser<? extends Tietoryhma<?>> parser) {
+    Ryhmatunnus(String code, boolean tarkentava, TietoryhmaParser<? extends Tietoryhma> parser) {
         this.code = code;
         this.tarkentava = tarkentava;
         this.parser = parser;
@@ -64,12 +64,16 @@ public enum Ryhmatunnus {
         return tarkentava;
     }
 
-    public TietoryhmaParser<? extends Tietoryhma<?>> getParser() {
+    public TietoryhmaParser<? extends Tietoryhma> getParser() {
         return parser;
     }
 
     public static Ryhmatunnus getEnum(String code) {
         return map.get(code);
+    }
+
+    public Tietoryhma parse(String tietoryhma, String... tarkentavatTietoryhmat) {
+        return parser.parse(tietoryhma, tarkentavatTietoryhmat);
     }
 
 }
