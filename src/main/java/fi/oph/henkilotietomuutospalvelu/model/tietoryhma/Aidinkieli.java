@@ -37,11 +37,11 @@ public class Aidinkieli extends Tietoryhma {
         this.additionalInformation = additionalInformation;
     }
 
-
     @Override
     protected void updateHenkiloInternal(Context context, HenkiloForceUpdateDto henkilo) {
         KielisyysDto aidinkieli = new KielisyysDto();
         aidinkieli.setKieliKoodi(this.languageCode);
         henkilo.setAidinkieli(aidinkieli);
     }
+
 }

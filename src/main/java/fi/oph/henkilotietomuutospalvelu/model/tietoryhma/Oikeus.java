@@ -43,4 +43,5 @@ public class Oikeus extends Tietoryhma {
         this.alkupvm = alkupvm;
         this.loppupvm = loppupvm;
     }
+
 }

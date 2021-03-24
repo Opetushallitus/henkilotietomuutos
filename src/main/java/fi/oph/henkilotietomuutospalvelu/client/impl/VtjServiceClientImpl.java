@@ -6,6 +6,7 @@ import fi.oph.henkilotietomuutospalvelu.config.ConfigEnums;
 import fi.oph.henkilotietomuutospalvelu.config.UrlConfiguration;
 import fi.oph.henkilotietomuutospalvelu.config.properties.CasProperties;
 import fi.oph.henkilotietomuutospalvelu.config.properties.OppijanumerorekisteriProperties;
+import fi.oph.henkilotietomuutospalvelu.utils.HenkiloUtils;
 import fi.vm.sade.javautils.http.OphHttpClient;
 import fi.vm.sade.javautils.http.OphHttpRequest;
 import fi.vm.sade.javautils.http.auth.CasAuthenticator;
@@ -62,7 +63,7 @@ public class VtjServiceClientImpl implements VtjServiceClient {
                     }
                 });
         if (!yksiloityHenkilo.isPresent()) {
-            log.warn("Could not find henkilo from VTJ with hetu {}", hetu);
+            log.warn("Could not find henkilo from VTJ with hetu {}", HenkiloUtils.sensuroiHetu(hetu));
         }
         try {
             TimeUnit.MILLISECONDS.sleep(200);

@@ -295,11 +295,13 @@ public class MuutostietoHandleServiceImplTest {
 
     @Test
     public void handleMuutostietoTilapainenOsoitePoistettu() {
-        Tietoryhma osoitePoistettu = TilapainenKotimainenOsoite.builder()
-                .muutostapa(Muutostapa.POISTETTU)
-                .lahiosoite("osoitePoistettu")
-                .postinumero("00001")
-                .build();
+        Tietoryhma osoitePoistettu = TilapainenKotimainenOsoite.from(
+                KotimainenOsoite.builder()
+                        .muutostapa(Muutostapa.POISTETTU)
+                        .lahiosoite("osoitePoistettu")
+                        .postinumero("00001")
+                        .build()
+        );
 
         HenkiloMuutostietoRivi henkiloMuutostietoRivi = new HenkiloMuutostietoRivi();
         henkiloMuutostietoRivi.setTiedosto(new Tiedosto());

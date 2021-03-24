@@ -5,6 +5,7 @@ import fi.oph.henkilotietomuutospalvelu.client.VtjServiceClient;
 import fi.oph.henkilotietomuutospalvelu.config.OrikaConfiguration;
 import fi.oph.henkilotietomuutospalvelu.service.VtjService;
 import fi.oph.henkilotietomuutospalvelu.service.build.HenkiloUpdateUtil;
+import fi.oph.henkilotietomuutospalvelu.utils.HenkiloUtils;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HuoltajaCreateDto;
@@ -74,7 +75,8 @@ public class VtjServiceImpl implements VtjService {
 
     private boolean filterPassivoitu(YksiloityHenkilo yksiloityHenkilo) {
         if (yksiloityHenkilo.isPassivoitu()) {
-            log.warn("Got passivoitu huoltaja from VTJ with hetu {}", yksiloityHenkilo.getHetu());
+            log.warn("Got passivoitu huoltaja from VTJ with hetu {}",
+                    HenkiloUtils.sensuroiHetu(yksiloityHenkilo.getHetu()));
         }
         return !yksiloityHenkilo.isPassivoitu();
     }

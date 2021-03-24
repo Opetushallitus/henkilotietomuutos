@@ -45,7 +45,12 @@ public class MuutostietoServiceImpl implements MuutostietoService {
             throws IOException, MuutostietoFileException {
         Optional<String> optional = this.fileService.findNextFile();
         if (optional.isPresent()) {
-            return handleFile(optional.get(), lastHandledLineNumber);
+            try {
+                return handleFile(optional.get(), lastHandledLineNumber);
+            } catch (MuutostietoFileException e) {
+                log.error("Handling muutostieto file failed", e);
+                throw e;
+            }
         }
         return Collections.emptyList();
     }
@@ -109,18 +114,24 @@ public class MuutostietoServiceImpl implements MuutostietoService {
     @Transactional(readOnly = true)
     @Override
     public void updateMuutostietos() {
-        List<String> unprocessedFileNames = this.henkiloMuutostietoRepository.findDistinctUnprocessedTiedostoFileName();
-        Optional<String> firstFileToProcess = unprocessedFileNames.stream()
-                .min(this.fileService.byFileExtension().thenComparing(this.fileService.bySequentalNumbering()));
+        try {
+            List<String> unprocessedFileNames = this.henkiloMuutostietoRepository.findDistinctUnprocessedTiedostoFileName();
+            Optional<String> firstFileToProcess = unprocessedFileNames.stream()
+                    .min(this.fileService.byFileExtension().thenComparing(this.fileService.bySequentalNumbering()));
 
-        firstFileToProcess.ifPresent(fileName ->
-                this.henkiloMuutostietoRepository
-                        .findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(fileName)
-                        .forEach(id -> {
-                            HenkiloMuutostietoRivi henkiloMuutostietoRivi = this.henkiloMuutostietoRepository.findById(id)
-                                    .orElseThrow(() -> new IllegalStateException(String.format("Could not find HenkiloMuutostietoRivi by id %d", id)));
-                            this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
-                        }));
+
+            firstFileToProcess.ifPresent(fileName ->
+                    this.henkiloMuutostietoRepository
+                            .findByTiedostoFileNameAndProcessTimestampIsNullOrderByRivi(fileName)
+                            .forEach(id -> {
+                                HenkiloMuutostietoRivi henkiloMuutostietoRivi = this.henkiloMuutostietoRepository.findById(id)
+                                        .orElseThrow(() -> new IllegalStateException(String.format("Could not find HenkiloMuutostietoRivi by id %d", id)));
+                                this.muutostietoHandleService.handleMuutostieto(henkiloMuutostietoRivi);
+                            }));
+        } catch (RuntimeException e) { // lokitetaan, jotta virhe ei huku mikäli notifikaatio epäonnistuu
+            log.error("Failed to update muutostietos", e); // ihanaa sekakieltä! <3
+            throw e;
+        }
     }
 
     /**

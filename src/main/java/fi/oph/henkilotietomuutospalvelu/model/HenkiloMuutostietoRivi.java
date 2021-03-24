@@ -34,7 +34,8 @@ public class HenkiloMuutostietoRivi extends IdentifiableAndVersionedEntity {
     @Column(name = "process_timestamp")
     private LocalDateTime processTimestamp;
 
-    public void addTietoryhma(Tietoryhma... tietoryhmat) {
+    @SafeVarargs
+    public final void addTietoryhma(Tietoryhma... tietoryhmat) {
         for (Tietoryhma tietoryhma : tietoryhmat) {
             tietoryhma.setHenkiloMuutostietoRivi(this);
             tietoryhmaList.add(tietoryhma);

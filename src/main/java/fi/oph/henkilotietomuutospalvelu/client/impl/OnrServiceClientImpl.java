@@ -59,11 +59,12 @@ public class OnrServiceClientImpl implements OnrServiceClient {
         String content;
         try {
             content = this.objectMapper.writeValueAsString(updateDto);
-        }
-        catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             throw new RestClientException("Error mapping to json", e);
         }
+
         if (Boolean.FALSE.equals(this.oppijanumerorekisteriProperties.getNoUpdateMode())) {
+            log.debug("ONR updates are enabled, updating henkilo {}.", updateDto.getOidHenkilo());
             OphHttpRequest request = OphHttpRequest.Builder
                     .put(urlConfiguration.url("oppijanumerorekisteri-service.s2s.henkilo"))
                     .addHeader("Content-Type", CONTENT_TYPE)
@@ -79,9 +80,8 @@ public class OnrServiceClientImpl implements OnrServiceClient {
                     })
                     .expectedStatus(SC_OK)
                     .ignoreResponse();
-        }
-        else {
-            log.info("No update mode is active. Not updating henkilo {}", updateDto.getOidHenkilo());
+        } else {
+            log.info("No update mode is active. Not updating henkilo {}.", updateDto.getOidHenkilo());
         }
     }
 

@@ -12,4 +12,11 @@ public interface MuutostietoParseService {
      * @throws MuutostietoLineParseException if parsing the data fails
      */
     MuutostietoDto deserializeMuutostietoLine(MuutostietoLine line) throws MuutostietoLineParseException;
+
+    /**
+     * Serialize a <code>MuutostietoDto</code> to a String.
+     * @param dto dto to serialize
+     * @return dto serialized
+     */
+    String serializeMuutostietoDto(MuutostietoDto dto);
 }

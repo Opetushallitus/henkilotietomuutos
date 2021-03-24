@@ -27,7 +27,6 @@ public class Sukupuoli extends Tietoryhma {
         this.gender = gender;
     }
 
-
     @Override
     protected void updateHenkiloInternal(Context context, HenkiloForceUpdateDto henkilo) {
         henkilo.setSukupuoli(this.gender.getCode());

@@ -4,6 +4,7 @@ import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
 import fi.oph.henkilotietomuutospalvelu.model.HenkiloMuutostietoRivi;
 import fi.oph.henkilotietomuutospalvelu.model.IdentifiableAndVersionedEntity;
+import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceReadDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import lombok.AllArgsConstructor;
@@ -47,7 +48,7 @@ public abstract class Tietoryhma extends IdentifiableAndVersionedEntity {
         this.muutostapa = muutostapa;
     }
 
-    public boolean isVoimassa() {
+    public boolean isVoimassa(Context context) {
         return true;
     }
 
@@ -75,4 +76,14 @@ public abstract class Tietoryhma extends IdentifiableAndVersionedEntity {
         LocalDate getLocalDateNow();
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends Tietoryhma> String serialize() {
+        TietoryhmaParser<T> parser = (TietoryhmaParser<T>) getRyhmatunnus().getParser();
+        return parser.serialize(getThis());
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T extends Tietoryhma> T getThis() {
+        return (T) this;
+    }
 }

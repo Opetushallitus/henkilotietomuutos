@@ -31,6 +31,15 @@ public class MuutostietoParseServiceImpl implements MuutostietoParseService {
         }
     }
 
+    @Override
+    public String serializeMuutostietoDto(MuutostietoDto dto) {
+        String serialized = serializeTunnisteosa(dto);
+        for (Tietoryhma ryhma : dto.getTietoryhmat()) {
+            serialized = String.join("|", serialized, ryhma.serialize());
+        }
+        return serialized + "|";
+    }
+
     private static MuutostietoDto parseTunnisteosa(String tunnisteosa) {
         return MuutostietoDto.builder()
             .hetu(tunnisteosa.substring(0, 11))
@@ -41,12 +50,20 @@ public class MuutostietoParseServiceImpl implements MuutostietoParseService {
             .build();
     }
 
+    private static String serializeTunnisteosa(MuutostietoDto dto) {
+        return dto.getHetu()
+                + dto.getTapahtuma()
+                + VRKParseUtil.serializeDate(dto.getRekisterointipaiva())
+                + dto.getMuutosType().getCode()
+                + dto.getRole();
+    }
+
     private static List<Tietoryhma> deserializeTietoryhmat(String[] tietoryhmat) {
         List<Tietoryhma> ryhmat = new ArrayList<>();
         for (int i = 1; i <= tietoryhmat.length - 1; i++) {
             List<String> tarkentavatTietoryhmat = etsiTarkentavatTietoryhmat(tietoryhmat, i);
             Tietoryhma ryhma = TietoryhmaParserUtil.deserializeTietoryhma(tietoryhmat[i],
-                    tarkentavatTietoryhmat.toArray(new String[tarkentavatTietoryhmat.size()]));
+                    tarkentavatTietoryhmat.toArray(new String[0]));
 
             ryhmat.add(ryhma);
             if (ryhma instanceof Huoltaja && ((Huoltaja)ryhma).getHenkilotunnuksetonHenkilo() != null) {

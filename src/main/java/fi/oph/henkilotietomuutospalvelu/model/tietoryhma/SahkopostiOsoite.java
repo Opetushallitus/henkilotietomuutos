@@ -24,7 +24,6 @@ import static fi.oph.henkilotietomuutospalvelu.utils.YhteystietoUtils.setYhteyst
 @NoArgsConstructor
 public class SahkopostiOsoite extends YhteystietoTietoryhma {
 
-
     /**
      * 99=henkilon ilmoittama sahkopostiosoite,
      * 11=maistraatin sahkopostiosoite,

@@ -56,6 +56,9 @@ public class FileServiceImpl implements FileService {
             moveFilesToImportDir(filePaths);
 
             return fileNames;
+        } catch (IOException e) {
+            log.error("Downloading BIX files failed", e); // lokitetaan siltä varalta, etteivät notifikaatiot toimi (köh, QA-ympäristö, köh)
+            throw e; // notifikaatio tulee heitetyn poikkarin perusteella
         }
     }
 
