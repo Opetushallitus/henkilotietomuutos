@@ -7,7 +7,6 @@ import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Huoltaja;
 import fi.oph.henkilotietomuutospalvelu.model.tietoryhma.Tietoryhma;
 import fi.oph.henkilotietomuutospalvelu.service.MuutostietoParseService;
 import fi.oph.henkilotietomuutospalvelu.service.exception.MuutostietoLineParseException;
-import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParser;
 import fi.oph.henkilotietomuutospalvelu.service.parse.TietoryhmaParserUtil;
 import fi.oph.henkilotietomuutospalvelu.service.parse.VRKParseUtil;
 import org.springframework.stereotype.Service;
@@ -36,15 +35,9 @@ public class MuutostietoParseServiceImpl implements MuutostietoParseService {
     public String serializeMuutostietoDto(MuutostietoDto dto) {
         String serialized = serializeTunnisteosa(dto);
         for (Tietoryhma ryhma : dto.getTietoryhmat()) {
-            serialized = String.join("|", serialized, serializeTietoryhma(ryhma));
+            serialized = String.join("|", serialized, ryhma.serialize());
         }
         return serialized + "|";
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T extends Tietoryhma> String serializeTietoryhma(T tietoryhma) {
-        TietoryhmaParser<T> parser = (TietoryhmaParser<T>) tietoryhma.getRyhmatunnus().getParser();
-        return parser.serialize(tietoryhma);
     }
 
     private static MuutostietoDto parseTunnisteosa(String tunnisteosa) {
