@@ -30,7 +30,9 @@ public class UlkomainenOsoiteParser implements TietoryhmaParser<UlkomainenOsoite
                 .build();
 
         if (countryCode.equals("998")) {
-            osoite.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
+            if (tarkentavatTietoryhmat.length > 0) {
+                osoite.setAdditionalInformation(parseAdditionalInformation(tarkentavatTietoryhmat[0]));
+            }
         }
 
         return osoite;
