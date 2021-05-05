@@ -59,4 +59,9 @@ public class UlkomainenOsoiteParserTest {
         assertEquals(Ryhmatunnus.ULKOMAINEN_OSOITE_TILAPAINEN, osoite.getRyhmatunnus());
         assertEquals(tietoryhma, parser.serialize(osoite));
     }
+
+    @Test
+    public void parsesFaultyProdLine() {
+        String tietoryhma = "020889-2016XCF202104280101|1044                                                                                                                                                                9980000000019890801|";
+    }
 }
