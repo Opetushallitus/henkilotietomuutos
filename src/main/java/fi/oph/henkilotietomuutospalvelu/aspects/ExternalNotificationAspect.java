@@ -30,7 +30,7 @@ public class ExternalNotificationAspect {
     public void notifyOnException(JoinPoint joinPoint, NotifyOnError notifyOnError, Exception exception) {
         String process = notifyOnError.value().getValue();
         String topic = String.format("Virhe henkilötietomuutospalvelun prosessissa: %s", process);
-        String errorMessage = String.format("%s: %s", LocalDateTime.now(), exception);
+        String errorMessage = String.format("%s: %s", LocalDateTime.now(), sanitize(exception.toString()));
 
         if (lastNotificationSent == null || MINUTES.between(lastNotificationSent, LocalDateTime.now()) >= this.viestintaProperties.getMaxNotificationIntervalInMinutes()) {
             if (StringUtils.hasLength(this.viestintaProperties.getDefaultReceiverEmail())) {
@@ -41,5 +41,9 @@ public class ExternalNotificationAspect {
             }
             this.lastNotificationSent = LocalDateTime.now();
         }
+    }
+
+    protected String sanitize(String message) {
+        return message.replaceAll("\\b(\\d{6}[-+A])\\d{3}\\w(\\W|\\b)", "$1****$2");
     }
 }
