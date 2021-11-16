@@ -63,7 +63,7 @@ public class VtjServiceClientImpl implements VtjServiceClient {
                     }
                 });
         if (!yksiloityHenkilo.isPresent()) {
-            log.warn("Could not find henkilo from VTJ with hetu {}", HenkiloUtils.sensuroiHetu(hetu));
+            log.warn("Could not find henkilo from VTJ with hetu {}", hetu);
         }
         try {
             TimeUnit.MILLISECONDS.sleep(200);

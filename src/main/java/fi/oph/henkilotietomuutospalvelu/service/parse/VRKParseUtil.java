@@ -62,7 +62,7 @@ public class VRKParseUtil {
             case '+':
                 return 1800;
             default:
-               throw new TietoryhmaParseException("Invalid sign in hetu " + HenkiloUtils.sensuroiHetu(hetu) + "!");
+               throw new TietoryhmaParseException("Invalid sign in hetu " + hetu + "!");
         }
     }
 

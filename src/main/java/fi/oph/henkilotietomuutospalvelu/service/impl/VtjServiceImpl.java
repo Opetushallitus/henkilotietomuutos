@@ -75,8 +75,7 @@ public class VtjServiceImpl implements VtjService {
 
     private boolean filterPassivoitu(YksiloityHenkilo yksiloityHenkilo) {
         if (yksiloityHenkilo.isPassivoitu()) {
-            log.warn("Got passivoitu huoltaja from VTJ with hetu {}",
-                    HenkiloUtils.sensuroiHetu(yksiloityHenkilo.getHetu()));
+            log.warn("Got passivoitu huoltaja from VTJ with hetu {}", yksiloityHenkilo.getHetu());
         }
         return !yksiloityHenkilo.isPassivoitu();
     }

@@ -25,12 +25,12 @@ public final class HenkiloUtils {
      * @param hetu sensuroitava hetu.
      *
      * @return hetu sellaisenaan, jos väärän pituinen tai testihetu.
-     */
+
     public static String sensuroiHetu(String hetu) {
         if (hetu == null || hetu.length() != 11 || hetu.charAt(7) == '9') {
             return hetu;
         }
         return hetu.substring(0, 7) + "####";
     }
-
+     */
 }

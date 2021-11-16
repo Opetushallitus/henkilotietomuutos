@@ -243,8 +243,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
                 allCurrentHenkiloRivis.forEach(currentHenkiloRivi -> currentHenkiloRivi.setQueryHetu(newHetu));
             }
             else {
-                log.error("Henkilo {} not found from oppijanumerorekisteri and no other known hetus match. Can not update.",
-                        HenkiloUtils.sensuroiHetu(queryHetu));
+                log.error("Henkilo {} not found from oppijanumerorekisteri and no other known hetus match. Can not update.", queryHetu);
             }
         }
         return optionalHenkiloDto;
