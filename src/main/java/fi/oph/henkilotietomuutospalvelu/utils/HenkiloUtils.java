@@ -18,19 +18,4 @@ public final class HenkiloUtils {
                 .map(kielikoodi -> kielikoodi.trim().toLowerCase())
                 .orElse(KIELIKOODI_FI);
     }
-
-    /**
-     * Sensuroi hetu. Korvaa loppuosan ja tarkisteen &quot;risuaidoilla&quot;.
-     *
-     * @param hetu sensuroitava hetu.
-     *
-     * @return hetu sellaisenaan, jos väärän pituinen tai testihetu.
-
-    public static String sensuroiHetu(String hetu) {
-        if (hetu == null || hetu.length() != 11 || hetu.charAt(7) == '9') {
-            return hetu;
-        }
-        return hetu.substring(0, 7) + "####";
-    }
-     */
 }
