@@ -7,9 +7,21 @@ Henkilotietomuutospalvelu (HTMP) on ajastettu palvelu, joka:
  
 Jatkossa HTMP on tarkoitus muuttaa käyttämään VRK:n muutostietopalvelua. Ks. suunnitelmat: https://jira.oph.ware.fi/jira/browse/KJHH-845. Placeholder-endpoint: _/startLocalSyncWithVtjMuutostietopalvelu_.
 
-## Teknologia
+## Technologies & Frameworks
 
-HTMP on Spring Boot -sovellus. 
+Below is non-exhaustive list of the key technologies & frameworks used in the project.
+
+### Backend
+
+* Spring Boot
+* Spring Security (CAS)
+* Postgresql
+* QueryDSL
+* JPA / Hibernate5
+* Flyway
+* Orika
+* Lombok
+* Swagger
 
 ## Käynnistäminen kehitysmoodissa
 
