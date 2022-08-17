@@ -56,7 +56,7 @@ public class ExternalNotificationAspectIntegrationTest {
     @Before
     public void setup() {
         given(this.viestintaProperties.getDefaultReceiverEmail()).willReturn("email");
-        given(this.viestintaProperties.getFlowToken()).willReturn("token");
+        given(this.viestintaProperties.getSlackUrl()).willReturn("slackurl");
     }
 
     @Test
@@ -64,7 +64,7 @@ public class ExternalNotificationAspectIntegrationTest {
         willThrow(new RuntimeException()).given(this.vtjDataRepository).findByVtjdataTimestampIsNull();
         assertThatThrownBy(() -> this.hetuService.updateHetusToVtj()).isInstanceOf(RuntimeException.class);
         verify(notificationService, times(1)).sendEmailNotification(any(), any());
-        verify(notificationService, times(1)).sendFlowdocNotification(any(), any(), any());
+        verify(notificationService, times(1)).sendSlackNotification(any(), any());
     }
 
     @Test
@@ -75,7 +75,7 @@ public class ExternalNotificationAspectIntegrationTest {
         assertThatThrownBy(() -> this.hetuService.updateHetusToVtj()).isInstanceOf(RuntimeException.class);
         assertThatThrownBy(() -> this.hetuService.updateHetusToVtj()).isInstanceOf(RuntimeException.class);
         verify(notificationService, times(1)).sendEmailNotification(any(), any());
-        verify(notificationService, times(1)).sendFlowdocNotification(any(), any(), any());
+        verify(notificationService, times(1)).sendSlackNotification(any(), any());
     }
 
     @Test
@@ -83,7 +83,7 @@ public class ExternalNotificationAspectIntegrationTest {
         willThrow(new RuntimeException()).given(this.henkiloMuutostietoRepository).findDistinctUnprocessedTiedostoFileName();
         assertThatThrownBy(() -> this.muutostietoService.updateMuutostietos()).isInstanceOf(RuntimeException.class);
         verify(notificationService, times(1)).sendEmailNotification(any(), any());
-        verify(notificationService, times(1)).sendFlowdocNotification(any(), any(), any());
+        verify(notificationService, times(1)).sendSlackNotification(any(), any());
     }
 
     @Test
@@ -91,7 +91,7 @@ public class ExternalNotificationAspectIntegrationTest {
         given(this.fileService.findNextFile()).willThrow(new RuntimeException());
         assertThatThrownBy(() -> this.muutostietoService.importMuutostiedot(1)).isInstanceOf(RuntimeException.class);
         verify(notificationService, times(1)).sendEmailNotification(any(), any());
-        verify(notificationService, times(1)).sendFlowdocNotification(any(), any(), any());
+        verify(notificationService, times(1)).sendSlackNotification(any(), any());
     }
 
     @Test
@@ -99,6 +99,6 @@ public class ExternalNotificationAspectIntegrationTest {
         given(this.muutostietoService.downloadFiles()).willThrow(new RuntimeException());
         assertThatThrownBy(() -> this.muutostietoService.downloadFiles()).isInstanceOf(RuntimeException.class);
         verify(notificationService, times(1)).sendEmailNotification(any(), any());
-        verify(notificationService, times(1)).sendFlowdocNotification(any(), any(), any());
+        verify(notificationService, times(1)).sendSlackNotification(any(), any());
     }
 }
