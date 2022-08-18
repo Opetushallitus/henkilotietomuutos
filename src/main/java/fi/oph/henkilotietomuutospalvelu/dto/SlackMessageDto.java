@@ -15,11 +15,7 @@ public class SlackMessageDto {
     @Setter
     public static class MessageBlock {
         public enum Type {
-            header("header"), section("section");
-            String type;
-            Type(String type) {
-                this.type = type;
-            }
+            header, section
         };
         private Type type;
         private Text text;
@@ -30,7 +26,7 @@ public class SlackMessageDto {
         @Getter
         public static class Text {
             public enum Type {
-                mrkdwn, plain_text;
+                mrkdwn, plain_text
             };
             @NonNull
             private Type type;
