@@ -1,10 +1,10 @@
 package fi.oph.henkilotietomuutospalvelu.dto;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
+import org.springframework.beans.factory.annotation.Required;
 
 import java.util.List;
+
 @Getter
 @Setter
 public class SlackMessageDto {
@@ -14,20 +14,32 @@ public class SlackMessageDto {
     @Getter
     @Setter
     public static class MessageBlock {
-        private String type;
+        public enum Type {
+            header("header"), section("section");
+            String type;
+            Type(String type) {
+                this.type = type;
+            }
+        };
+        private Type type;
         private Text text;
 
         @AllArgsConstructor
+        @RequiredArgsConstructor
+        @NoArgsConstructor
         @Getter
         public static class Text {
-            private String type;
+            public enum Type {
+                mrkdwn, plain_text;
+            };
+            @NonNull
+            private Type type;
+            @NonNull
             private String text;
+
+            @JsonInclude(JsonInclude.Include.NON_NULL)
             private Boolean emoji;
 
-            public Text(String type, String text) {
-                this.type = type;
-                this.text = text;
-            }
         }
     }
 }

@@ -1,4 +1,6 @@
 package fi.oph.henkilotietomuutospalvelu.client.impl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fi.oph.henkilotietomuutospalvelu.client.SlackClient;
 import fi.oph.henkilotietomuutospalvelu.config.ConfigEnums;
 import fi.oph.henkilotietomuutospalvelu.config.properties.ViestintaProperties;
@@ -11,12 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.ContentType;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import com.google.gson.*;
+import org.springframework.web.client.RestClientException;
 
 import javax.annotation.PostConstruct;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.apache.http.HttpStatus.*;
@@ -28,14 +29,9 @@ public class SlackClientImpl implements SlackClient {
     private final ViestintaProperties viestintaProperties;
 
     private OphHttpClient ophHttpClient;
+    private final ObjectMapper objectMapper;
 
-    private final Gson gson = new Gson();
-
-    private static final String MESSAGE_HEADER_TYPE = "header";
-    private static final String MESSAGE_SECTION_TYPE = "section";
     private static final String MESSAGE_HEADER_TEXT = ":ghost: Error in Henkilötietomuutospalvelu :ghost:";
-    private static final String MESSAGE_HEADER_TEXT_TYPE = "plain_text";
-    private static final String MESSAGE_SECTION_TEXT_TYPE = "mrkdwn";
 
 
     @PostConstruct
@@ -47,16 +43,22 @@ public class SlackClientImpl implements SlackClient {
     @Override
     public String constructSlackMessage(String topic, String message) {
         String content = String.format("%s: ```%s```", topic, message);
-        SlackMessageDto slackMsg = new SlackMessageDto();
-        slackMsg.setText(MESSAGE_HEADER_TEXT);
+        SlackMessageDto slackMsgDto = new SlackMessageDto();
+        slackMsgDto.setText(MESSAGE_HEADER_TEXT);
         SlackMessageDto.MessageBlock msgHeader = new SlackMessageDto.MessageBlock();
-        msgHeader.setType(MESSAGE_HEADER_TYPE);
-        msgHeader.setText(new SlackMessageDto.MessageBlock.Text(MESSAGE_HEADER_TEXT_TYPE, MESSAGE_HEADER_TEXT, true));
+        msgHeader.setType(SlackMessageDto.MessageBlock.Type.header);
+        msgHeader.setText(new SlackMessageDto.MessageBlock.Text(SlackMessageDto.MessageBlock.Text.Type.plain_text, MESSAGE_HEADER_TEXT, true));
         SlackMessageDto.MessageBlock msgSection = new SlackMessageDto.MessageBlock();
-        msgSection.setType(MESSAGE_SECTION_TYPE);
-        msgSection.setText(new SlackMessageDto.MessageBlock.Text(MESSAGE_SECTION_TEXT_TYPE, content));
-        slackMsg.setBlocks(Arrays.asList(msgHeader, msgSection));
-        return gson.toJson(slackMsg);
+        msgSection.setType(SlackMessageDto.MessageBlock.Type.section);
+        msgSection.setText(new SlackMessageDto.MessageBlock.Text(SlackMessageDto.MessageBlock.Text.Type.mrkdwn, content));
+        slackMsgDto.setBlocks(Arrays.asList(msgHeader, msgSection));
+        String slackMsgJson;
+        try {
+            slackMsgJson = this.objectMapper.writeValueAsString(slackMsgDto);
+        } catch (JsonProcessingException jpe) {
+            throw new RestClientException("Json processing failure", jpe);
+        }
+        return slackMsgJson;
     }
 
     @Override
