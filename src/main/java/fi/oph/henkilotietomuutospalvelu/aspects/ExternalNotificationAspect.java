@@ -36,8 +36,8 @@ public class ExternalNotificationAspect {
             if (StringUtils.hasLength(this.viestintaProperties.getDefaultReceiverEmail())) {
                 this.notificationService.sendEmailNotification(topic, errorMessage);
             }
-            if (StringUtils.hasLength(this.viestintaProperties.getFlowToken())) {
-                this.notificationService.sendFlowdocNotification(topic, errorMessage, notifyOnError);
+            if (StringUtils.hasLength(this.viestintaProperties.getSlackUrl())) {
+                this.notificationService.sendSlackNotification(topic, errorMessage);
             }
             this.lastNotificationSent = LocalDateTime.now();
         }

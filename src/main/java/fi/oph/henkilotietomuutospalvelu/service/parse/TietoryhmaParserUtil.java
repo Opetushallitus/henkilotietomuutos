@@ -79,5 +79,4 @@ public class TietoryhmaParserUtil {
     static LocalDate parseDate(String str, int startIndex) {
         return VRKParseUtil.deserializeDate(parseString(str, startIndex, 8));
     }
-
 }

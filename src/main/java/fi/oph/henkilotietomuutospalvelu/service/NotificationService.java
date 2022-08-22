@@ -1,23 +1,17 @@
 package fi.oph.henkilotietomuutospalvelu.service;
 
-import fi.oph.henkilotietomuutospalvelu.annotations.NotifyOnError;
-
-/**
- * Palvelu notifikaatioiden lähettämiseen
- */
 public interface NotificationService {
     /**
-     * Lähettää sähköpostinotifikaation
-     * @param topic Sähköpostiviestin otsikko
-     * @param message Sähköpostiviestin tekstin sisältö
+     * Sends an email notification
+     * @param topic Email topic
+     * @param message Email message
      */
     void sendEmailNotification(String topic, String message);
 
     /**
-     * Lähettää flowdoc notifikaation
-     * @param topic Notifikaatioviestin tekstin otsikko
-     * @param message Notifikaatioviestin tekstin sisältö
-     * @param notifyOnError Notifikaation tyyppi
+     * Sends a notification to Slack
+     * @param topic Notification topic
+     * @param message Notification message
      */
-    void sendFlowdocNotification(String topic, String message, NotifyOnError notifyOnError);
+    void sendSlackNotification(String topic, String message);
 }

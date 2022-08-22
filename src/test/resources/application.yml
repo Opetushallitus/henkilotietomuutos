@@ -43,7 +43,6 @@ clients:
 host:
   host-cas: not.used
   host-virkailija: not.used
-  host-flowdoc: not.used
 
 swagger:
   enabled: false
