@@ -28,7 +28,8 @@
         <ant-contrib.version>20020829</ant-contrib.version>
         <jsch.version>0.1.54</jsch.version>
         <ant-jsch.version>1.9.9</ant-jsch.version>
-
+        <sonar.organization>opetushallitus</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <!-- Inherit defaults from Spring Boot -->
