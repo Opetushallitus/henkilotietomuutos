@@ -267,6 +267,7 @@
 
     <!-- Package as an executable jar -->
     <build>
+        <finalName>henkilotietomuutos</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
