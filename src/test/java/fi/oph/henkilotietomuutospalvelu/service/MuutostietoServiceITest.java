@@ -566,6 +566,32 @@ public class MuutostietoServiceITest {
     }
 
     @Test
+    public void invalidEmailIsSentAsEmptyStringToOppijanumerorekisteriToAvoidFailingValidation() {
+        String hetu = "281198-911L";
+        String tiedostonimi1 = "test_001.PTT";
+        tallennaTiedosto(tiedostonimi1, MuutostietoDto.builder()
+                .hetu(hetu)
+                .tietoryhmat(asList(SahkopostiOsoite.builder().email("+35891234567").build()))
+                .tiedostoNimi(tiedostonimi1)
+                .build());
+
+        HenkiloForceReadDto existingHenkilo = new HenkiloForceReadDto();
+        existingHenkilo.setHetu(hetu);
+        when(onrServiceClient.getHenkiloByHetu(hetu)).thenReturn(Optional.of(existingHenkilo));
+
+        muutostietoService.updateMuutostietos();
+        verify(onrServiceClient).updateHenkilo(captor.capture(), eq(true));
+        HenkiloForceUpdateDto update = captor.getValue();
+
+        assertThat(update.getYhteystiedotRyhma()).hasSize(1);
+        YhteystiedotRyhmaDto ryhma = update.getYhteystiedotRyhma().stream().findFirst().get();
+        assertThat(ryhma.getYhteystieto()).hasSize(1);
+        YhteystietoDto yhteystieto = ryhma.getYhteystieto().stream().findFirst().get();
+        assertThat(yhteystieto.getYhteystietoTyyppi()).isEqualTo(YhteystietoTyyppi.YHTEYSTIETO_SAHKOPOSTI);
+        assertThat(yhteystieto.getYhteystietoArvo()).isEmpty();
+    }
+
+    @Test
     public void uudelleenkasittelyTurvakieltoFalseSailyttaaYhteystiedot() {
         String hetu = "281198-911L";
 
