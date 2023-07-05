@@ -265,6 +265,14 @@
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
+
+
+        <!-- For same email validation as oppijanumerorekisteri -->
+        <dependency>
+            <groupId>com.sanctionco.jmail</groupId>
+            <artifactId>jmail</artifactId>
+            <version>1.5.0</version>
+        </dependency>
     </dependencies>
 
     <!-- Package as an executable jar -->
