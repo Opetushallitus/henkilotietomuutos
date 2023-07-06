@@ -64,14 +64,14 @@ public class MuutostietoHandleServiceImplTest {
     @Mock
     private TiedostoRepository tiedostoRepository;
 
+    @Mock
+    private CorrectingHenkiloUpdateValidator correctingHenkiloUpdateValidator;
+
     @Captor
     private ArgumentCaptor<List<HenkiloMuutostietoRivi>> listArgumentCaptor;
 
     @Captor
     private ArgumentCaptor<HenkiloForceUpdateDto> henkiloForceUpdateDtoArgumentCaptor;
-
-    @Mock
-    private CorrectingHenkiloUpdateValidator correctingHenkiloUpdateValidator;
 
     @Mock
     private KoodistoService koodistoService;
