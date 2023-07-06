@@ -1,7 +1,5 @@
 package fi.oph.henkilotietomuutospalvelu.model.tietoryhma;
 
-import com.sanctionco.jmail.EmailValidator;
-import com.sanctionco.jmail.JMail;
 import fi.oph.henkilotietomuutospalvelu.dto.type.KoodistoYhteystietoTyyppi;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Muutostapa;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Ryhmatunnus;
@@ -58,15 +56,7 @@ public class SahkopostiOsoite extends YhteystietoTietoryhma {
 
     @Override
     protected void updateYhteystietoryhma(Context context, YhteystiedotRyhmaDto yhteystietoryhma) {
-        EmailValidator emailValidator = JMail
-                .strictValidator()
-                .requireTopLevelDomain()
-                .disallowExplicitSourceRouting()
-                .disallowObsoleteWhitespace()
-                .disallowQuotedIdentifiers();
-
-        String validatedEmailValue = emailValidator.isValid(email) ? email : "";
-        setYhteystietoArvo(yhteystietoryhma, YhteystietoTyyppi.YHTEYSTIETO_SAHKOPOSTI, validatedEmailValue);
+        setYhteystietoArvo(yhteystietoryhma, YhteystietoTyyppi.YHTEYSTIETO_SAHKOPOSTI, email);
     }
 
 }

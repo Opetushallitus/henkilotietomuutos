@@ -1,11 +1,15 @@
 package fi.oph.henkilotietomuutospalvelu.service.validators.impl;
 
+import com.sanctionco.jmail.EmailValidator;
+import com.sanctionco.jmail.JMail;
 import fi.oph.henkilotietomuutospalvelu.dto.type.Koodisto;
 import fi.oph.henkilotietomuutospalvelu.service.KoodistoService;
 import fi.oph.henkilotietomuutospalvelu.service.validators.CorrectingHenkiloUpdateValidator;
 import fi.oph.henkilotietomuutospalvelu.service.validators.UnknownKoodi;
 import fi.vm.sade.oppijanumerorekisteri.dto.HenkiloForceUpdateDto;
 import fi.vm.sade.oppijanumerorekisteri.dto.HuoltajaCreateDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.YhteystietoDto;
+import fi.vm.sade.oppijanumerorekisteri.dto.YhteystietoTyyppi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,6 +29,13 @@ import static fi.oph.henkilotietomuutospalvelu.service.validators.UnknownKoodi.*
 @RequiredArgsConstructor
 public class CorrectingHenkiloUpdateValidatorImpl implements CorrectingHenkiloUpdateValidator {
     private final KoodistoService koodistoService;
+
+    private EmailValidator emailValidator = JMail
+            .strictValidator()
+            .requireTopLevelDomain()
+            .disallowExplicitSourceRouting()
+            .disallowObsoleteWhitespace()
+            .disallowQuotedIdentifiers();
 
     @Override
     public void validateAndCorrectErrors(HenkiloForceUpdateDto henkiloForceUpdateDto) {
@@ -50,8 +61,20 @@ public class CorrectingHenkiloUpdateValidatorImpl implements CorrectingHenkiloUp
                                                 kansalaisuusKoodi,
                                                 KANSALAISUUSKOODI_TUNTEMATON)))),
                 (updateDto) -> Optional.ofNullable(henkiloForceUpdateDto.getHuoltajat())
-                        .ifPresent(huoltajat -> huoltajat.forEach(this::validateAndCorrectErrors))
+                        .ifPresent(huoltajat -> huoltajat.forEach(this::validateAndCorrectErrors)),
+                this::replaceInvalidEmailWithEmptyString
         ).forEach(consumer -> consumer.accept(henkiloForceUpdateDto));
+    }
+
+    private void replaceInvalidEmailWithEmptyString(HenkiloForceUpdateDto updateDto) {
+        Optional.ofNullable(updateDto.getYhteystiedotRyhma()).ifPresent(ryhmat -> ryhmat.forEach(ryhma ->
+            Optional.ofNullable(ryhma.getYhteystieto()).ifPresent(yhteystiedot -> yhteystiedot.forEach(yhteystieto -> {
+                boolean isEmail = YhteystietoTyyppi.YHTEYSTIETO_SAHKOPOSTI.equals(yhteystieto.getYhteystietoTyyppi());
+                if (isEmail && !emailValidator.isValid(yhteystieto.getYhteystietoArvo())) {
+                    yhteystieto.setYhteystietoArvo("");
+                }
+            }))
+        ));
     }
 
     private void validateAndCorrectErrors(HuoltajaCreateDto huoltajaCreateDto) {
