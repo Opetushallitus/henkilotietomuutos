@@ -91,12 +91,15 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void handleMuutostieto(HenkiloMuutostietoRivi henkiloMuutostietoRivi) {
+        log.info("Handling muutostietorivi {}", henkiloMuutostietoRivi.getId());
         if (henkiloMuutostietoRivi.getProcessTimestamp() != null) {
             return;
         }
         Optional<HenkiloForceReadDto> currentHenkiloOptional = this.getCurrentHenkilo(henkiloMuutostietoRivi.getQueryHetu());
         currentHenkiloOptional.ifPresent(currentHenkilo -> {
+            log.info("Found henkilo {} for muutostietorivi {}", currentHenkilo.getOidHenkilo(), henkiloMuutostietoRivi.getId());
             Set<String> kaikkiHetut = getKaikkiHetut(currentHenkilo.getHetu());
+            log.info("Found {} hetus for henkilo {}", kaikkiHetut.size(), currentHenkilo.getOidHenkilo());
             Map<Tiedosto, List<HenkiloMuutostietoRivi>> kaikkiMuutostietoRivit = henkiloMuutostietoRepository
                     .findByQueryHetuInAndProcessTimestampIsNull(kaikkiHetut)
                     .stream()
@@ -160,6 +163,7 @@ public class MuutostietoHandleServiceImpl implements MuutostietoHandleService {
                     .forEach(this::updateProcessTimestamp);
         });
         if (!currentHenkiloOptional.isPresent()) {
+            log.info("Henkilo not found for muutostietorivi {} from oppijanumerorekisteri", henkiloMuutostietoRivi.getId());
             updateProcessTimestamp(henkiloMuutostietoRivi);
         }
     }
