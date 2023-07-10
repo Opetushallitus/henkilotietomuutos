@@ -116,9 +116,10 @@ public class MuutostietoServiceImpl implements MuutostietoService {
     public void updateMuutostietos() {
         try {
             List<String> unprocessedFileNames = this.henkiloMuutostietoRepository.findDistinctUnprocessedTiedostoFileName();
+            log.info("There are currently {} unprocessed files", unprocessedFileNames.size());
             Optional<String> firstFileToProcess = unprocessedFileNames.stream()
                     .min(this.fileService.byFileExtension().thenComparing(this.fileService.bySequentalNumbering()));
-
+            log.info("First file to process is {}", firstFileToProcess);
 
             firstFileToProcess.ifPresent(fileName ->
                     this.henkiloMuutostietoRepository
