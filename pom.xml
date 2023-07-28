@@ -214,7 +214,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>1.11.301</version>
+            <version>1.12.517</version>
         </dependency>
 
         <!-- DB / Domain -->
@@ -292,7 +292,7 @@
                             </goals>
                             <configuration>
                                 <target>
-                                    <echo message="writing target/public/classes/buildversion.txt" />
+                                    <echo message="writing target/public/classes/buildversion.txt"/>
                                     <echo file="target/classes/public/buildversion.txt">
                                         <![CDATA[artifactId=${project.artifactId}
 version=${project.version}
