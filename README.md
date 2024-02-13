@@ -1,4 +1,6 @@
-# Henkilotietomuutospalvelu
+# 💀 Henkilötietomuutospalvelu on korvattu VTJ-muutostietorajapintaratkaisulla [Oppijanumerorekisterissä](https://github.com/Opetushallitus/oppijanumerorekisteri/blob/master/oppijanumerorekisteri-service/src/main/java/fi/vm/sade/oppijanumerorekisteri/services/VtjMuutostietoService.java) 💀
+
+# Vanha dokumentaatio
 
 Henkilotietomuutospalvelu (HTMP) on ajastettu palvelu, joka:
 
